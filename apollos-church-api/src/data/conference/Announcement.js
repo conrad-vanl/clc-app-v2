@@ -51,6 +51,15 @@ export const resolver = {
     coverImage: ({ fields }) => fields.art,
     media: ({ fields }) => ({ uri: fields.mediaUrl }),
 
+    videos: ({ fields: { mediaUrl } }) => {
+      if (!mediaUrl) return [];
+      return [
+        {
+          sources: [{ uri: mediaUrl }],
+        },
+      ];
+    },
+
     sharing: () => ({}),
   },
 };
