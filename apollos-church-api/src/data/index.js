@@ -18,8 +18,8 @@ import {
   Followings,
   Interactions,
   RockConstants,
-  ContentItem,
-  ContentChannel,
+  // ContentItem,
+  // ContentChannel,
   Sharable,
   Auth,
   PersonalDevice,
@@ -30,8 +30,8 @@ import {
   BinaryFiles,
   Feature,
   FeatureFeed,
-  ActionAlgorithm,
-  Event,
+  // ActionAlgorithm,
+  // Event,
   PrayerRequest,
   Persona,
   Person,
@@ -39,15 +39,17 @@ import {
 
 import * as Theme from './theme';
 
+import * as Conference from './conference';
+import * as ActionAlgorithm from './ActionAlgorithms';
+
 // This module is used to attach Rock User updating to the OneSignal module.
 // This module includes a Resolver that overides a resolver defined in `OneSignal`
 import * as OneSignalWithRock from './oneSignalWithRock';
 
 const data = {
+  ...Conference,
   Interfaces,
   Followings,
-  ContentChannel,
-  ContentItem,
   BinaryFiles,
   Cloudinary,
   Auth,
@@ -71,7 +73,7 @@ const data = {
   Feature,
   FeatureFeed,
   ActionAlgorithm,
-  Event,
+  // Event,
   Cache,
   PrayerRequest,
   Persona,
