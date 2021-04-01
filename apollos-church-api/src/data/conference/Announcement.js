@@ -38,8 +38,8 @@ export const schema = gql`
 
 export const resolver = {
   Announcement: {
-    id: ({ sys }, args, context, { parentType }) =>
-      createGlobalId(sys.id, parentType.name),
+    id: ({ id, sys }, args, context, { parentType }) =>
+      createGlobalId(id || sys.id, parentType.name),
     title: ({ fields }, { hyphenated }, { dataSources }) =>
       hyphenated
         ? dataSources.ContentItem.createHyphenatedString({ text: fields.title })

@@ -4,10 +4,7 @@ import PropTypes from 'prop-types';
 
 import { ThemeMixin } from '@apollosproject/ui-kit';
 
-import {
-  InteractWhenLoadedConnected,
-  NodeSingleConnected,
-} from '@apollosproject/ui-connected';
+import { NodeSingleConnected } from '@apollosproject/ui-connected';
 
 import NavigationHeader from '../ui/NavigationHeader';
 
@@ -39,7 +36,6 @@ class NodeSingle extends PureComponent {
           colors: get(this.props, 'theme.colors'),
         }}
       >
-        <InteractWhenLoadedConnected nodeId={this.nodeId} action={'COMPLETE'} />
         <NodeSingleConnected nodeId={this.nodeId} />
       </ThemeMixin>
     );

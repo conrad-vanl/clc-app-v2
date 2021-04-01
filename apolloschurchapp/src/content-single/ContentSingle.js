@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 
 import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 import {
-  InteractWhenLoadedConnected,
   NodeSingleConnected,
   ThemeMixinConnected,
 } from '@apollosproject/ui-connected';
@@ -34,11 +33,6 @@ const ContentSingle = (props) => {
   );
   return (
     <ThemeMixinConnected nodeId={nodeId}>
-      <InteractWhenLoadedConnected
-        isLoading={loading}
-        nodeId={nodeId}
-        action={'COMPLETE'}
-      />
       <TrackEventWhenLoaded
         isLoading={loading}
         eventName={'View Content'}
