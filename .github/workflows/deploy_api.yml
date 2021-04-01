@@ -2,7 +2,7 @@ name: Deploy Api
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -24,8 +24,8 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.5.6
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "apollos-church-api"
-          heroku_email: "apps@apollos.app"
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
           appdir: apollos-church-api
 
       - name: Setup Node
