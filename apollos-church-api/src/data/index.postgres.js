@@ -18,8 +18,8 @@ import {
   Followings,
   Interactions,
   RockConstants,
-  ContentItem,
-  ContentChannel,
+  // ContentItem,
+  // ContentChannel,
   Sharable,
   Auth,
   PersonalDevice,
@@ -30,7 +30,7 @@ import {
   BinaryFiles,
   Feature,
   FeatureFeed,
-  ActionAlgorithm,
+  // ActionAlgorithm,
   Event,
   PrayerRequest,
   Persona,
@@ -47,6 +47,9 @@ import {
 
 import * as Theme from './theme';
 
+import * as Conference from './conference';
+import * as ActionAlgorithm from './ActionAlgorithms';
+
 // This module is used to attach Rock User updating to the OneSignal module.
 // This module includes a Resolver that overides a resolver defined in `OneSignal`
 import * as OneSignalWithRock from './oneSignalWithRock';
@@ -56,10 +59,11 @@ import * as OneSignalWithRock from './oneSignalWithRock';
 import * as Person from './rockWithPostgres';
 
 const data = {
+  ...Conference,
   Interfaces,
   Followings,
-  ContentChannel,
-  ContentItem,
+  // ContentChannel,
+  // ContentItem,
   RockPerson, // This entry needs to come before (postgres) Person
   BinaryFiles, // This entry needs to come before (postgres) Person
   PostgresPerson, // Postgres person for now, as we extend this dataSource in the 'rockWithPostgres' file
