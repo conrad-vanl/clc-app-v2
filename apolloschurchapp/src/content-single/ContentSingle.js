@@ -41,9 +41,7 @@ const ContentSingle = (props) => {
           itemId: nodeId,
         }}
       />
-      <PaddedNodeSingleConnected nodeId={nodeId}>
-        <ActionContainer itemId={nodeId} />
-      </PaddedNodeSingleConnected>
+      <PaddedNodeSingleConnected nodeId={nodeId}/>
     </ThemeMixinConnected>
   );
 };

@@ -44,33 +44,6 @@ function Onboarding({ navigation }) {
       <OnboardingSwiper>
         {({ swipeForward }) => (
           <>
-            <FeaturesConnected
-              onPressPrimary={swipeForward}
-              BackgroundComponent={
-                <ImageContainer>
-                  <StyledImage source={require('./img/personalize.jpg')} />
-                </ImageContainer>
-              }
-            />
-            <LocationFinderConnected
-              onPressPrimary={swipeForward}
-              onNavigate={() => {
-                navigation.navigate('Location');
-              }}
-              BackgroundComponent={
-                <ImageContainer>
-                  <StyledImage source={require('./img/locations.jpg')} />
-                </ImageContainer>
-              }
-            />
-            <FollowConnected
-              onPressPrimary={swipeForward}
-              BackgroundComponent={
-                <ImageContainer>
-                  <StyledImage source={require('./img/follow.jpg')} />
-                </ImageContainer>
-              }
-            />
             <Query query={WITH_USER_ID} fetchPolicy="network-only">
               {({ data }) => (
                 <AskNotificationsConnected
