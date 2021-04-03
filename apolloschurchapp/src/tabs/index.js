@@ -5,7 +5,7 @@ import { withTheme } from '@apollosproject/ui-kit';
 
 import Connect from './connect';
 import Home from './home';
-// import Discover from './discover';
+import Discover from './discover';
 import Schedule from './schedule';
 import tabBarIcon from './tabBarIcon';
 
@@ -22,6 +22,11 @@ const TabNavigator = (props) => (
       name="Schedule"
       component={Schedule}
       options={{ tabBarIcon: tabBarIcon('calendar') }}
+    />
+    <Screen
+      name="Tracks"
+      component={Discover}
+      options={{ tabBarIcon: tabBarIcon('sections') }}
     />
     <Screen
       name="Connect"

@@ -88,7 +88,7 @@ const data = {
   Group,
   Feature,
   FeatureFeed,
-  // ActionAlgorithm,
+  ActionAlgorithm,
   // Event,
   Cache,
   PrayerRequest,

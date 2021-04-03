@@ -182,7 +182,8 @@ HOME_FEATURES:
     type: VerticalCardList
 
 DISCOVER_FEATURES:
-
+  - algorithms: [TRACKS]
+    type: VerticalCardList
 
 # Default mapping of field types -> ids. There's probably no reason to edit this.
 ROCK_CONSTANTS:

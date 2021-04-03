@@ -38,7 +38,6 @@ const Discover = () => {
     <RockAuthedWebBrowser>
       {(openUrl) => (
         <BackgroundView>
-          <SafeAreaView edges={['right', 'top', 'left']}>
             <Query query={GET_DISCOVER_FEED}>
               {({ data }) => (
                 <FeaturesFeedConnected
@@ -49,7 +48,6 @@ const Discover = () => {
                 />
               )}
             </Query>
-          </SafeAreaView>
         </BackgroundView>
       )}
     </RockAuthedWebBrowser>

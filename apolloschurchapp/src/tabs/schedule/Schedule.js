@@ -17,7 +17,6 @@ import { TabBar, TabView } from 'react-native-tab-view';
 
 import moment from 'moment';
 
-import Day from './Day';
 import ScheduleItem from '../../ui/ScheduleItem';
 
 const getDays = gql`
