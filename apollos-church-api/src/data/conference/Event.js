@@ -7,8 +7,8 @@ export class dataSource extends ContentfulDataSource {}
 
 export const schema = gql`
   extend type Mutation {
-    likeNode(nodeId: ID!): Node
-    unlikeNode(nodeId: ID!): Node
+    likeNode(nodeId: ID!): Boolean
+    unlikeNode(nodeId: ID!): Boolean
   }
   type Event implements ContentItem & Node & ContentNode & Card & VideoNode & AudioNode & ContentChildNode & ContentParentNode {
     id: ID!
@@ -83,9 +83,13 @@ export const resolver = {
       UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
   },
   Mutation: {
-    likeNode: (root, args, { dataSources: { UserLike } }) =>
-      UserLike.likeNode({ ...args, operation: 'Like' }),
-    unlikeNode: (root, args, { dataSources: { UserLike } }) =>
-      UserLike.unlikeNode({ ...args, operation: 'Unlike' }),
+    likeNode: async (root, args, { dataSources: { UserLike, Person } }) => {
+      const personId = await Person.getCurrentPersonId();
+      return UserLike.likeNode({ ...args, personId, operation: 'Like' });
+    },
+    unlikeNode: async (root, args, { dataSources: { UserLike, Person } }) => {
+      const personId = await Person.getCurrentPersonId();
+      return UserLike.unlikeNode({ ...args, personId, operation: 'Unlike' });
+    },
   },
 };
