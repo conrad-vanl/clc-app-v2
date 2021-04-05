@@ -5,7 +5,7 @@ import ContentfulDataSource from './ContentfulDataSource';
 export class dataSource extends ContentfulDataSource {}
 
 export const schema = gql`
-  type Location implements Node & ContentNode & Card & ContentChildNode & ContentParentNode {
+  type Location implements ContentItem & Node & ContentNode & Card & ContentChildNode & ContentParentNode {
     id: ID!
     title(hyphenated: Boolean): String
     summary: String
@@ -29,6 +29,8 @@ export const schema = gql`
 
     publishDate: String
     images: [ImageMedia]
+    videos: [VideoMedia]
+    audios: [AudioMedia]
     theme: Theme
   }
 `;

@@ -41,6 +41,7 @@ import {
   Comment,
   UserFlag,
   Follow,
+  UserLike,
   Campus as PostgresCampus,
   Person as PostgresPerson,
 } from '@apollosproject/data-connector-postgres';
@@ -62,6 +63,7 @@ const data = {
   ...Conference,
   Interfaces,
   Followings,
+  UserLike,
   // ContentChannel,
   // ContentItem,
   RockPerson, // This entry needs to come before (postgres) Person

@@ -60,5 +60,6 @@ export const resolver = {
     startTime: ({ fields }) => fields.startTime,
     endTime: ({ fields }) => fields.endTime,
     coverImage: ({ fields }) => fields.art,
+    isLiked: () => false, // todo
   },
 };

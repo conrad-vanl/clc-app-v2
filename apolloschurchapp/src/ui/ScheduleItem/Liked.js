@@ -9,7 +9,7 @@ const query = gql`
   query getLikedContentItem($id: ID!) {
     node(id: $id) {
       id
-      ...on LikableNode {
+      ...on ContentItem {
         isLiked
       }
     }
@@ -27,9 +27,9 @@ const LikedIcon = compose(
   }))
 )((props) => <Icon name="like-solid" {...props} />);
 
-const Liked = ({ id }) => (
+const Liked = ({ id }) => console.log('Liked', id) || (
   <Query query={query} variables={{ id }}>
-    {({ data: { node = {} } = {} }) =>
+    {({ data: { node = {} } = {} }) => console.log({ node }) ||
       node && node.isLiked ? <LikedIcon /> : null
     }
   </Query>

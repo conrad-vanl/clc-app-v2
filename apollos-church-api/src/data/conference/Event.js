@@ -6,6 +6,10 @@ import ContentfulDataSource from './ContentfulDataSource';
 export class dataSource extends ContentfulDataSource {}
 
 export const schema = gql`
+  extend type Mutation {
+    likeNode(nodeId: ID!): Node
+    unlikeNode(nodeId: ID!): Node
+  }
   type Event implements ContentItem & Node & ContentNode & Card & VideoNode & AudioNode & ContentChildNode & ContentParentNode {
     id: ID!
     title(hyphenated: Boolean): String
@@ -75,5 +79,13 @@ export const resolver = {
     downloads: ({ fields }) => fields.downloads,
     coverImage: ({ fields }) => fields.art,
     label: ({ fields }) => fields.eventType,
+    isLiked: ({ sys }, args, { dataSources: { UserLike }}, { parentType }) => 
+      UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
+  },
+  Mutation: {
+    likeNode: (root, args, { dataSources: { UserLike } }) =>
+      UserLike.likeNode({ ...args, operation: 'Like' }),
+    unlikeNode: (root, args, { dataSources: { UserLike } }) =>
+      UserLike.unlikeNode({ ...args, operation: 'Unlike' }),
   },
 };
