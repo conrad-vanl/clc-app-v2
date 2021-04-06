@@ -30,8 +30,8 @@ platform :ios do
     )
     setup_ci
     match(type: 'appstore', readonly: true)
-    increment_build_number(build_number: number_of_commits, xcodeproj: "ios/apolloschurchapp.xcodeproj")
-    build_app(workspace: "ios/apolloschurchapp.xcworkspace", scheme: "apolloschurchappprod")
+    increment_build_number(build_number: number_of_commits, xcodeproj: "ios/CLC.xcodeproj")
+    build_app(workspace: "ios/CLC.xcworkspace", scheme: "CLCprod")
     changelog_from_git_commits
     upload_to_testflight
   end
