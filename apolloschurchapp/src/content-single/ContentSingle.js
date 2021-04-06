@@ -41,7 +41,7 @@ const ContentSingle = (props) => {
           itemId: nodeId,
         }}
       />
-      <PaddedNodeSingleConnected nodeId={nodeId}/>
+      <PaddedNodeSingleConnected nodeId={nodeId} />
     </ThemeMixinConnected>
   );
 };
