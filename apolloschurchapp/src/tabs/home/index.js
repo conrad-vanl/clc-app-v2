@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Query } from '@apollo/client/react/components';
 import { gql, useApolloClient } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import { styled, BackgroundView } from '@apollosproject/ui-kit';
 
 import {
   styled,
@@ -20,7 +19,6 @@ import {
 import { SearchButton } from '../../ui/Search';
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
 
-import { SearchButton } from '../../ui/Search';
 import { ONBOARDING_VERSION } from '../../ui/Onboarding';
 
 const LogoTitle = styled(({ theme }) => ({

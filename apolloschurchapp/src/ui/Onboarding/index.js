@@ -68,8 +68,9 @@ function Onboarding({ navigation, route }) {
             }}
           >
             {({ swipeForward }) => (
-              <>
+              [
                 <AskNotificationsConnected
+                  key={'AskNotifications'}
                   onPressPrimary={swipeForward}
                   onRequestPushPermissions={(update) => {
                     checkNotifications().then((checkRes) => {
@@ -91,8 +92,8 @@ function Onboarding({ navigation, route }) {
                       />
                     </ImageContainer>
                   }
-                />
-              </>
+                />,
+              ]
             )}
           </OnboardingSwiper>
         </>

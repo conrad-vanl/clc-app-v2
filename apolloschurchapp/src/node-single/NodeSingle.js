@@ -7,6 +7,7 @@ import { ThemeMixin } from '@apollosproject/ui-kit';
 import { NodeSingleConnected } from '@apollosproject/ui-connected';
 
 import NavigationHeader from '../ui/NavigationHeader';
+import NodeSingleInner from '../NodeSingleInner';
 
 class NodeSingle extends PureComponent {
   static propTypes = {
@@ -36,7 +37,7 @@ class NodeSingle extends PureComponent {
           colors: get(this.props, 'theme.colors'),
         }}
       >
-        <NodeSingleConnected nodeId={this.nodeId} />
+        <NodeSingleConnected nodeId={this.nodeId} Component={NodeSingleInner} />
       </ThemeMixin>
     );
   }
