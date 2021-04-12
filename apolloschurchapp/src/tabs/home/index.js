@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import gql from 'graphql-tag';
 import { Query } from '@apollo/client/react/components';
+import { gql, useApolloClient } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-
 import { styled, BackgroundView } from '@apollosproject/ui-kit';
+
+import {
+  styled,
+  BackgroundView,
+  NavigationService,
+} from '@apollosproject/ui-kit';
 import {
   FeaturesFeedConnected,
   FEATURE_FEED_ACTION_MAP,
@@ -13,6 +18,10 @@ import {
 } from '@apollosproject/ui-connected';
 
 import { SearchButton } from '../../ui/Search';
+import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
+
+import { SearchButton } from '../../ui/Search';
+import { ONBOARDING_VERSION } from '../../ui/Onboarding';
 
 const LogoTitle = styled(({ theme }) => ({
   height: theme.sizing.baseUnit,
@@ -43,6 +52,17 @@ export const GET_HOME_FEED = gql`
 
 const Home = () => {
   const navigation = useNavigation();
+  const client = useApolloClient();
+
+  useEffect(() => {
+    checkOnboardingStatusAndNavigate({
+      client,
+      navigation: NavigationService,
+      latestOnboardingVersion: ONBOARDING_VERSION,
+      navigateHome: false,
+    });
+  }, []);
+
   return (
     <RockAuthedWebBrowser>
       {(openUrl) => (
