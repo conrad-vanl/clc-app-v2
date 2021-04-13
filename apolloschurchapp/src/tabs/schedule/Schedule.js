@@ -71,10 +71,12 @@ const SectionHeader = styled(({ theme }) => ({
 const Schedule = ({ navigation }) => {
   const { loading, error, refetch, data } = useQuery(getDays, { fetchPolicy: 'cache-and-network' });
 
-  const sections = useMemo(() => data?.conference?.days.map((day) => ({
-    title: day?.title,
-    data: day?.childContentItemsConnection?.edges.map(({ node }) => node),
-  })), [data?.conference?.days]);
+  const sections = useMemo(() => (data?.conference?.days || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date))
+    .map((day) => ({
+      title: day?.title,
+      data: day?.childContentItemsConnection?.edges.map(({ node }) => node),
+    })
+  ), [data?.conference?.days]);
 
   const renderItem = useMemo(() => ({ item }) => (
     <ScheduleItem

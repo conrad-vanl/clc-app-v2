@@ -27,9 +27,9 @@ const LikedIcon = compose(
   }))
 )((props) => <Icon name="like-solid" {...props} />);
 
-const Liked = ({ id }) => console.log('Liked', id) || (
+const Liked = ({ id }) => (
   <Query query={query} variables={{ id }}>
-    {({ data: { node = {} } = {} }) => console.log({ node }) ||
+    {({ data: { node = {} } = {} }) => 
       node && node.isLiked ? <LikedIcon /> : null
     }
   </Query>
