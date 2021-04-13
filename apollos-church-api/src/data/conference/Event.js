@@ -10,6 +10,12 @@ export const schema = gql`
     register(nodeId: ID!): Event
     unregister(nodeId: ID!): Event
   }
+  extend type Query {
+    myScheduleFeed: FeatureFeed
+  }
+  type Registration {
+    node: Event
+  }
   type Event implements ContentItem & Node & ContentNode & Card & VideoNode & AudioNode & ContentChildNode & ContentParentNode {
     id: ID!
     title(hyphenated: Boolean): String
@@ -57,7 +63,7 @@ export const resolver = {
     summary: (node, args, { dataSources }) =>
       dataSources.ContentItem.createSummary(node),
     htmlContent: ({ fields }) =>
-      fields.description ? marked(fields.description) : null,
+      fields.description ? marked(fields.description) : '',
     speakers: ({ fields }) => fields.speakers,
     location: ({ fields }) => fields.location,
     startTime: async ({ fields, sys }, args, { dataSources }) => {
@@ -93,6 +99,16 @@ export const resolver = {
     registered: ({ sys }, { nodeId }, { dataSources: { UserLike } }, { parentType }) => (
       UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } })
     ),
+  },
+  Query: {
+    myScheduleFeed: (root, args, { dataSources: { FeatureFeed } }) =>
+      FeatureFeed.getFeed({
+        type: 'apollosConfig',
+        args: { section: 'SCHEDULE_FEATURES' },
+      }),
+  },
+  Registration: {
+    node: async ({ nodeId }, args, { dataSources: { Event } }) => Event.getFromId(nodeId),
   },
   Mutation: {
     register: async (root, args, { dataSources: { Event, UserLike, Person } }) => {

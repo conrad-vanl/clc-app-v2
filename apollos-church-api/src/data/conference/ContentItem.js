@@ -80,7 +80,7 @@ export const resolver = {
   },
   ContentItemsConnection: {
     edges: (items) =>
-      items.map((node) => ({
+      (items?.edges || items).map((node) => ({
         node,
         cursor: null,
       })),

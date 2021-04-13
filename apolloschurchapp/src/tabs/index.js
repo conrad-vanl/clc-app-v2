@@ -7,6 +7,7 @@ import Connect from './connect';
 import Home from './home';
 import Discover from './discover';
 import Schedule from './schedule';
+import MySchedule from './my-schedule';
 import tabBarIcon from './tabBarIcon';
 
 const { Navigator, Screen } = createBottomTabNavigator();

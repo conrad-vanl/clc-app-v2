@@ -43,7 +43,7 @@ export const resolver = {
     summary: (node, args, { dataSources }) =>
       dataSources.ContentItem.createSummary(node),
     htmlContent: ({ fields }) =>
-      fields.description ? marked(fields.description) : null,
+      fields.description ? marked(fields.description) : '',
     childContentItemsConnection: ({ fields }) => fields.scheduleItems,
     coverImage: ({ fields }) => fields.art,
   },

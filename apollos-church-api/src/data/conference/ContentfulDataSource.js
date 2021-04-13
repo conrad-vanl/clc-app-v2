@@ -25,6 +25,12 @@ class ContentfulDataSource extends RESTDataSource {
       throw new Error(`Entry with contentful ID ${id} could not be found.`);
     return result[0];
   };
+
+  getFromIds = (ids) => {
+    return {
+      get: () => Promise.all(ids.map((id) => this.getFromId(id)))
+    };
+  }
 }
 
 export default ContentfulDataSource;

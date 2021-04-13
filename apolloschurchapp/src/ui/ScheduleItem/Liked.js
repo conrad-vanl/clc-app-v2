@@ -25,7 +25,7 @@ const LikedIcon = compose(
     size: theme.sizing.baseUnit,
     fill: theme.colors.secondary,
   }))
-)((props) => <Icon name="like-solid" {...props} />);
+)((props) => <Icon name="circle-outline-check-mark" {...props} />);
 
 const Liked = ({ id }) => (
   <Query query={query} variables={{ id }}>

@@ -186,6 +186,10 @@ DISCOVER_FEATURES:
   - algorithms: [TRACKS]
     type: VerticalCardList
 
+SCHEDULE_FEATURES:
+  - algorithms: [REGISTRATIONS]
+    type: ActionList
+
 # Default mapping of field types -> ids. There's probably no reason to edit this.
 ROCK_CONSTANTS:
   TEXT: 1
