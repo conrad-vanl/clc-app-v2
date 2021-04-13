@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { createGlobalId } from '@apollosproject/server-core';
+import { parseGlobalId, createGlobalId } from '@apollosproject/server-core';
 import marked from 'marked';
 import ContentfulDataSource from './ContentfulDataSource';
 
@@ -7,8 +7,8 @@ export class dataSource extends ContentfulDataSource {}
 
 export const schema = gql`
   extend type Mutation {
-    likeNode(nodeId: ID!): Boolean
-    unlikeNode(nodeId: ID!): Boolean
+    register(nodeId: ID!): Event
+    unregister(nodeId: ID!): Event
   }
   type Event implements ContentItem & Node & ContentNode & Card & VideoNode & AudioNode & ContentChildNode & ContentParentNode {
     id: ID!
@@ -42,6 +42,10 @@ export const schema = gql`
     videos: [VideoMedia]
     audios: [AudioMedia]
     theme: Theme
+
+    capacity: Int
+    registered: Int
+    isRegistered: Boolean
   }
 `;
 
@@ -81,15 +85,25 @@ export const resolver = {
     label: ({ fields }) => fields.eventType,
     isLiked: ({ sys }, args, { dataSources: { UserLike }}, { parentType }) => 
       UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
+
+    isRegistered: ({ sys }, args, { dataSources: { UserLike }}, { parentType }) => 
+      UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
+    
+    capacity: ({ fields }) => fields.capacity,
+    registered: ({ sys }, { nodeId }, { dataSources: { UserLike } }, { parentType }) => (
+      UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } })
+    ),
   },
   Mutation: {
-    likeNode: async (root, args, { dataSources: { UserLike, Person } }) => {
+    register: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
       const personId = await Person.getCurrentPersonId();
-      return UserLike.likeNode({ ...args, personId, operation: 'Like' });
+      await UserLike.likeNode({ ...args, personId });
+      return Event.getFromId(parseGlobalId(args.nodeId).id)
     },
-    unlikeNode: async (root, args, { dataSources: { UserLike, Person } }) => {
+    unregister: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
       const personId = await Person.getCurrentPersonId();
-      return UserLike.unlikeNode({ ...args, personId, operation: 'Unlike' });
+      await UserLike.unlikeNode({ ...args, personId });
+      return Event.getFromId(parseGlobalId(args.nodeId).id)
     },
   },
 };

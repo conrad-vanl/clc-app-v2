@@ -15,6 +15,8 @@ import Speakers from './Speakers';
 import Time from './Time';
 import ChildContentFeed from './ChildContentFeed';
 
+import ActionContainer from './ActionContainer';
+
 const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
   <View {...props}>
     <ContentNodeConnected
@@ -35,6 +37,8 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
     <ContentChildFeedConnected nodeId={nodeId} />
     */}
     <ChildContentFeed contentId={nodeId} />
+
+    <ActionContainer contentId={nodeId} />
   </View>
 );
 

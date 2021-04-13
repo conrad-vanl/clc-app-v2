@@ -58,7 +58,7 @@ const ThemedNavigator = withTheme(({ theme, ...props }) => ({
       ...Platform.select(theme.shadows.default),
     },
     headerShown: false,
-    stackPresentation: 'modal',
+    // stackPresentation: 'modal',
   },
 }))(Navigator);
 
