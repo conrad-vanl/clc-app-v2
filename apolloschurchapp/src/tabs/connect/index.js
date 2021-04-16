@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
-import { withTheme } from '@apollosproject/ui-kit';
+import { withTheme, Touchable, Icon } from '@apollosproject/ui-kit';
 import { LikedContentFeedConnected } from '@apollosproject/ui-connected';
 
 import UserSettings from '../../user-settings';
@@ -12,12 +13,23 @@ import Connect from './Connect';
 
 const { Screen, Navigator } = createNativeStackNavigator();
 
+const SettingsButton = () => {
+  const navigation = useNavigation();
+  return (
+    <Touchable onPress={() => {
+      navigation.navigate('UserSettings');
+    }}>
+      <Icon name="settings" size={24} />
+    </Touchable>
+  );
+};
+
 const ConnectNavigator = (props) => (
   <Navigator {...props}>
     <Screen
       component={Connect}
       name="Connect"
-      options={{ headerShown: false }}
+      options={{ headerRight: SettingsButton }}
     />
     <Screen
       component={TestingControlPanel}

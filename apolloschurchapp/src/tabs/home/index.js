@@ -22,8 +22,8 @@ import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding'
 import { ONBOARDING_VERSION } from '../../ui/Onboarding';
 
 const LogoTitle = styled(({ theme }) => ({
-  height: theme.sizing.baseUnit,
-  margin: theme.sizing.baseUnit,
+  height: theme.sizing.baseUnit * 2,
+  margin: theme.sizing.baseUnit / 2,
   alignSelf: 'center',
   resizeMode: 'contain',
 }))(Image);
@@ -76,9 +76,6 @@ const Home = () => {
                   ListHeaderComponent={
                     <>
                       <LogoTitle source={require('./wordmark.png')} />
-                      <SearchButton
-                        onPress={() => navigation.navigate('Search')}
-                      />
                     </>
                   }
                 />

@@ -38,8 +38,6 @@ class UserSettings extends PureComponent {
           return (
             <BackgroundView>
               <ScrollView>
-                <UserAvatarUpdate />
-
                 <RockAuthedWebBrowser>
                   {(openUrl) => (
                     <>
@@ -57,57 +55,11 @@ class UserSettings extends PureComponent {
                         <Divider />
                         <Touchable
                           onPress={() => {
-                            this.props.navigation.navigate('Location');
-                          }}
-                        >
-                          <Cell>
-                            <CellText>Location</CellText>
-                            <CellIcon name="arrow-next" />
-                          </Cell>
-                        </Touchable>
-                        <Divider />
-                        <Touchable
-                          onPress={() => {
                             this.props.navigation.navigate('ChangePassword');
                           }}
                         >
                           <Cell>
                             <CellText>Change Password</CellText>
-                            <CellIcon name="arrow-next" />
-                          </Cell>
-                        </Touchable>
-                      </TableView>
-                      <TableView>
-                        <Touchable
-                          onPress={() =>
-                            openUrl('https://apollosrock.newspring.cc/')
-                          }
-                        >
-                          <Cell>
-                            <CellText>Give Feedback</CellText>
-                            <CellIcon name="arrow-next" />
-                          </Cell>
-                        </Touchable>
-                      </TableView>
-                      <TableView>
-                        <Touchable
-                          onPress={() =>
-                            openUrl('https://apollosrock.newspring.cc/')
-                          }
-                        >
-                          <Cell>
-                            <CellText>Privacy Policy</CellText>
-                            <CellIcon name="arrow-next" />
-                          </Cell>
-                        </Touchable>
-                        <Divider />
-                        <Touchable
-                          onPress={() =>
-                            openUrl('https://apollosrock.newspring.cc/')
-                          }
-                        >
-                          <Cell>
-                            <CellText>Terms of Use</CellText>
                             <CellIcon name="arrow-next" />
                           </Cell>
                         </Touchable>

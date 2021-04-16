@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { Image } from 'react-native';
+
 import {
   styled,
   withTheme,
@@ -19,13 +21,14 @@ const Content = styled({
 })(PaddedView);
 
 const BrandIcon = withTheme(({ theme, color }) => ({
-  name: 'brand-icon',
-  size: theme.sizing.baseUnit * 3,
-  ...(color ? { fill: color } : {}),
+  source: require('./img/logo-orange.jpg'),
   style: {
     marginBottom: theme.sizing.baseUnit,
+    width: theme.sizing.baseUnit * 3,
+    height: theme.sizing.baseUnit * 3,
+    aspectRatio: 1,
   },
-}))(Icon);
+}))(Image);
 
 const Title = styled(({ theme, color }) => ({
   marginBottom: theme.sizing.baseUnit,
@@ -74,9 +77,9 @@ LandingScreen.propTypes = {
 };
 
 LandingScreen.defaultProps = {
-  slideTitle: "We're glad you're here.",
+  slideTitle: "Meet the Church Leaders Conference App",
   description:
-    "We're not just a building you go to, but a family to belong to.",
+    "Your go-to resource for schedules, maps, news and of course - Farkle.",
 };
 
 LandingScreen.navigationOptions = {

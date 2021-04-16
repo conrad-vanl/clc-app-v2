@@ -71,6 +71,9 @@ function Onboarding({ navigation, route }) {
               [
                 <AskNotificationsConnected
                   key={'AskNotifications'}
+                  BackgroundComponent={ImageContainer}
+                  slideTitle={'Don\'t miss a thing'}
+                  description={"Stay up to date on announcements, schedule reminders, and things you won’t want to miss."}
                   onPressPrimary={swipeForward}
                   onRequestPushPermissions={(update) => {
                     checkNotifications().then((checkRes) => {
@@ -85,13 +88,6 @@ function Onboarding({ navigation, route }) {
                       }
                     });
                   }}
-                  BackgroundComponent={
-                    <ImageContainer>
-                      <StyledImage
-                        source={require('./img/notifications.jpg')}
-                      />
-                    </ImageContainer>
-                  }
                 />,
               ]
             )}

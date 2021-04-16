@@ -16,7 +16,7 @@ import {
 } from '@apollosproject/ui-kit';
 import Passes from '@apollosproject/ui-passes';
 import { MapViewConnected as Location } from '@apollosproject/ui-mapview';
-import Auth, { ProtectedRoute } from '@apollosproject/ui-auth';
+import { ProtectedRoute } from '@apollosproject/ui-auth';
 
 import Providers from './Providers';
 import ContentSingle from './content-single';
@@ -26,6 +26,7 @@ import Tabs from './tabs';
 import LandingScreen from './ui/LandingScreen';
 import Onboarding from './ui/Onboarding';
 import Search from './ui/Search';
+import Auth from './auth';
 
 enableScreens(); // improves performance for react-navigation
 
