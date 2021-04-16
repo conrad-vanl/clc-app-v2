@@ -187,8 +187,13 @@ DISCOVER_FEATURES:
     type: VerticalCardList
 
 SCHEDULE_FEATURES:
+  - algorithms: [UPNEXT]
+    subtitle: Up Next
+    title: For you
+    type: VerticalCardList
   - algorithms: [REGISTRATIONS]
-    type: ActionList
+    title: Your Registered Events
+    type: VerticalCardList
 
 # Default mapping of field types -> ids. There's probably no reason to edit this.
 ROCK_CONSTANTS:

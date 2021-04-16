@@ -3,7 +3,28 @@ import { parseGlobalId, createGlobalId } from '@apollosproject/server-core';
 import marked from 'marked';
 import ContentfulDataSource from './ContentfulDataSource';
 
-export class dataSource extends ContentfulDataSource {}
+export class dataSource extends ContentfulDataSource {
+  getStartTime = async ({ fields, sys }) => {
+    if (fields.startTime) return fields.startTime;
+    // a little contrived...
+    try {
+      const breakout = await this.context.dataSources.Breakouts.getFromEvent(sys.id);
+      return breakout.fields.startTime;
+    } catch (e) {
+      return null;
+    }
+  }
+  getEndTime = async ({ fields, sys }) => {
+    if (fields.endTime) return fields.endTime;
+      // a little contrived...
+      try {
+        const breakout = await this.context.dataSources.Breakouts.getFromEvent(sys.id);
+        return breakout.fields.endTime;
+      } catch (e) {
+        return null;
+      }
+  }
+}
 
 export const schema = gql`
   extend type Mutation {
@@ -66,26 +87,10 @@ export const resolver = {
       fields.description ? marked(fields.description) : '',
     speakers: ({ fields }) => fields.speakers,
     location: ({ fields }) => fields.location,
-    startTime: async ({ fields, sys }, args, { dataSources }) => {
-      if (fields.startTime) return fields.startTime;
-      // a little contrived...
-      try {
-        const breakout = await dataSources.Breakouts.getFromEvent(sys.id);
-        return breakout.fields.startTime;
-      } catch (e) {
-        return null;
-      }
-    },
-    endTime: async ({ fields, sys }, args, { dataSources }) => {
-      if (fields.endTime) return fields.endTime;
-      // a little contrived...
-      try {
-        const breakout = await dataSources.Breakouts.getFromEvent(sys.id);
-        return breakout.fields.endTime;
-      } catch (e) {
-        return null;
-      }
-    },
+    startTime: async (item, args, { dataSources }) =>
+      dataSources.Event.getStartTime(item),
+    endTime: async (item, args, { dataSources }) =>
+      dataSources.Event.getEndTime(item),
     downloads: ({ fields }) => fields.downloads,
     coverImage: ({ fields }) => fields.art,
     label: ({ fields }) => fields.eventType,

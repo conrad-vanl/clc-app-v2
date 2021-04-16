@@ -25,6 +25,11 @@ const TabNavigator = (props) => (
       options={{ tabBarIcon: tabBarIcon('calendar') }}
     />
     <Screen
+      name="My CLC"
+      component={MySchedule}
+      options={{ tabBarIcon: tabBarIcon('circle-outline-check-mark') }}
+    />
+    <Screen
       name="Tracks"
       component={Discover}
       options={{ tabBarIcon: tabBarIcon('sections') }}

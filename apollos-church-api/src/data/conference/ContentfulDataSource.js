@@ -27,8 +27,18 @@ class ContentfulDataSource extends RESTDataSource {
   };
 
   getFromIds = (ids) => {
+    const get = async () => {
+      const items = await Promise.all(ids.map(async (id) => {
+        let item = null;
+        try {
+          item = await this.getFromId(id);
+        } catch(e) {}
+        return item;
+      }));
+      return items.filter((item) => !!item);
+    };
     return {
-      get: () => Promise.all(ids.map((id) => this.getFromId(id)))
+      get,
     };
   }
 }

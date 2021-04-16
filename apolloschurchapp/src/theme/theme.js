@@ -1,3 +1,6 @@
+import React from 'react';
+import { HighlightCard } from '@apollosproject/ui-kit';
+
 // import styleOverrides from './styleOverrides';
 // import propOverrides from './propOverrides';
 
@@ -62,4 +65,9 @@ const colors = {
 
 export default {
   colors,
+  overrides: {
+    'ui-connected.ContentCardConnected.ContentCardComponentMapper': (props) => ({
+      labelText: props.startTime ? props.startTime : null,
+    }),
+  },
 };

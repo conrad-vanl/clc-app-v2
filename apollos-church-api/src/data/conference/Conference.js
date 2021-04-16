@@ -29,7 +29,7 @@ export const schema = gql`
     announcements: ContentItemsConnection @cacheControl(maxAge: 900)
     tracks: [ConferenceTrack] @cacheControl(maxAge: 1800)
     maps: [Location] @cacheControl(maxAge: 1800)
-    upNext(likedIds: [ID]): ContentItem @cacheControl(maxAge: 300)
+    upNext: ContentItem @cacheControl(maxAge: 300)
     resources: [Resource] @cacheControl(maxAge: 1800)
   }
 
@@ -81,8 +81,16 @@ export const resolver = {
     tracks: ({ fields }) => fields.tracks,
     maps: ({ fields }) => fields.maps,
     resources: ({ fields }) => fields.resources,
-    upNext: ({ fields }, { likedIds = [] }) => {
+    upNext: async ({ fields }, args, { dataSources: { UserLike, Person } }) => {
       const currentTime = moment();
+      const personId = await Person.getCurrentPersonId();
+      const likes = await UserLike.model.findAll({
+        where: {
+          nodeType: 'Event',
+          personId,
+        },
+      });
+      const likedIds = likes?.map((like) => like.nodeId);
 
       // find the current day:
       let { days = [] } = fields;
@@ -107,7 +115,7 @@ export const resolver = {
             startTimeToBeBefore = halfwayOverTime;
           }
 
-          if (upNext && likedIds.includes(upNext.id)) {
+          if (upNext && likedIds.includes(upNext.sys.id)) {
             return true;
           }
 
@@ -116,11 +124,10 @@ export const resolver = {
       );
 
       if (likedIds) {
-        const parsedLikedIds = likedIds.map((id) => parseGlobalId(id).id);
         const childNodes = upNext.fields.breakouts || [];
         if (childNodes.length) {
           childNodes.find((node) => {
-            if (parsedLikedIds.includes(node.sys.id)) {
+            if (likedIds.includes(node.sys.id)) {
               upNext = node;
               return true;
             }

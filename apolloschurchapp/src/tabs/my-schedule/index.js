@@ -11,7 +11,7 @@ const FeedNavigator = (props) => (
   <Navigator initialRouteName="Feed" {...props}>
     <Screen
       component={Feed}
-      name="Feed"
+      name="My CLC"
     />
   </Navigator>
 );
