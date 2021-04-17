@@ -91,10 +91,16 @@ class ActionAlgorithm extends core.dataSource {
       }
     }
 
+    const startTime = await Event.getStartTime(upNext);
+    let subtitle = null;
+    if (startTime) {
+      subtitle = moment(startTime).format('ddd h:mma');
+    }
+
     return [{
       id: `${upNext.id}0`,
       title: upNext.fields.title,
-      subtitle: null,
+      subtitle,
       relatedNode: { ...upNext, __type: 'Event' },
       image: ContentItem.getCoverImage(upNext),
       action: 'READ_CONTENT',
@@ -112,17 +118,28 @@ class ActionAlgorithm extends core.dataSource {
       },
     });
 
-    const items = await Event.getFromIds(registrations.map(item => item.nodeId)).get();
+    let items = await Event.getFromIds(registrations.map(item => item.nodeId)).get();
+    items = await Promise.all(items.map(async (item) => ({
+      ...item,
+      startTime: await Event.getStartTime(item),
+    })));
+    items = items.sort((a, b) => moment(a.startTime) - moment(b.startTime));
 
-    return items.map((item, i) => ({
-      id: `${item.id}${i}`,
-      title: item.fields.title,
-      labelText: Event.getStartTime(item),
-      relatedNode: { ...item, __type: 'Event' },
-      image: ContentItem.getCoverImage(item),
-      action: 'READ_CONTENT',
-      summary: ContentItem.createSummary(item),
-    }));
+    return items.map(async (item, i) => {
+      let subtitle = null;
+      if (item.startTime) {
+        subtitle = moment(item.startTime).format('ddd h:mma');
+      }
+      return {
+        id: `${item.id}${i}`,
+        title: item.fields.title,
+        subtitle,
+        relatedNode: { ...item, __type: 'Event' },
+        image: ContentItem.getCoverImage(item),
+        action: 'READ_CONTENT',
+        summary: ContentItem.createSummary(item),
+      };
+    });
   }
 
   async userFeedAlgorithm({ limit = 20 } = {}) {

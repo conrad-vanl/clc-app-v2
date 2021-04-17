@@ -13,12 +13,15 @@ import {
 import Location from './Location';
 import Speakers from './Speakers';
 import Time from './Time';
+import Downloads from './Downloads';
+import Spacer from './Spacer';
 import ChildContentFeed from './ChildContentFeed';
 
 import ActionContainer from './ActionContainer';
 
 const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
   <View {...props}>
+    <Spacer nodeId={nodeId} />
     <ContentNodeConnected
       ImageWrapperComponent={ImageWrapperComponent}
       nodeId={nodeId}
@@ -32,6 +35,7 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
     <Time contentId={nodeId} />
     <Location contentId={nodeId} />
     <Speakers contentId={nodeId} />
+    <Downloads contentId={nodeId} />
     {/*
     <ContentParentFeedConnected nodeId={nodeId} />
     <ContentChildFeedConnected nodeId={nodeId} />
@@ -39,6 +43,8 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
     <ChildContentFeed contentId={nodeId} />
 
     <ActionContainer contentId={nodeId} />
+
+    <View style={{ height: 200 }} />
   </View>
 );
 

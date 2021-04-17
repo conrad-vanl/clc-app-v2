@@ -1,5 +1,5 @@
 import React from 'react';
-import { HighlightCard } from '@apollosproject/ui-kit';
+import Card from '../ui/Card';
 
 // import styleOverrides from './styleOverrides';
 // import propOverrides from './propOverrides';
@@ -66,8 +66,11 @@ const colors = {
 export default {
   colors,
   overrides: {
-    'ui-connected.ContentCardConnected.ContentCardComponentMapper': (props) => ({
-      labelText: props.startTime ? props.startTime : null,
+    'ui-connected.ContentCardConnected.ContentCardComponentMapper': () => () => ({
+      Component: Card,
+    }),
+    'ui-kit.ConnectedImage.enhanced': ({ colors }) => () => ({
+      backgroundColor: colors.background.screen,
     }),
   },
 };

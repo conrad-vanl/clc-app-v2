@@ -63,9 +63,9 @@ export const resolver = {
     },
   },
   ContentfulAsset: {
-    name: ({ fields }) => fields.name,
+    name: ({ fields }) => fields.title,
     description: ({ fields }) => fields.description,
-    key: ({ fields }) => fields.name,
+    key: ({ fields }) => fields.file.fileName,
     sources: ({ fields }) => [fields.file],
   },
   ContentfulMediaSource: {
