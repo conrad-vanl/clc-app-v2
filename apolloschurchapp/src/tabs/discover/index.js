@@ -18,14 +18,14 @@ const DiscoverNavigator = (props) => (
 const EnhancedDiscover = withTheme(({ theme, ...props }) => ({
   ...props,
   screenOptions: {
-    headerTintColor: theme.colors.action.secondary,
-    headerTitleStyle: {
-      color: theme.colors.text.primary,
-    },
-    headerStyle: {
-      backgroundColor: theme.colors.background.screen,
-      ...Platform.select(theme.shadows.default),
-    },
+    // headerTintColor: theme.colors.action.secondary,
+    // headerTitleStyle: {
+    //   color: theme.colors.text.primary,
+    // },
+    // headerStyle: {
+    //   backgroundColor: theme.colors.background.screen,
+    //   ...Platform.select(theme.shadows.default),
+    // },
     headerLargeTitle: true,
   },
 }))(DiscoverNavigator);

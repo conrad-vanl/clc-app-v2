@@ -45,12 +45,19 @@ const HorizontalContentFeed = ({ contentId }) => {
     []
   ).map((edge) => edge.node);
 
-  const content = childContent;
+  let content = childContent;
+  if (loading && !content.length && contentId.includes('Breakout')) {
+    content = [
+      { isLoading: true },
+      { isLoading: true },
+      { isLoading: true },
+    ];
+  }
 
-  return (content && content.length) || loading ? (
+  return (content && content.length) || (loading && contentId.includes('Breakout')) ? (
     <React.Fragment>
       <PaddedView vertical={false}>
-        <H4 padded isLoading={(!content || !content.length) && loading}>
+        <H4 padded>
           Sessions
         </H4>
       </PaddedView>

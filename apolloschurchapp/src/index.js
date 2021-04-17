@@ -3,7 +3,7 @@
 import hoistNonReactStatic from 'hoist-non-react-statics';
 import React from 'react';
 import { StatusBar, Platform } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import SplashScreen from 'react-native-splash-screen';
 import 'react-native-gesture-handler'; // required for react-navigation
@@ -50,25 +50,50 @@ const { Navigator, Screen } = createNativeStackNavigator();
 const ThemedNavigator = withTheme(({ theme, ...props }) => ({
   ...props,
   screenOptions: {
-    headerTintColor: theme.colors.action.secondary,
-    headerTitleStyle: {
-      color: theme.colors.text.primary,
-    },
-    headerStyle: {
-      backgroundColor: theme.colors.background.paper,
-      ...Platform.select(theme.shadows.default),
-    },
+    // headerTintColor: theme.colors.action.secondary,
+    // headerTitleStyle: {
+    //   color: theme.colors.text.primary,
+    // },
+    // headerStyle: {
+    //   backgroundColor: theme.colors.background.paper,
+    //   ...Platform.select(theme.shadows.default),
+    // },
     headerShown: false,
-    // stackPresentation: 'modal',
+    stackPresentation: 'fullScreenModal',
   },
 }))(Navigator);
+
+const ThemedNavigationContainer = withTheme(({ theme, ...props }) => ({
+  theme: {
+    ...(theme.type === 'dark' ? DarkTheme : DefaultTheme),
+    dark: theme.type === 'dark',
+    colors: {
+      ...(theme.type === 'dark' ? DarkTheme.colors : DefaultTheme.colors),
+      primary: theme.colors.secondary,
+      background: theme.colors.background.screen,
+      card: theme.colors.background.paper,
+      text: theme.colors.text.primary,
+    },
+  },
+  ...props,
+}))(NavigationContainer); 
+
+/*
+dark (boolean): Whether this is a dark theme or a light theme
+colors (object): Various colors used by react navigation components:
+primary (string): The primary color of the app used to tint various elements. Usually you'll want to use your brand color for this.
+background (string): The color of various backgrounds, such as background color for the screens.
+card (string): The background color of card-like elements, such as headers, tab bars etc.
+text (string): The text color of various elements.
+border (string): The color of borders, e.g. header border, tab bar border etc.
+notification (string): The color of Tab Navigator badge.
+*/
 
 const App = (props) => (
   <Providers>
     <BackgroundView>
       <AppStatusBar />
-      <NavigationContainer
-        ref={NavigationService.setTopLevelNavigator}
+      <ThemedNavigationContainer
         onReady={NavigationService.setIsReady}
       >
         <ThemedNavigator initialRouteName="ProtectedRoute" {...props}>
@@ -123,7 +148,7 @@ const App = (props) => (
           />
           <Screen component={Search} name="Search" />
         </ThemedNavigator>
-      </NavigationContainer>
+      </ThemedNavigationContainer>
     </BackgroundView>
   </Providers>
 );

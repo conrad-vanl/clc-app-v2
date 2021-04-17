@@ -28,7 +28,7 @@ const query = gql`
 const Spacer = ({ nodeId }) => {
   const { loading, data } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { itemId: nodeId }});
   if (data?.node?.coverImage || data?.node?.videos) return null;
-  return (<View style={{ height: 88 }} />);
+  return (<View style={{ height: 60 }} />);
 }
 
 export default Spacer;

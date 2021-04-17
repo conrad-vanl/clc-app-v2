@@ -65,13 +65,13 @@ const ConnectNavigator = (props) => (
 const EnhancedConnect = withTheme(({ theme, ...props }) => ({
   ...props,
   screenOptions: {
-    headerTintColor: theme.colors.action.secondary,
-    headerTitleStyle: {
-      color: theme.colors.text.primary,
-    },
-    headerStyle: {
-      backgroundColor: theme.colors.background.paper,
-    },
+    // headerTintColor: theme.colors.action.secondary,
+    // headerTitleStyle: {
+    //   color: theme.colors.text.primary,
+    // },
+    // headerStyle: {
+    //   backgroundColor: theme.colors.background.paper,
+    // },
     headerLargeTitle: true,
   },
 }))(ConnectNavigator);

@@ -11,13 +11,13 @@ import {
   H3,
   H4,
   BodyText,
-  H6,
+  H5,
   styled,
 } from '@apollosproject/ui-kit';
 
 const LabelText = styled(({ theme }) => ({
-  color: theme.colors.primary,
-}))(H6);
+  color: theme.colors.text.secondary,
+}))(H5);
 
 const FloatingFooterText = styled(({ theme }) => ({
   position: 'absolute',

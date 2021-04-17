@@ -12,6 +12,7 @@ import { styled } from '@apollosproject/ui-kit';
 
 import ActionContainer from './ActionContainer';
 import NodeSingleInner from '../NodeSingleInner';
+import MapView from './MapView';
 
 const PaddedNodeSingleConnected = styled(({ theme: { sizing } }) => ({
   paddingBottom: sizing.baseUnit * 5,
@@ -32,6 +33,10 @@ const ContentSingle = (props) => {
     `,
     { variables: { nodeId } }
   );
+
+  let content = <PaddedNodeSingleConnected nodeId={nodeId} Component={NodeSingleInner} />;
+  if (nodeId.includes('Location')) content = <MapView nodeId={nodeId} />;
+
   return (
     <ThemeMixinConnected nodeId={nodeId}>
       <TrackEventWhenLoaded
@@ -42,7 +47,7 @@ const ContentSingle = (props) => {
           itemId: nodeId,
         }}
       />
-      <PaddedNodeSingleConnected nodeId={nodeId} Component={NodeSingleInner} />
+      {content}
     </ThemeMixinConnected>
   );
 };

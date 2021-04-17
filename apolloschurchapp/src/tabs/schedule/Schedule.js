@@ -6,6 +6,7 @@ import {
   // TabView,
   ActivityIndicator,
   H5,
+  H4,
   styled,
   H6,
   ThemeMixin,
@@ -63,10 +64,10 @@ const ThemedTabBar = withThemeMixin(({ theme }) => ({
 
 const SectionHeader = styled(({ theme }) => ({
   backgroundColor: theme.colors.background.paper,
-  color: theme.colors.text.tertiary,
+  color: theme.colors.text.secondary,
   paddingHorizontal: theme.sizing.baseUnit,
   paddingVertical: theme.sizing.baseUnit / 2,
-}))(H5);
+}))(H4);
 
 const Schedule = ({ navigation }) => {
   const { loading, error, refetch, data } = useQuery(getDays, { fetchPolicy: 'cache-and-network' });

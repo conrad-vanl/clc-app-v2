@@ -35,6 +35,7 @@ const EventInfo = styled(({ theme }) => ({
 const ScheduleCell = styled(({ theme, expired }) => ({
   height: theme.sizing.baseUnit * 5,
   opacity: expired ? 0.6 : 1,
+  backgroundColor: theme.colors.background.screen,
 }))(Cell);
 
 const ScheduleCellRowPositioner = styled({
@@ -57,36 +58,37 @@ export const Caret = styled(({ theme }) => ({
 
 const SecondaryText = styled({ opacity: 0.6 })(UIText);
 
-const formatTime = (time) => moment(time).format('h:mma');
+const formatTime = (time) => time ? moment(time).format('h:mma') : null;
 
 const ScheduleItem = ({
   id,
   startTime,
   endTime,
-  title,
-  summary,
-  label,
+  title = '',
+  summary = '',
+  label = '',
   onPress,
+  isLoading,
   ...other
 }) => {
   let cell = (
     <ScheduleCell expired={moment(endTime) < new Date()} {...other}>
       <ScheduleCellRowPositioner>
-        {startTime ? (
+        {startTime || isLoading ? (
           <TimeContainer>
-            <UIText>{formatTime(startTime)}</UIText>
-            <SecondaryText>{formatTime(endTime)}</SecondaryText>
+            <UIText isLoading={isLoading}>{formatTime(startTime)}</UIText>
+            <SecondaryText isLoading={isLoading}>{formatTime(endTime)}</SecondaryText>
           </TimeContainer>
         ) : null}
         <EventInfo>
-          {label ? (
-            <LabelText expired={moment(endTime) < new Date()}>
+          {label || isLoading ? (
+            <LabelText isLoading={isLoading} expired={moment(endTime) < new Date()}>
               {label}
             </LabelText>
           ) : null}
-          <H5 numberOfLines={2}>{title}</H5>
-          {summary && !label ? (
-            <SecondaryText numberOfLines={title.length > 30 ? 1 : 2}>
+          <H5 isLoading={isLoading} numberOfLines={2}>{title}</H5>
+          {(summary && !label) || isLoading ? (
+            <SecondaryText isLoading={isLoading} numberOfLines={title.length > 30 ? 1 : 2}>
               {summary}
             </SecondaryText>
           ) : null}

@@ -22,16 +22,16 @@ export const ScheduleNavigator = (props) => (
 const EnhancedScheduleNavigator = withTheme(({ theme, ...props }) => ({
   ...props,
   screenOptions: {
-    headerTintColor: theme.colors.action.secondary,
-    headerTitleStyle: {
-      color: theme.colors.text.primary,
-    },
-    headerStyle: {
-      backgroundColor: theme.colors.background.screen,
-    },
-    cardStyle: {
-      backgroundColor: theme.colors.background.screen,
-    },
+    // headerTintColor: theme.colors.action.secondary,
+    // headerTitleStyle: {
+    //   color: theme.colors.text.primary,
+    // },
+    // headerStyle: {
+    //   backgroundColor: theme.colors.background.screen,
+    // },
+    // cardStyle: {
+    //   backgroundColor: theme.colors.background.screen,
+    // },
     headerLargeTitle: true,
   },
 }))(ScheduleNavigator);
