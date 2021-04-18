@@ -22,12 +22,10 @@ class Connect extends PureComponent {
   render() {
     return (
       <BackgroundView>
-        <SafeAreaView edges={['top', 'left', 'right']}>
-          <ScrollView>
-            <Maps />
-            <Resources />
-          </ScrollView>
-        </SafeAreaView>
+        <ScrollView style={{ flex: 1 }}>
+          <Maps />
+          <Resources />
+        </ScrollView>
       </BackgroundView>
     );
   }

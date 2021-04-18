@@ -51,7 +51,7 @@ const Maps = () => {
   const navigation = useNavigation();
   const { data: { conference } = {}, loading } = useQuery(getMaps, { fetchPolicy: 'cache-and-network '});
   return (
-    <>
+    <PaddedView horizontal={false}>
       <PaddedView vertical={false}>
         <H5>Maps</H5>
       </PaddedView>
@@ -74,7 +74,7 @@ const Maps = () => {
           </TouchableScale>
         )}
       />
-    </>
+    </PaddedView>
   );
 };
 

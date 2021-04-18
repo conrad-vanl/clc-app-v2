@@ -76,7 +76,7 @@ const ThemedNavigationContainer = withTheme(({ theme, ...props }) => ({
     },
   },
   ...props,
-}))(NavigationContainer); 
+}))(({ containerRef, ...otherProps }) => <NavigationContainer ref={containerRef} {...otherProps} />); 
 
 /*
 dark (boolean): Whether this is a dark theme or a light theme
@@ -94,6 +94,7 @@ const App = (props) => (
     <BackgroundView>
       <AppStatusBar />
       <ThemedNavigationContainer
+        containerRef={NavigationService.setTopLevelNavigator}
         onReady={NavigationService.setIsReady}
       >
         <ThemedNavigator initialRouteName="ProtectedRoute" {...props}>
