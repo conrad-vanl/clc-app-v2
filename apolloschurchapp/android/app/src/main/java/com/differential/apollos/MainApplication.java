@@ -1,4 +1,4 @@
-package com.differential.apollos;
+package org.watermark.clc;
 
 import android.app.Application;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.differential.apollos;
+package org.watermark.clc;
 import android.os.Bundle;
 import org.devio.rn.splashscreen.SplashScreen;
 import com.facebook.react.ReactActivity;
