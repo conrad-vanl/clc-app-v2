@@ -25,7 +25,8 @@ const query = gql`
 
 const Location = ({ contentId }) => {
   const navigation = useNavigation();
-  const { loading, data } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { item: contentId }});
+  const { loading, data } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { itemId: contentId }});
+  console.log({ contentId, loading, data });
 
   const handlePress = (item) => {
     navigation.push('ContentSingle', {
@@ -40,7 +41,7 @@ const Location = ({ contentId }) => {
     <Touchable onPress={() => handlePress(data.node.location)}>
       <Cell>
         <OpaqueIcon
-          name="map"
+          name="pin"
           size={14}
           isLoading={!get(data, 'node.location') && loading}
         />
