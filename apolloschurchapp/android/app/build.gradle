@@ -149,7 +149,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.watermark.clc"
+        applicationId "org.watermark.clc2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -157,7 +157,7 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
-        resValue "string", "build_config_package", "org.watermark.clc"
+        resValue "string", "build_config_package", "org.watermark.clc2"
         multiDexEnabled true
     }
     signingConfigs {

@@ -1,4 +1,4 @@
-package org.watermark.clc;
+package org.watermark.clc2;
 import android.os.Bundle;
 import org.devio.rn.splashscreen.SplashScreen;
 import com.facebook.react.ReactActivity;
