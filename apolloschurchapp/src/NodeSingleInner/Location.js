@@ -5,7 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 
-import { Icon, Cell, CellText, styled, Touchable } from '@apollosproject/ui-kit';
+import {
+  Icon,
+  Cell,
+  CellText,
+  styled,
+  Touchable,
+} from '@apollosproject/ui-kit';
 import { Caret } from '../ui/ScheduleItem';
 
 const OpaqueIcon = styled({ opacity: 0.8 })(Icon);
@@ -25,8 +31,10 @@ const query = gql`
 
 const Location = ({ contentId }) => {
   const navigation = useNavigation();
-  const { loading, data } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { itemId: contentId }});
-  console.log({ contentId, loading, data });
+  const { loading, data } = useQuery(query, {
+    fetchPolicy: 'cache-and-network',
+    variables: { itemId: contentId },
+  });
 
   const handlePress = (item) => {
     navigation.push('ContentSingle', {
