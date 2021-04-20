@@ -94,7 +94,7 @@ const ActionContianer = ({ contentId }) => {
     >
       <Container edges={['bottom', 'left', 'right']}>
         <CapacityRow>
-          <ChannelLabel icon="groups" label={isCapacityEvent ? `${data?.node?.capacity} person capacity` : `Registration not required`} />
+          <ChannelLabel icon="groups" label={isCapacityEvent ? `${data?.node?.capacity} person capacity` : ``} />
           {(isCapacityEvent && capacityRemaining >= 0) ? <H6>{capacityRemaining} {capacityRemaining === 1 ? 'spot' : 'spots'} left</H6> : null}
         </CapacityRow>
         <RegisterButton
