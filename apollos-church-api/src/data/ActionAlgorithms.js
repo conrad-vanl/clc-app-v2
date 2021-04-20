@@ -34,7 +34,8 @@ class ActionAlgorithm extends core.dataSource {
   }
 
   async upNextAlgorithm() {
-    const { Person, UserLike, Event, ContentItem, Conference } = this.context.dataSources;
+    const { Feature, Person, UserLike, Event, ContentItem, Conference } = this.context.dataSources;
+    Feature.setCacheHint({ maxAge: 0, scope: 'PRIVATE' });
     const currentTime = moment();
     const { fields } = await Conference.getFromCode();
 
@@ -109,7 +110,8 @@ class ActionAlgorithm extends core.dataSource {
   }
 
   async registrationsAlgorithm() {
-    const { Person, UserLike, Event, ContentItem } = this.context.dataSources;
+    const { Feature, Person, UserLike, Event, ContentItem } = this.context.dataSources;
+    Feature.setCacheHint({ maxAge: 0, scope: 'PRIVATE' });
     const personId = await Person.getCurrentPersonId();
     const registrations = await UserLike.model.findAll({
       where: {
