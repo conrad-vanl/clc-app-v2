@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Image } from 'react-native';
+import { View, Platform } from 'react-native';
 import { Query } from '@apollo/client/react/components';
 import PropTypes from 'prop-types';
 import {
@@ -15,9 +15,6 @@ import {
 } from '@apollosproject/ui-kit';
 import {
   AskNotificationsConnected,
-  FeaturesConnected,
-  LocationFinderConnected,
-  FollowConnected,
   OnboardingSwiper,
   onboardingComplete,
   WITH_USER_ID,
@@ -33,11 +30,6 @@ const ImageContainer = styled({
   height: '40%',
 })(View);
 
-const StyledImage = styled({
-  height: '100%',
-  width: '100%',
-})(Image);
-
 // Represents the current version of onboarding.
 // Some slides will be "older", they shouldn't be shown to existing users.
 // Some slides will be the same version as teh current onboarding version.
@@ -48,32 +40,41 @@ function Onboarding({ navigation, route }) {
   const userVersion = route?.params?.userVersion || 0;
   return (
     <Query query={WITH_USER_ID} fetchPolicy="network-only">
-      {({ data }) => (
-        <>
-          <FullscreenBackgroundView />
-          <OnboardingSwiper
-            navigation={navigation}
-            userVersion={userVersion}
-            onComplete={() => {
-              onboardingComplete({
-                userId: data?.currentUser?.id,
-                version: ONBOARDING_VERSION,
-              });
-              navigation.dispatch(
-                NavigationService.resetAction({
-                  navigatorName: 'Tabs',
-                  routeName: 'Home',
-                })
-              );
-            }}
-          >
-            {({ swipeForward }) => (
-              [
+      {({ data }) => {
+        if (Platform.OS === 'android') {
+          // we can skip onboaridng on android since notification permissions on implied
+          onboardingComplete({
+            userId: data?.currentUser?.id,
+            version: ONBOARDING_VERSION,
+          });
+        }
+        return (
+          <>
+            <FullscreenBackgroundView />
+            <OnboardingSwiper
+              navigation={navigation}
+              userVersion={userVersion}
+              onComplete={() => {
+                onboardingComplete({
+                  userId: data?.currentUser?.id,
+                  version: ONBOARDING_VERSION,
+                });
+                navigation.dispatch(
+                  NavigationService.resetAction({
+                    navigatorName: 'Tabs',
+                    routeName: 'Home',
+                  })
+                );
+              }}
+            >
+              {({ swipeForward }) => [
                 <AskNotificationsConnected
                   key={'AskNotifications'}
                   BackgroundComponent={ImageContainer}
-                  slideTitle={'Don\'t miss a thing'}
-                  description={"Stay up to date on announcements, schedule reminders, and things you won’t want to miss."}
+                  slideTitle={"Don't miss a thing"}
+                  description={
+                    'Stay up to date on announcements, schedule reminders, and things you won’t want to miss.'
+                  }
                   onPressPrimary={swipeForward}
                   onRequestPushPermissions={(update) => {
                     checkNotifications().then((checkRes) => {
@@ -89,11 +90,11 @@ function Onboarding({ navigation, route }) {
                     });
                   }}
                 />,
-              ]
-            )}
-          </OnboardingSwiper>
-        </>
-      )}
+              ]}
+            </OnboardingSwiper>
+          </>
+        );
+      }}
     </Query>
   );
 }
