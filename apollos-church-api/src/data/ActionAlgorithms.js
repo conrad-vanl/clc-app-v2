@@ -145,7 +145,8 @@ class ActionAlgorithm extends core.dataSource {
   }
 
   async userFeedAlgorithm({ limit = 20 } = {}) {
-    const { Conference, ContentItem } = this.context.dataSources;
+    const { Conference, ContentItem, Feature } = this.context.dataSources;
+    Feature.setCacheHint({ maxAge: 120 });
 
     const conference = await Conference.getFromCode();
 
