@@ -90,7 +90,7 @@ app.get('/version', cors(), (req, res) => {
   }
 });
 
-app.use('/', (req, res, next) => {
+app.use((req, res, next) => {
   const prevSetHeader = res.setHeader;
   res.setHeader = (...args) => {
     let [name, value] = args;
