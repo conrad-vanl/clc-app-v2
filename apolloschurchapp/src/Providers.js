@@ -13,7 +13,7 @@ import customTheme, { customIcons } from './theme';
 const AppProviders = (props) => (
   <ClientProvider {...props}>
     <NotificationsProvider
-      oneSignalKey={ApollosConfig.ONE_SIGNAL_APP_ID}
+      oneSignalKey={ApollosConfig.ONE_SIGNAL_KEY}
       navigate={NavigationService.navigate}
     >
       <AuthProvider
