@@ -36,7 +36,7 @@ const isDev =
 
 const extensions = isDev ? [() => new RockLoggingExtension()] : [];
 
-const cacheOptions = isDev
+const cacheOptions = !isDev
   ? {}
   : {
       cacheControl: {
@@ -89,6 +89,22 @@ app.get('/version', cors(), (req, res) => {
     res.send('unknown');
   }
 });
+
+app.use('/', (req, res, next) => {
+  const prevSetHeader = res.setHeader
+  res.setHeader = (...args) => {
+    let [name, value] = args
+    if (name && name.toLowerCase() == 'cache-control') {
+      value = appendStaleWhileRevalidate(value.toString())
+    }
+    prevSetHeader.apply(res, [name, value])
+  }
+  next()
+})
+
+function appendStaleWhileRevalidate(header) {
+  return header + ', stale-while-revalidate=30, stale-if-error=86400'
+}
 
 applyServerMiddleware({ app, dataSources, context });
 setupJobs({ app, dataSources, context });
