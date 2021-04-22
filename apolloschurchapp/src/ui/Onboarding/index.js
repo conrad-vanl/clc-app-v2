@@ -41,13 +41,13 @@ function Onboarding({ navigation, route }) {
   return (
     <Query query={WITH_USER_ID} fetchPolicy="network-only">
       {({ data }) => {
-        // if (Platform.OS === 'android') {
-        //   // we can skip onboaridng on android since notification permissions on implied
-        //   onboardingComplete({
-        //     userId: data?.currentUser?.id,
-        //     version: ONBOARDING_VERSION,
-        //   });
-        // }
+        if (Platform.OS === 'android') {
+          // we can skip onboaridng on android since notification permissions on implied
+          onboardingComplete({
+            userId: data?.currentUser?.id,
+            version: ONBOARDING_VERSION,
+          });
+        }
         return (
           <>
             <FullscreenBackgroundView />
@@ -70,7 +70,7 @@ function Onboarding({ navigation, route }) {
               {({ swipeForward }) => [
                 <AskNotificationsConnected
                   key={'AskNotifications'}
-                  BackgroundComponent={ImageContainer}
+                  BackgroundComponent={<ImageContainer />}
                   slideTitle={"Don't miss a thing"}
                   description={
                     'Stay up to date on announcements, schedule reminders, and things you won’t want to miss.'
