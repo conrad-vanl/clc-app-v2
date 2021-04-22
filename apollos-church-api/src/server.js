@@ -36,7 +36,7 @@ const isDev =
 
 const extensions = isDev ? [() => new RockLoggingExtension()] : [];
 
-const cacheOptions = !isDev
+const cacheOptions = isDev
   ? {}
   : {
       cacheControl: {
