@@ -47,6 +47,12 @@ function Onboarding({ navigation, route }) {
             userId: data?.currentUser?.id,
             version: ONBOARDING_VERSION,
           });
+          navigation.dispatch(
+            NavigationService.resetAction({
+              navigatorName: 'Tabs',
+              routeName: 'Home',
+            })
+          );
         }
         return (
           <>
