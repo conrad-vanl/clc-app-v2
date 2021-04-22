@@ -91,6 +91,9 @@ app.get('/version', cors(), (req, res) => {
 });
 
 app.use((req, res, next) => {
+  // Set a constant surrogate key for soft purging
+  res.setHeader('Surrogate-Key', 'all');
+
   const prevSetHeader = res.setHeader;
   res.setHeader = (...args) => {
     let [name, value] = args;
