@@ -38,24 +38,25 @@ export const ONBOARDING_VERSION = 2;
 
 function Onboarding({ navigation, route }) {
   const userVersion = route?.params?.userVersion || 0;
+  React.useEffect(() => {
+    if (Platform.OS === 'android') {
+      // we can skip onboaridng on android since notification permissions on implied
+        onboardingComplete({
+          userId: data?.currentUser?.id,
+          version: ONBOARDING_VERSION,
+        });
+        navigation.dispatch(
+          NavigationService.resetAction({
+            navigatorName: 'Tabs',
+            routeName: 'Home',
+          })
+        );
+    }
+  }, [])
+
   return (
     <Query query={WITH_USER_ID} fetchPolicy="network-only">
       {({ data }) => {
-        React.useEffect(() => {
-          if (Platform.OS === 'android') {
-            // we can skip onboaridng on android since notification permissions on implied
-              onboardingComplete({
-                userId: data?.currentUser?.id,
-                version: ONBOARDING_VERSION,
-              });
-              navigation.dispatch(
-                NavigationService.resetAction({
-                  navigatorName: 'Tabs',
-                  routeName: 'Home',
-                })
-              );
-          }
-        }, [])
         return (
           <>
             <FullscreenBackgroundView />
