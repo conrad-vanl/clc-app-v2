@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import gql from 'graphql-tag';
 import { Query } from '@apollo/client/react/components';
 import { useNavigation } from '@react-navigation/native';
+import { AppState } from 'react-native';
 
 import { BackgroundView } from '@apollosproject/ui-kit';
 import {
@@ -34,13 +35,38 @@ export const GET_FEED_FEED = gql`
 
 const Feed = () => {
   const navigation = useNavigation();
+
+  const handleAppStateChange = (nextAppState) => {
+    const appState = useRef(AppState.currentState);
+    const featuresFeedRef = useRef(null);
+    if (
+      appState.current.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      console.log("App has come to the foreground!");
+      featuresFeedRef.refetch();
+    }
+
+    appState.current = nextAppState;
+    console.log("AppState", appState.current);
+  };
+  
+  useEffect(() => {
+    AppState.addEventListener("change", handleAppStateChange);
+
+    return () => {
+      AppState.removeEventListener("change", handleAppStateChange);
+    };
+  }, []);
+
   return (
     <RockAuthedWebBrowser>
       {(openUrl) => (
         <BackgroundView>
-            <Query query={GET_FEED_FEED} pollInterval={5000} fetchPolicy={'cache-and-network'}>
+            <Query query={GET_FEED_FEED}>
               {({ data }) => (
                 <FeaturesFeedConnected
+                  ref={featuresFeedRef}
                   openUrl={openUrl}
                   navigation={navigation}
                   featureFeedId={data?.myScheduleFeed?.id}
