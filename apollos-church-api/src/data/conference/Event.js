@@ -109,7 +109,7 @@ export const resolver = {
     myScheduleFeed: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
         type: 'apollosConfig',
-        args: { section: 'SCHEDULE_FEATURES' },
+        args: { section: 'SCHEDULE_FEATURES', time: Math.round(Date.now() / 1000 / 60 / 5) }, // makes the ID change every 5 minutes
       }),
     homeFeedFeatures: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
