@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import gql from 'graphql-tag';
-import { Query } from '@apollo/client/react/components';
+import { gql, useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 import { AppState } from 'react-native';
 
@@ -35,6 +34,8 @@ export const GET_FEED_FEED = gql`
 
 const Feed = () => {
   const navigation = useNavigation();
+  
+  const { data, refetch } = useQuery(GET_FEED_FEED);
 
   const handleAppStateChange = (nextAppState) => {
     const appState = useRef(AppState.currentState);
@@ -44,7 +45,7 @@ const Feed = () => {
       nextAppState === "active"
     ) {
       console.log("App has come to the foreground!");
-      featuresFeedRef.refetch();
+      refetch();
     }
 
     appState.current = nextAppState;
@@ -63,17 +64,12 @@ const Feed = () => {
     <RockAuthedWebBrowser>
       {(openUrl) => (
         <BackgroundView>
-            <Query query={GET_FEED_FEED}>
-              {({ data }) => (
-                <FeaturesFeedConnected
-                  ref={featuresFeedRef}
-                  openUrl={openUrl}
-                  navigation={navigation}
-                  featureFeedId={data?.myScheduleFeed?.id}
-                  onPressActionItem={handleOnPress}
-                />
-              )}
-            </Query>
+          <FeaturesFeedConnected
+            openUrl={openUrl}
+            navigation={navigation}
+            featureFeedId={data?.myScheduleFeed?.id}
+            onPressActionItem={handleOnPress}
+          />
         </BackgroundView>
       )}
     </RockAuthedWebBrowser>
