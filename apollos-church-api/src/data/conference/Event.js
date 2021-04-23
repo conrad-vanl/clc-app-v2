@@ -109,17 +109,17 @@ export const resolver = {
     myScheduleFeed: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
         type: 'apollosConfig',
-        args: { section: 'SCHEDULE_FEATURES', time: Math.round(Date.now() / 1000 / 60 / 5) }, // makes the ID change every 5 minutes
+        args: { section: 'SCHEDULE_FEATURES', time: Math.round(Date.now() / 1000 / 60) }, // makes the ID change every minute
       }),
     homeFeedFeatures: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
         type: 'apollosConfig',
-        args: { section: 'HOME_FEATURES', ...args, time: Math.round(Date.now() / 1000 / 60 / 5) },
+        args: { section: 'HOME_FEATURES', ...args, time: Math.round(Date.now() / 1000 / 60) },
       }),
     discoverFeedFeatures: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
         type: 'apollosConfig',
-        args: { section: 'DISCOVER_FEATURES', time: Math.round(Date.now() / 1000 / 60 / 5) },
+        args: { section: 'DISCOVER_FEATURES', time: Math.round(Date.now() / 1000 / 60) },
       }),
   },
   Registration: {

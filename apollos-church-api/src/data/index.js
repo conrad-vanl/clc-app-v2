@@ -47,7 +47,6 @@ import * as ActionAlgorithm from './ActionAlgorithms';
 import * as OneSignalWithRock from './oneSignalWithRock';
 
 const data = {
-  ...Conference,
   Interfaces,
   Followings,
   BinaryFiles,
@@ -78,6 +77,7 @@ const data = {
   PrayerRequest,
   Persona,
   Person,
+  ...Conference,
 };
 
 const {
