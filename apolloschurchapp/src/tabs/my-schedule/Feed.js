@@ -38,7 +38,7 @@ const Feed = () => {
     <RockAuthedWebBrowser>
       {(openUrl) => (
         <BackgroundView>
-            <Query query={GET_FEED_FEED}>
+            <Query query={GET_FEED_FEED} pollInterval={5000} fetchPolicy={'cache-and-network'}>
               {({ data }) => (
                 <FeaturesFeedConnected
                   openUrl={openUrl}
