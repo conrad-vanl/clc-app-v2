@@ -11,6 +11,7 @@ import {
   FEATURE_FEED_ACTION_MAP,
   RockAuthedWebBrowser,
 } from '@apollosproject/ui-connected';
+import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 function handleOnPress({ action, ...props }) {
   if (FEATURE_FEED_ACTION_MAP[action]) {
@@ -34,20 +35,19 @@ export const GET_DISCOVER_FEED = gql`
 
 const Discover = () => {
   const navigation = useNavigation();
+
+  const { data } = useQueryAutoRefresh(GET_DISCOVER_FEED);
+
   return (
     <RockAuthedWebBrowser>
       {(openUrl) => (
         <BackgroundView>
-            <Query query={GET_DISCOVER_FEED}>
-              {({ data }) => (
-                <FeaturesFeedConnected
-                  openUrl={openUrl}
-                  navigation={navigation}
-                  featureFeedId={data?.discoverFeedFeatures?.id}
-                  onPressActionItem={handleOnPress}
-                />
-              )}
-            </Query>
+          <FeaturesFeedConnected
+            openUrl={openUrl}
+            navigation={navigation}
+            featureFeedId={data?.discoverFeedFeatures?.id}
+            onPressActionItem={handleOnPress}
+          />
         </BackgroundView>
       )}
     </RockAuthedWebBrowser>

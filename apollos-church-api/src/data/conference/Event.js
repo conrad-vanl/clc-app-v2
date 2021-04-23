@@ -111,6 +111,16 @@ export const resolver = {
         type: 'apollosConfig',
         args: { section: 'SCHEDULE_FEATURES' },
       }),
+    homeFeedFeatures: (root, args, { dataSources: { FeatureFeed } }) =>
+      FeatureFeed.getFeed({
+        type: 'apollosConfig',
+        args: { section: 'HOME_FEATURES', ...args, time: Math.round(Date.now() / 1000 / 60 / 5) },
+      }),
+    discoverFeedFeatures: (root, args, { dataSources: { FeatureFeed } }) =>
+      FeatureFeed.getFeed({
+        type: 'apollosConfig',
+        args: { section: 'DISCOVER_FEATURES', time: Math.round(Date.now() / 1000 / 60 / 5) },
+      }),
   },
   Registration: {
     node: async ({ nodeId }, args, { dataSources: { Event } }) => Event.getFromId(nodeId),

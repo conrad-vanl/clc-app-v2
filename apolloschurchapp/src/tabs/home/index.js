@@ -20,6 +20,7 @@ import { SearchButton } from '../../ui/Search';
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
 
 import { ONBOARDING_VERSION } from '../../ui/Onboarding';
+import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 const LogoTitle = styled(({ theme }) => ({
   height: theme.sizing.baseUnit * 2,
@@ -61,26 +62,27 @@ const Home = () => {
     });
   }, []);
 
+  const { data } = useQueryAutoRefresh(GET_HOME_FEED, {
+    fetchPolicy: 'cache-and-network',
+    pollInterval: 30000
+  });
+
   return (
     <RockAuthedWebBrowser>
       {(openUrl) => (
         <BackgroundView>
           <SafeAreaView edges={['top', 'left', 'right']}>
-            <Query query={GET_HOME_FEED} fetchPolicy="cache-and-network" pollInterval={30000}>
-              {({ data }) => (
-                <FeaturesFeedConnected
-                  openUrl={openUrl}
-                  navigation={navigation}
-                  featureFeedId={data?.homeFeedFeatures?.id}
-                  onPressActionItem={handleOnPress}
-                  ListHeaderComponent={
-                    <>
-                      <LogoTitle source={require('./wordmark.png')} />
-                    </>
-                  }
-                />
-              )}
-            </Query>
+            <FeaturesFeedConnected
+              openUrl={openUrl}
+              navigation={navigation}
+              featureFeedId={data?.homeFeedFeatures?.id}
+              onPressActionItem={handleOnPress}
+              ListHeaderComponent={
+                <>
+                  <LogoTitle source={require('./wordmark.png')} />
+                </>
+              }
+            />
           </SafeAreaView>
         </BackgroundView>
       )}

@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { gql, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import { AppState } from 'react-native';
 
 import { BackgroundView } from '@apollosproject/ui-kit';
 import {
@@ -11,6 +10,7 @@ import {
   FEATURE_FEED_ACTION_MAP,
   RockAuthedWebBrowser,
 } from '@apollosproject/ui-connected';
+import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 function handleOnPress({ action, ...props }) {
   if (FEATURE_FEED_ACTION_MAP[action]) {
@@ -35,30 +35,7 @@ export const GET_FEED_FEED = gql`
 const Feed = () => {
   const navigation = useNavigation();
   
-  const { data, refetch } = useQuery(GET_FEED_FEED);
-
-  const handleAppStateChange = (nextAppState) => {
-    const appState = useRef(AppState.currentState);
-    const featuresFeedRef = useRef(null);
-    if (
-      appState.current.match(/inactive|background/) &&
-      nextAppState === "active"
-    ) {
-      console.log("App has come to the foreground!");
-      refetch();
-    }
-
-    appState.current = nextAppState;
-    console.log("AppState", appState.current);
-  };
-  
-  useEffect(() => {
-    AppState.addEventListener("change", handleAppStateChange);
-
-    return () => {
-      AppState.removeEventListener("change", handleAppStateChange);
-    };
-  }, []);
+  const { data } = useQueryAutoRefresh(GET_FEED_FEED);
 
   return (
     <RockAuthedWebBrowser>
