@@ -16,7 +16,7 @@ import {
 import Liked from './Liked';
 
 const LabelText = styled(({ theme, expired }) => ({
-  ...(!expired ? { color: theme.colors.primary } : {}),
+  ...(!expired ? { color: '#b9a9b3' } : {}),
   fontSize: 10,
 }))(H6);
 
