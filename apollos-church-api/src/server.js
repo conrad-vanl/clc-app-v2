@@ -106,7 +106,7 @@ app.use((req, res, next) => {
 });
 
 function appendStaleWhileRevalidate(header) {
-  return `${header}, stale-while-revalidate=30, stale-if-error=86400`;
+  return `${header}, stale-while-revalidate=600, stale-if-error=86400`;
 }
 
 applyServerMiddleware({ app, dataSources, context });
