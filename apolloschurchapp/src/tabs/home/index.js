@@ -66,7 +66,7 @@ const Home = () => {
       {(openUrl) => (
         <BackgroundView>
           <SafeAreaView edges={['top', 'left', 'right']}>
-            <Query query={GET_HOME_FEED} fetchPolicy="cache-and-network">
+            <Query query={GET_HOME_FEED} fetchPolicy="cache-and-network" pollInterval={30000}>
               {({ data }) => (
                 <FeaturesFeedConnected
                   openUrl={openUrl}
