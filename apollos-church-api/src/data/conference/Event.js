@@ -101,9 +101,12 @@ export const resolver = {
       UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
     
     capacity: ({ fields }) => fields.capacity,
-    registered: ({ sys }, { nodeId }, { dataSources: { UserLike } }, { parentType }) => (
-      UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } })
-    ),
+    registered: async ({ sys, fields }, { nodeId }, { dataSources: { UserLike } }, { parentType }) => {
+      const registered = await UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } });
+      const capacity = fields.capacity;
+      if (registered > capacity) return capacity;
+      return registered;
+    },
   },
   Query: {
     myScheduleFeed: (root, args, { dataSources: { FeatureFeed } }) =>
@@ -127,9 +130,17 @@ export const resolver = {
   },
   Mutation: {
     register: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
-      const personId = await Person.getCurrentPersonId();
-      await UserLike.likeNode({ ...args, personId });
-      return Event.getFromId(parseGlobalId(args.nodeId).id)
+      const globalId = parseGlobalId(args.nodeId);
+      const event = await Event.getFromId(globalId.id);
+      const capacity = event?.fields?.capacity;
+      const registered = await UserLike.model.count({ where: { nodeId: String(event?.sys?.id), nodeType: globalId.__type } });
+      
+      if (!capacity || registered < capacity) {
+        const personId = await Person.getCurrentPersonId();
+        await UserLike.likeNode({ ...args, personId });
+      }
+
+      return event;
     },
     unregister: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
       const personId = await Person.getCurrentPersonId();
