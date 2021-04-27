@@ -18,7 +18,9 @@ export default class Cache extends DataSource {
     if (!CLIENT) {
       CLIENT = Client.create(process.env.MEMCACHEDCLOUD_SERVERS, {
         username: process.env.MEMCACHEDCLOUD_USERNAME,
-        password: process.env.MEMCACHEDCLOUD_PASSWORD
+        password: process.env.MEMCACHEDCLOUD_PASSWORD,
+        retries: 0,
+        keepAlive: true,
       });
     }
     this.client = CLIENT;
