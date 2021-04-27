@@ -101,7 +101,7 @@ export const resolver = {
     registered: async ({ sys, fields }, { nodeId }, { dataSources: { UserLike, Cache } }, { parentType }) => {
       const key = `/${createGlobalId(sys.id, parentType.name)}/${parentType.name}/count`
       let registered = await Cache.get({ key })
-      if (registered === undefined) {
+      if (registered === undefined || registered === null) {
         registered = await UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } });
         await Cache.set({ key, data: registered, expiresIn: 3600 })
       }
@@ -167,7 +167,7 @@ async function isLiked({ sys }, args, { sessionId, dataSources: { UserLike, Cach
   const nodeId = createGlobalId(sys.id, parentType.name)
   const key = `/${sessionId}/${nodeId}/${parentType.name}`
   const cached = await Cache.get({ key })
-  if (cached !== undefined) {
+  if (cached !== undefined && cached !== null) {
     return cached
   }
 
