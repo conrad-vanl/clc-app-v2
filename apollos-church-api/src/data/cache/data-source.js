@@ -11,6 +11,14 @@ const maxConnections =
 
 const pool = genericPool.createPool({
   create() {
+    if (!process.env.MEMCACHEDCLOUD_SERVERS) {
+      return Promise.resolve({
+        get: () => Promise.resolve(),
+        set: () => Promise.resolve(),
+        delete: () => Promise.resolve()
+      })
+    }
+
     return Promise.resolve(
       Client.create(process.env.MEMCACHEDCLOUD_SERVERS, {
         username: process.env.MEMCACHEDCLOUD_USERNAME,
