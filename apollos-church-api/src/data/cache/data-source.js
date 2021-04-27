@@ -74,7 +74,7 @@ export default class Cache extends DataSource {
   async get({ key }) {
     return this.safely(async (client) => {
       const data = await client.get(parseKey(key));
-      if (!data.value) {
+      if (!data || !data.value) {
         return null
       }
       return JSON.parse(data.value.toString());
