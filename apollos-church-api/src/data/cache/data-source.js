@@ -7,26 +7,33 @@ import genericPool from 'generic-pool'
 const maxConnections = 
   process.env.MAX_MEMCACHE_CONNECTIONS ?
     parseInt(process.env.MAX_MEMCACHE_CONNECTIONS) :
-    20
+    2
 
 const pool = genericPool.createPool({
   create() {
-    if (!process.env.MEMCACHEDCLOUD_SERVERS) {
-      return Promise.resolve({
-        get: () => Promise.resolve(),
-        set: () => Promise.resolve(),
-        delete: () => Promise.resolve()
+    if (process.env.MEMCACHIER_SERVERS) {
+      // https://devcenter.heroku.com/articles/memcachier#node-js
+      return Client.create(process.env.MEMCACHIER_SERVERS, {
+        failover: true,  // default: false
+        keepAlive: true  // default: false
       })
     }
 
-    return Promise.resolve(
-      Client.create(process.env.MEMCACHEDCLOUD_SERVERS, {
-        username: process.env.MEMCACHEDCLOUD_USERNAME,
-        password: process.env.MEMCACHEDCLOUD_PASSWORD,
-        retries: 0,
-        keepAlive: true,
-      })
-    )
+    if (process.env.MEMCACHEDCLOUD_SERVERS) {
+      return Promise.resolve(
+        Client.create(process.env.MEMCACHEDCLOUD_SERVERS, {
+          username: process.env.MEMCACHEDCLOUD_USERNAME,
+          password: process.env.MEMCACHEDCLOUD_PASSWORD,
+          keepAlive: true,
+        })
+      )
+    }
+
+    return Promise.resolve({
+      get: () => Promise.resolve(),
+      set: () => Promise.resolve(),
+      delete: () => Promise.resolve()
+    })
   },
   async destroy(client) {
     await client.quit()
