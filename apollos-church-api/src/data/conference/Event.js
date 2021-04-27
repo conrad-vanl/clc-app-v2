@@ -72,7 +72,7 @@ export const schema = gql`
 
     capacity: Int @cacheControl(maxAge: 600)
     registered: Int @cacheControl(maxAge: 5)
-    isRegistered: Boolean @cacheControl(maxAge: 0)
+    isRegistered: Boolean @cacheControl(maxAge: 0,scope: PRIVATE)
   }
 `;
 
@@ -94,15 +94,18 @@ export const resolver = {
     downloads: ({ fields }) => fields.downloads,
     coverImage: ({ fields }) => fields.art,
     label: ({ fields }) => fields.eventType,
-    isLiked: ({ sys }, args, { dataSources: { UserLike }}, { parentType }) => 
-      UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
-
-    isRegistered: ({ sys }, args, { dataSources: { UserLike }}, { parentType }) => 
-      UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) }), // todo
+    isLiked: isLiked,
+    isRegistered: isLiked,
     
     capacity: ({ fields }) => fields.capacity,
-    registered: async ({ sys, fields }, { nodeId }, { dataSources: { UserLike } }, { parentType }) => {
-      const registered = await UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } });
+    registered: async ({ sys, fields }, { nodeId }, { dataSources: { UserLike, Cache } }, { parentType }) => {
+      const key = `/${createGlobalId(sys.id, parentType.name)}/${parentType.name}/count`
+      let registered = await Cache.get({ key })
+      if (registered === undefined) {
+        registered = await UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } });
+        await Cache.set({ key, data: registered, expiresIn: 3600 })
+      }
+
       const capacity = fields.capacity;
       if (registered > capacity) return capacity;
       return registered;
@@ -129,7 +132,7 @@ export const resolver = {
     node: async ({ nodeId }, args, { dataSources: { Event } }) => Event.getFromId(nodeId),
   },
   Mutation: {
-    register: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
+    register: async (root, args, { sessionId, dataSources: { Event, UserLike, Person, Cache } }) => {
       const globalId = parseGlobalId(args.nodeId);
       const event = await Event.getFromId(globalId.id);
       const capacity = event?.fields?.capacity;
@@ -138,14 +141,37 @@ export const resolver = {
       if (!capacity || registered < capacity) {
         const personId = await Person.getCurrentPersonId();
         await UserLike.likeNode({ ...args, personId });
+
+        await Cache.set({ key: `/${sessionId}/${args.nodeId}/Event`, data: true, expiresIn: 3600 })
+        await Cache.set({ key: `/${args.nodeId}/Event/count`, data: undefined, expiresIn: 3600 })
       }
 
       return event;
     },
-    unregister: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
+    unregister: async (root, args, { sessionId, dataSources: { Event, UserLike, Person, Cache } }) => {
       const personId = await Person.getCurrentPersonId();
       await UserLike.unlikeNode({ ...args, personId });
+
+      await Cache.set({ key: `/${sessionId}/${args.nodeId}/Event`, data: false, expiresIn: 3600 })
+      await Cache.set({ key: `/${args.nodeId}/Event/count`, data: undefined, expiresIn: 3600 })
+
       return Event.getFromId(parseGlobalId(args.nodeId).id)
     },
   },
 };
+
+async function isLiked({ sys }, args, { sessionId, dataSources: { UserLike, Cache }}, { parentType }) {
+  if (!sessionId) {
+    return false
+  }
+  const nodeId = createGlobalId(sys.id, parentType.name)
+  const key = `/${sessionId}/${nodeId}/${parentType.name}`
+  const cached = await Cache.get({ key })
+  if (cached !== undefined) {
+    return cached
+  }
+
+  const result = await UserLike.userLikedNode({ nodeId })
+  await Cache.set({ key, data: result, expiresIn: 3600 })
+  return result
+}

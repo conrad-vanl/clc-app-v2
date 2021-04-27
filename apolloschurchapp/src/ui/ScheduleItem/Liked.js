@@ -10,7 +10,7 @@ const query = gql`
     node(id: $id) {
       id
       ...on ContentItem {
-        isLiked
+        isLiked @cacheControl(maxAge: 0,scope: PRIVATE)
       }
     }
   }
