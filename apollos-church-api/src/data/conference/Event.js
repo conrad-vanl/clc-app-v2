@@ -94,40 +94,12 @@ export const resolver = {
     downloads: ({ fields }) => fields.downloads,
     coverImage: ({ fields }) => fields.art,
     label: ({ fields }) => fields.eventType,
-    isLiked: async ({ sys }, args, { sessionId, dataSources: { UserLike, Cache }}, { parentType }) => {
-      if (!sessionId) {
-        return false
-      }
-      const key = `${sessionId}/${sys.id}/${parentType.name}`
-      const cached = await Cache.get({ key })
-      if (cached) {
-        return cached
-      }
-
-      const result = UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) })
-      await Cache.set({ key, data: result, expiresIn: 3600 })
-      return result
-    },
-
-    isRegistered: async ({ sys }, args, { sessionId, dataSources: { UserLike, Cache }}, { parentType }) => {
-      if (!sessionId) {
-        return false
-      }
-      const key = `${sessionId}/${sys.id}/${parentType.name}`
-      const cached = await Cache.get({ key })
-      if (cached) {
-        console.log('cached!!!', cached)
-        return cached
-      }
-
-      const result = UserLike.userLikedNode({ nodeId: createGlobalId(sys.id, parentType.name) })
-      await Cache.set({ key, data: result, expiresIn: 3600 })
-      return result
-    },
+    isLiked: isLiked,
+    isRegistered: isLiked,
     
     capacity: ({ fields }) => fields.capacity,
     registered: async ({ sys, fields }, { nodeId }, { dataSources: { UserLike, Cache } }, { parentType }) => {
-      const key = `${sys.id}/${parentType.name}/count`
+      const key = `/${createGlobalId(sys.id, parentType.name)}/${parentType.name}/count`
       let registered = await Cache.get({ key })
       if (!registered) {
         registered = await UserLike.model.count({ where: { nodeId: String(sys.id), nodeType: parentType.name } });
@@ -163,6 +135,7 @@ export const resolver = {
     register: async (root, args, { sessionId, dataSources: { Event, UserLike, Person, Cache } }) => {
       const globalId = parseGlobalId(args.nodeId);
       const event = await Event.getFromId(globalId.id);
+      console.log('globalId', globalId, args.nodeId)
       const capacity = event?.fields?.capacity;
       const registered = await UserLike.model.count({ where: { nodeId: String(event?.sys?.id), nodeType: globalId.__type } });
       
@@ -170,20 +143,37 @@ export const resolver = {
         const personId = await Person.getCurrentPersonId();
         await UserLike.likeNode({ ...args, personId });
 
-        await Cache.set({ key: `${sessionId}/${args.nodeId}/Event`, data: true, expiresIn: 3600 })
-        await Cache.set({ key: `${args.nodeId}/Event/count`, data: undefined, expiresIn: 3600 })
+        await Cache.set({ key: `/${sessionId}/${args.nodeId}/Event`, data: true, expiresIn: 3600 })
+        await Cache.set({ key: `/${args.nodeId}/Event/count`, data: undefined, expiresIn: 3600 })
       }
 
       return event;
     },
-    unregister: async (root, args, { dataSources: { Event, UserLike, Person } }) => {
+    unregister: async (root, args, { sessionId, dataSources: { Event, UserLike, Person, Cache } }) => {
       const personId = await Person.getCurrentPersonId();
       await UserLike.unlikeNode({ ...args, personId });
 
-      await Cache.set({ key: `${sessionId}/${args.nodeId}/Event`, data: false, expiresIn: 3600 })
-      await Cache.set({ key: `${args.nodeId}/Event/count`, data: undefined, expiresIn: 3600 })
+      await Cache.set({ key: `/${sessionId}/${args.nodeId}/Event`, data: false, expiresIn: 3600 })
+      await Cache.set({ key: `/${args.nodeId}/Event/count`, data: undefined, expiresIn: 3600 })
 
       return Event.getFromId(parseGlobalId(args.nodeId).id)
     },
   },
 };
+
+async function isLiked({ sys }, args, { sessionId, dataSources: { UserLike, Cache }}, { parentType }) {
+  if (!sessionId) {
+    return false
+  }
+  const nodeId = createGlobalId(sys.id, parentType.name)
+  const key = `/${sessionId}/${nodeId}/${parentType.name}`
+  const cached = await Cache.get({ key })
+  if (cached) {
+    console.log('cached!!!', cached)
+    return cached
+  }
+
+  const result = await UserLike.userLikedNode({ nodeId })
+  await Cache.set({ key, data: result, expiresIn: 3600 })
+  return result
+}
