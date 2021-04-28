@@ -46,6 +46,5 @@ export const resolver = {
       fields.description ? marked(fields.description) : '',
     childContentItemsConnection: ({ fields }) => fields.scheduleItems,
     coverImage: ({ fields }) => fields.art,
-    isLiked: () => false,
   },
 };
