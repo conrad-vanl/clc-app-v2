@@ -40,6 +40,7 @@ export const resolver = {
   Announcement: {
     id: ({ id, sys }, args, context, { parentType }) =>
       createGlobalId(id || sys.id, parentType.name),
+    isLiked: () => false,
     title: ({ fields }, { hyphenated }, { dataSources }) =>
       hyphenated
         ? dataSources.ContentItem.createHyphenatedString({ text: fields.title })
