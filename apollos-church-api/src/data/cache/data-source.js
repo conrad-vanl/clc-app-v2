@@ -15,7 +15,9 @@ const pool = genericPool.createPool({
       // https://devcenter.heroku.com/articles/memcachier#node-js
       return Client.create(process.env.MEMCACHIER_SERVERS, {
         failover: true,  // default: false
-        keepAlive: true  // default: false
+        keepAlive: true,  // default: false
+        timeout: 3, // default 0.5
+        retries: 0    // default 2
       })
     }
 
@@ -25,6 +27,8 @@ const pool = genericPool.createPool({
           username: process.env.MEMCACHEDCLOUD_USERNAME,
           password: process.env.MEMCACHEDCLOUD_PASSWORD,
           keepAlive: true,
+          timeout: 3, // default 0.5
+          retries: 0    // default 2
         })
       )
     }
