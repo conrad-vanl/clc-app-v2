@@ -61,5 +61,7 @@ export const resolver = {
     },
 
     sharing: () => ({}),
+
+    isLiked: () => false,
   },
 };
