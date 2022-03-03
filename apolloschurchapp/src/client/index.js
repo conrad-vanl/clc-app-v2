@@ -1,7 +1,9 @@
+
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider, ApolloClient, ApolloLink } from '@apollo/client';
 import { getVersion, getApplicationName } from 'react-native-device-info';
+import { mergeTypeDefs } from '@graphql-tools/merge';
 
 import { authLink, buildErrorLink } from '@apollosproject/ui-auth';
 
@@ -11,6 +13,11 @@ import { resolvers, schema, defaults, GET_ALL_DATA } from '../store';
 import httpLink from './httpLink';
 import cache, { ensureCacheHydration } from './cache';
 import MARK_CACHE_LOADED from './markCacheLoaded';
+import {
+  localSchema,
+  localResolvers,
+  ensureContentfulLoaded,
+} from './contentful';
 
 const goToAuth = () => NavigationService.resetToAuth();
 const wipeData = () =>
@@ -36,8 +43,11 @@ export const client = new ApolloClient({
   cache,
   queryDeduplication: false,
   shouldBatch: true,
-  resolvers,
-  typeDefs: schema,
+  resolvers: {
+    ...localResolvers,
+    ...resolvers,
+  },
+  typeDefs: mergeTypeDefs(schema, localSchema),
   name: getApplicationName(),
   version: getVersion(),
   // NOTE: this is because we have some very taxing queries that we want to avoid running twice
@@ -83,7 +93,7 @@ class ClientProvider extends PureComponent {
 
   async componentDidMount() {
     try {
-      await ensureCacheHydration;
+      await Promise.all([ensureCacheHydration, ensureContentfulLoaded]);
     } catch (e) {
       throw e;
     } finally {
