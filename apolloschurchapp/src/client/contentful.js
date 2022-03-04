@@ -47,6 +47,11 @@ const syncComplete = restoreComplete
     throw ex;
   });
 
+// After syncing, back-up again to AsyncStorage
+syncComplete.then(() => enhancedDataSource.backup()).catch((ex) => {
+  console.error('Post-sync backup failed', ex);
+});
+
 // syncComplete promise includes restoreComplete
 const ensureContentfulLoaded = syncComplete;
 

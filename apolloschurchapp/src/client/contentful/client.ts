@@ -44,6 +44,9 @@ export class SimpleContentfulClient {
     const entries: Entry<any>[] = []
     const deletedEntries: DeletedEntry[] = []
 
+    query = query.nextSyncToken ?
+      { sync_token: query.nextSyncToken } :
+      { initial: true }
 
     let resp = await this.get(`/spaces/${space}/environments/${environmentId}/sync`, query)
     let body = await resp.json() as SyncResponse
