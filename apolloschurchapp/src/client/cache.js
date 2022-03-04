@@ -67,6 +67,8 @@ export const ensureCacheHydration = (async () => {
   } catch (error) {
     console.error('Error restoring or purging Apollo cache', error);
   }
+
+  console.log('ensurecacheHydration done')
 })();
 
 export default cache;

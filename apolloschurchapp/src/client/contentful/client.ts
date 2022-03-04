@@ -2,8 +2,8 @@
  * The standard contentful client doesn't work in react-native
  * So we create one that implements sync only
  */
-console.log('load client')
-
+import 'fastestsmallesttextencoderdecoder'
+import { URL } from 'whatwg-url';
 import {wait} from 'async-toolbox/wait'
 import type { SyncCollection, Entry, Asset, Sys } from "contentful";
 
@@ -11,7 +11,7 @@ type Fetch = typeof fetch
 
 interface IClientOptions {
   baseUrl: string,
-  spaceId: string,
+  space: string,
   environmentId: string,
   accessToken: string
 }
@@ -29,7 +29,7 @@ export class SimpleContentfulClient {
   ) {
     this.options = {
       baseUrl: 'https://cdn.contentful.com',
-      spaceId: process.env.CONTENTFUL_SPACE_ID!,
+      space: process.env.CONTENTFUL_SPACE_ID!,
       accessToken: process.env.CONTENTFUL_ACCESS_TOKEN!,
       environmentId: process.env.CONTENTFUL_ENVIRONMENT || 'master',
       ...options,
@@ -37,7 +37,7 @@ export class SimpleContentfulClient {
   }
 
   public async sync(query: any): Promise<SyncCollection> {
-    const {spaceId, environmentId} = this.options
+    const {space, environmentId} = this.options
     
     const assets: Asset[] = []
     const deletedAssets: DeletedAsset[] = []
@@ -45,7 +45,7 @@ export class SimpleContentfulClient {
     const deletedEntries: DeletedEntry[] = []
 
 
-    let resp = await this.get(`/spaces/${spaceId}/environments/${environmentId}/sync`, query)
+    let resp = await this.get(`/spaces/${space}/environments/${environmentId}/sync`, query)
     let body = await resp.json() as SyncResponse
     assets.push(...body.items.filter(isAsset))
     deletedAssets.push(...body.items.filter(isDeletedAsset))
@@ -61,8 +61,7 @@ export class SimpleContentfulClient {
       deletedEntries.push(...body.items.filter(isDeletedEntry))
     }
     
-    const match = body.nextSyncUrl && body.nextSyncUrl.match(/sync_token=(\w+)/)
-    const nextSyncToken = match && match[1]
+    const nextSyncToken = new URL(body.nextSyncUrl!).searchParams.get('sync_token')
     return {
       assets,
       deletedAssets: deletedAssets as Asset[],

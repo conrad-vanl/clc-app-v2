@@ -27,24 +27,25 @@ const enhancedDataSource = withSync(
   contentfulClient
 );
 
-const localResolvers = createLocalResolvers(enhancedDataSource, options);console.log('created resolvers');
+const localResolvers = createLocalResolvers(enhancedDataSource, options);
 
 // Import the current state from AsyncStorage
 const restoreComplete = enhancedDataSource.restore();
 
 // After restore is complete, sync
-const syncComplete = restoreComplete.then(
-  () => {
-    return enhancedDataSource.sync();
-  },
-  (ex) => {
-    // eslint-disable-next-line no-console
-    console.error('Restore failed, executing full sync', ex);
-    return enhancedDataSource.sync();
-  }
-).catch((ex) => {
-  console.error('Error in sync', ex, ex.stack)
-});
+const syncComplete = restoreComplete
+  .then(
+    () => enhancedDataSource.sync(),
+    (ex) => {
+      // eslint-disable-next-line no-console
+      console.error('Restore failed, executing full sync', ex);
+      return enhancedDataSource.sync();
+    }
+  )
+  .catch((ex) => {
+    console.error('sync failed', ex);
+    throw ex;
+  });
 
 // syncComplete promise includes restoreComplete
 const ensureContentfulLoaded = syncComplete;
