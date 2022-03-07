@@ -1,4 +1,3 @@
-
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider, ApolloClient, ApolloLink } from '@apollo/client';
@@ -66,6 +65,13 @@ export const client = new ApolloClient({
     },
   },
 });
+
+if (process.env.NODE_ENV === 'development') {
+  const {
+    enableFlipperApolloDevtools,
+  } = require('react-native-flipper-apollo-devtools');
+  enableFlipperApolloDevtools(client);
+}
 
 // Hack to give auth link access to method on client;
 // eslint-disable-next-line prefer-destructuring
