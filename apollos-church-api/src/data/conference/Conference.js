@@ -47,13 +47,13 @@ export const schema = gql`
   }
 
   extend type Query {
-    conferenceByCode(code: String): Conference
+    conference(code: String): Conference
   }
 `;
 
 export const resolver = {
   Query: {
-    conferenceByCode: (_, { code }, { dataSources }) =>
+    conference: (_, { code }, { dataSources }) =>
       dataSources.Conference.getFromCode(code),
   },
   Resource: {
