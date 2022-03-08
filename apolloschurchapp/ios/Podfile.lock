@@ -416,7 +416,7 @@ PODS:
     - React-Core
   - RNPermissions (2.2.2):
     - React-Core
-  - RNReanimated (2.0.0):
+  - RNReanimated (2.4.1):
     - DoubleConversion
     - FBLazyVector
     - FBReactNativeSpec
@@ -442,7 +442,6 @@ PODS:
     - React-RCTNetwork
     - React-RCTSettings
     - React-RCTText
-    - React-RCTVibration
     - ReactCommon/turbomodule/core
     - Yoga
   - RNScreens (2.18.1):
@@ -772,13 +771,13 @@ SPEC CHECKSUMS:
   RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNInAppBrowser: 48b95ba7a4eaff5cc223bca338d3e319561dbd1b
   RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
-  RNReanimated: afdca3ce41ab821dd67d25873f7da9a30a18edf0
+  RNReanimated: 32c91e28f5780937b8efc07ddde1bab8d373fe0b
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: 90dcd029e45d8a7c1ff059e8b3c6612ff409061a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 177c9bb1c50ce40690966def28a9121e438cd69f
+PODFILE CHECKSUM: b6f14c7c0873f40c06d2de9d0b10867a6c5622b4
 
 COCOAPODS: 1.11.2

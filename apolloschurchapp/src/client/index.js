@@ -37,16 +37,18 @@ const errorLink = buildErrorLink(onAuthError);
 
 const link = ApolloLink.from([authLink, errorLink, httpLink]);
 
+const mergedSchema = mergeTypeDefs(schema, localSchema);
+
 export const client = new ApolloClient({
   link,
   cache,
   queryDeduplication: false,
   shouldBatch: true,
   resolvers: {
-    ...localResolvers,
     ...resolvers,
+    ...localResolvers,
   },
-  typeDefs: mergeTypeDefs(schema, localSchema),
+  typeDefs: mergedSchema,
   name: getApplicationName(),
   version: getVersion(),
   // NOTE: this is because we have some very taxing queries that we want to avoid running twice
@@ -65,13 +67,6 @@ export const client = new ApolloClient({
     },
   },
 });
-
-if (process.env.NODE_ENV === 'development') {
-  const {
-    enableFlipperApolloDevtools,
-  } = require('react-native-flipper-apollo-devtools');
-  enableFlipperApolloDevtools(client);
-}
 
 // Hack to give auth link access to method on client;
 // eslint-disable-next-line prefer-destructuring

@@ -22,30 +22,25 @@ import ScheduleItem from '../../ui/ScheduleItem';
 
 const getDays = gql`
   query {
-    conference {
-      days {
-        id
-        title
-        date
-        childContentItemsConnection {
-          edges {
-            node {
-              id
-              title
-              summary
-              htmlContent
-              childContentItemsConnection {
-                pageInfo {
-                  startCursor
+    local @client {
+      conference(id: "doyAUR5XEVx4jK4NGvS8z") {
+        days {
+          items {
+            title
+            date
+            scheduleItem {
+              items {
+                ... on Local_Event {
+                  title
+                  summary
+                  startTime
+                  endTime
                 }
-              }
-              ... on Event {
-                startTime
-                endTime
-              }
-              ... on Breakouts {
-                startTime
-                endTime
+                ... on Local_Breakouts {
+                  title
+                  startTime
+                  endTime
+                }
               }
             }
           }
@@ -71,6 +66,9 @@ const SectionHeader = styled(({ theme }) => ({
 
 const Schedule = ({ navigation }) => {
   const { loading, error, refetch, data } = useQuery(getDays, { fetchPolicy: 'cache-and-network' });
+
+  console.log('data', JSON.stringify(data, undefined, '  '));
+  return <></>;
 
   const sections = useMemo(() => (data?.conference?.days || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date))
     .map((day) => ({

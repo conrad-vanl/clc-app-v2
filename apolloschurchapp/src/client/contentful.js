@@ -6,13 +6,11 @@ import {
   InMemoryDataSource,
 } from 'contentful-local-schema';
 import AsyncStorage from '@react-native-community/async-storage';
-import contentfulSchema from '../../contentful-schema.json';
-import { createClient } from './contentful/client';
+import { printSchema } from 'graphql';
 
-const options = {
-  contentTypes: contentfulSchema.contentTypes,
-};
-const localSchema = createSchema(options);
+// import contentfulSchema from '../../contentful-schema.gql';
+import contentfulSchemaJson from '../../contentful-schema.json';
+import { createClient } from './contentful/client';
 
 const dataSource = new InMemoryDataSource();
 
@@ -26,6 +24,13 @@ const enhancedDataSource = withSync(
   withBackup(dataSource, AsyncStorage, `contentful/${spaceId}`),
   contentfulClient
 );
+
+const options = {
+  contentTypes: contentfulSchemaJson.contentTypes,
+  namespace: 'Local',
+  queryNamespace: 'local',
+};
+const localSchema = printSchema(createSchema(options));
 
 const localResolvers = createLocalResolvers(enhancedDataSource, options);
 

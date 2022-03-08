@@ -5,7 +5,10 @@ platform :ios, '11.0'
 target 'CLC' do
   config = use_native_modules!
 
-  use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(
+    :path => config["reactNativePath"],
+    :hermes_enabled => false
+  )
 
   permissions_path = '../node_modules/react-native-permissions/ios'
 
