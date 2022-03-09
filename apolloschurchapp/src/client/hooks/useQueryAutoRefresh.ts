@@ -1,23 +1,27 @@
 import { useEffect, useRef } from 'react';
 import { ApolloQueryResult, useQuery } from '@apollo/client';
-import { AppState } from 'react-native';
+import { AppState, AppStateStatus } from 'react-native';
 import { resyncContentful } from '../contentful';
 
-// eslint-disable-next-line import/prefer-default-export
-export function useQueryAutoRefresh(query, options) {
+const useQueryAutoRefresh: typeof useQuery = (query, options) => {
   const data = useQuery(query, {
     fetchPolicy: 'cache-and-network',
     ...options,
   });
 
   const appState = useRef(AppState.currentState);
-  const handleAppStateChange = (nextAppState) => {
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
     if (
       appState.current.match(/inactive|background/) &&
       nextAppState === 'active'
     ) {
       console.log('App has come to the foreground!');
-      refetch();
+      resyncContentful()
+        .then(() => data.refetch())
+        .catch((ex) => {
+          console.error(ex);
+          return data.refetch();
+        });
     }
 
     appState.current = nextAppState;
@@ -33,15 +37,22 @@ export function useQueryAutoRefresh(query, options) {
 
   return {
     ...data,
-    refetch,
-  };
 
-  /**
-   * Wraps the refetch() function to resync from Contentful first.
-   * This forces a Contentful update whenever the user performs a pull-down.
-   */
-  async function refetch(): Promise<ApolloQueryResult<any>> {
-    await resyncContentful();
-    return data.refetch();
-  }
-}
+    /**
+     * Wraps the refetch() function to resync from Contentful first.
+     * This forces a Contentful update whenever the user performs a pull-down.
+     */
+    refetch: async function refetch(
+      variables
+    ): Promise<ApolloQueryResult<any>> {
+      return resyncContentful()
+        .then(() => data.refetch(variables))
+        .catch((ex) => {
+          console.error(ex);
+          return data.refetch(variables);
+        });
+    },
+  };
+};
+
+export { useQueryAutoRefresh };

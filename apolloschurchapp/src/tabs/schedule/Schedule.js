@@ -10,7 +10,6 @@ import {
 
 import { TabBar } from 'react-native-tab-view';
 
-import { resyncContentful } from '../../client/contentful';
 import ScheduleItem from '../../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
