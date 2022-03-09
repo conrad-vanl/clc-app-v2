@@ -10,7 +10,9 @@ import {
 
 import { TabBar } from 'react-native-tab-view';
 
+import { resyncContentful } from '../../client/contentful';
 import ScheduleItem from '../../ui/ScheduleItem';
+import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 const getDays = gql`
   query {
@@ -67,7 +69,7 @@ function byStartTime(a, b) {
 }
 
 const Schedule = ({ navigation }) => {
-  const { loading, error, refetch, data } = useQuery(getDays, {
+  const { loading, error, refetch, data } = useQueryAutoRefresh(getDays, {
     fetchPolicy: 'cache-and-network',
   });
 

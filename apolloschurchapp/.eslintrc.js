@@ -3,6 +3,7 @@ module.exports = {
   rules: {
     'import/extensions': 'off',
     'react/display-name': 'off',
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+    'no-use-before-define': 'off',
   },
 };

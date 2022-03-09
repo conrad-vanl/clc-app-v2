@@ -34,28 +34,34 @@ const localSchema = printSchema(createSchema(options));
 
 const localResolvers = createLocalResolvers(enhancedDataSource, options);
 
+export function resyncContentful(): Promise<void> {
+  const syncPromise = enhancedDataSource.sync();
+  // In the background, after the sync finishes, backup to AsyncStorage.
+  // If this fails, we don't really care because at least the sync succeeded.
+  syncPromise.then(() => enhancedDataSource.backup()).catch((ex) => {
+    console.error('Post-sync backup failed', ex);
+  });
+
+  return syncPromise;
+}
+
 // Import the current state from AsyncStorage
 const restoreComplete = enhancedDataSource.restore();
 
 // After restore is complete, sync
 const syncComplete = restoreComplete
   .then(
-    () => enhancedDataSource.sync(),
+    () => resyncContentful(),
     (ex) => {
       // eslint-disable-next-line no-console
       console.error('Restore failed, executing full sync', ex);
-      return enhancedDataSource.sync();
+      return resyncContentful();
     }
   )
   .catch((ex) => {
     console.error('sync failed', ex);
     throw ex;
   });
-
-// After syncing, back-up again to AsyncStorage
-syncComplete.then(() => enhancedDataSource.backup()).catch((ex) => {
-  console.error('Post-sync backup failed', ex);
-});
 
 // syncComplete promise includes restoreComplete
 const ensureContentfulLoaded = syncComplete;
