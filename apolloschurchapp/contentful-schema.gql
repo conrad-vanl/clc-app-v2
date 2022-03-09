@@ -118,6 +118,13 @@ interface Local_Entry {
   contentfulMetadata: Local_ContentfulMetadata
 }
 
+type Local_EntryCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Entry]!
+}
+
 type Local_Event implements Local_Entry {
   internalTitle: String
   title: String
@@ -141,9 +148,9 @@ type Local_EventCollection {
 }
 
 enum Local_EventEventType {
-  Breakout
-  Showcase
-  Workshop
+  breakout
+  showcase
+  workshop
 }
 
 type Local_Link implements Local_Entry {
@@ -176,24 +183,26 @@ type Local_LocationCollection {
 type local_Query {
   asset(id: String): Local_Asset
   assetCollection(skip: String, limit: String): Local_AssetCollection
-  localAnnouncement(id: String): Local_Announcement
-  localAnnouncementCollection(skip: String, limit: String): Local_AnnouncementCollection
-  localBreakouts(id: String): Local_Breakouts
-  localBreakoutsCollection(skip: String, limit: String): Local_BreakoutsCollection
-  localConference(id: String): Local_Conference
-  localConferenceCollection(skip: String, limit: String): Local_ConferenceCollection
-  localDay(id: String): Local_Day
-  localDayCollection(skip: String, limit: String): Local_DayCollection
-  localEvent(id: String): Local_Event
-  localEventCollection(skip: String, limit: String): Local_EventCollection
-  localLink(id: String): Local_Link
-  localLinkCollection(skip: String, limit: String): Local_LinkCollection
-  localLocation(id: String): Local_Location
-  localLocationCollection(skip: String, limit: String): Local_LocationCollection
-  localSpeaker(id: String): Local_Speaker
-  localSpeakerCollection(skip: String, limit: String): Local_SpeakerCollection
-  localTrack(id: String): Local_Track
-  localTrackCollection(skip: String, limit: String): Local_TrackCollection
+  entry(id: String): Local_Entry
+  entryCollection(skip: String, limit: String): Local_EntryCollection
+  announcement(id: String): Local_Announcement
+  announcementCollection(skip: String, limit: String): Local_AnnouncementCollection
+  breakouts(id: String): Local_Breakouts
+  breakoutsCollection(skip: String, limit: String): Local_BreakoutsCollection
+  conference(id: String): Local_Conference
+  conferenceCollection(skip: String, limit: String): Local_ConferenceCollection
+  day(id: String): Local_Day
+  dayCollection(skip: String, limit: String): Local_DayCollection
+  event(id: String): Local_Event
+  eventCollection(skip: String, limit: String): Local_EventCollection
+  link(id: String): Local_Link
+  linkCollection(skip: String, limit: String): Local_LinkCollection
+  location(id: String): Local_Location
+  locationCollection(skip: String, limit: String): Local_LocationCollection
+  speaker(id: String): Local_Speaker
+  speakerCollection(skip: String, limit: String): Local_SpeakerCollection
+  track(id: String): Local_Track
+  trackCollection(skip: String, limit: String): Local_TrackCollection
 }
 
 type Local_Speaker implements Local_Entry {
