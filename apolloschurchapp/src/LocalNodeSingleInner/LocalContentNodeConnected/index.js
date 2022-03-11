@@ -1,7 +1,6 @@
 import React from 'react';
 import marked from 'marked';
 import { View } from 'react-native';
-import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { Query } from '@apollo/client/react/components';
 import HTMLView from '@apollosproject/ui-htmlview';
@@ -30,7 +29,7 @@ const GET_CONTENT_ITEM_CONTENT = gql`
       }
     }
   }
-`
+`;
 
 const LocalContentNodeConnected = ({
   HtmlComponent,
@@ -38,7 +37,6 @@ const LocalContentNodeConnected = ({
   onPressAnchor,
   ImageWrapperComponent,
 }) => {
-  console.log('nodeId', nodeId)
   if (!nodeId) return <HTMLView isLoading />;
 
   return (
@@ -48,8 +46,6 @@ const LocalContentNodeConnected = ({
       fetchPolicy={'cache-and-network'}
     >
       {({ data: { local: { entry } = {} } = {}, loading, error }) => {
-        console.log('e', entry, 'error', error, loading)
-
         if (!entry && error) return <ErrorCard error={error} />;
         const coverImageSources = [entry?.art?.url].filter(present);
         const { title, description } = entry || {};
@@ -91,4 +87,4 @@ LocalContentNodeConnected.defaultProps = {
   onPressAnchor: safeHandleUrl,
 };
 
-export default named('LocalContentNodeConnected')(LocalContentNodeConnected);
+export default named('ui-connected.LocalContentNodeConnected')(LocalContentNodeConnected);

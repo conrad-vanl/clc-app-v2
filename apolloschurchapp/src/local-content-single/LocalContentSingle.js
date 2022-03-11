@@ -1,11 +1,10 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 import PropTypes from 'prop-types';
+import { ThemeMixin } from '@apollosproject/ui-kit';
 
 import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
-import {
-  NodeSingleConnected,
-} from '@apollosproject/ui-connected';
+import { NodeSingleConnected } from '@apollosproject/ui-connected';
 
 import { styled } from '@apollosproject/ui-kit';
 
@@ -23,7 +22,9 @@ const LocalContentSingle = (props) => {
       query getLocalNodeTitle($nodeId: ID!) {
         local @client {
           entry(id: $nodeId) {
-            sys { id }
+            sys {
+              id
+            }
             title
           }
         }
@@ -32,19 +33,15 @@ const LocalContentSingle = (props) => {
     { variables: { nodeId } }
   );
 
-  let content = (
-    <PaddedNodeSingleConnected nodeId={nodeId} Component={LocalNodeSingleInner} />
+  const content = (
+    <PaddedNodeSingleConnected
+      nodeId={nodeId}
+      Component={LocalNodeSingleInner}
+    />
   );
   // if (nodeId.includes('Location')) content = <MapView nodeId={nodeId} />;
 
-    console.log('entry', data, error, nodeId)
-
-  return (
-    <>
-      
-      {content}
-    </>
-  );
+  return <ThemeMixin>{content}</ThemeMixin>;
 };
 
 LocalContentSingle.propTypes = {

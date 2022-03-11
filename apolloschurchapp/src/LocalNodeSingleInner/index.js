@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 
+import Spacer from './Spacer';
 import LocalContentNodeConnected from './LocalContentNodeConnected';
 
 // import Location from './Location';
@@ -12,11 +13,9 @@ import LocalContentNodeConnected from './LocalContentNodeConnected';
 
 // import ActionContainer from './ActionContainer';
 
-const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => {
-  console.log('props', props);
-
-  return <View {...props}>
-    {/* <Spacer nodeId={nodeId} /> */}
+const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
+  <View {...props}>
+    <Spacer nodeId={nodeId} />
     <LocalContentNodeConnected
       ImageWrapperComponent={ImageWrapperComponent}
       nodeId={nodeId}
@@ -26,7 +25,7 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => {
     <NodeFeaturesConnected nodeId={nodeId} />
     <UpNextButtonConnected nodeId={nodeId} />
     */}
-    
+
     {/* <Time contentId={nodeId} />
     <Location contentId={nodeId} />
     <Speakers contentId={nodeId} />
@@ -41,6 +40,6 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => {
 
     <View style={{ height: 200 }} />
   </View>
-};
+);
 
 export default NodeSingleInner;
