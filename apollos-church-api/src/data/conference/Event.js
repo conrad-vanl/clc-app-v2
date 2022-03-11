@@ -38,6 +38,7 @@ export const schema = gql`
   }
   extend type Query {
     myScheduleFeed: FeatureFeed
+    eventByContentfulId(contentfulId: ID!): Event
   }
   type Registration {
     node: Event
@@ -126,6 +127,10 @@ export const resolver = {
     },
   },
   Query: {
+    eventByContentfulId: async (root, args, { dataSources: { Event } }) => {
+      // eslint-disable-next-line no-return-await
+      return await Event.getFromId(args.contentfulId);
+    },
     myScheduleFeed: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
         type: 'apollosConfig',

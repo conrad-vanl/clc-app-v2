@@ -11,7 +11,7 @@ import LocalContentNodeConnected from './LocalContentNodeConnected';
 // import Spacer from './Spacer';
 // import ChildContentFeed from './ChildContentFeed';
 
-// import ActionContainer from './ActionContainer';
+import LocalActionContainer from './LocalActionContainer';
 
 const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
   <View {...props}>
@@ -36,7 +36,7 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
     */}
     {/* <ChildContentFeed contentId={nodeId} /> */}
 
-    {/* <ActionContainer contentId={nodeId} /> */}
+    <LocalActionContainer contentId={nodeId} />
 
     <View style={{ height: 200 }} />
   </View>

@@ -6904,10 +6904,10 @@ content-type@~1.0.4:
   resolved "https://registry.yarnpkg.com/content-type/-/content-type-1.0.4.tgz#e138cc75e040c727b1966fe5e5f8c9aee256fe3b"
   integrity sha512-hIP3EEPs8tB9AT1L+NUqtwOAps4mk2Zob89MWXMHjHWg9milF/j4osnnQLXBCBFBk/tvIG/tUc9mOUJiPBhPXA==
 
-contentful-local-schema@0.0.14:
-  version "0.0.14"
-  resolved "https://registry.yarnpkg.com/contentful-local-schema/-/contentful-local-schema-0.0.14.tgz#59578aa05b79f965ef1086b4bdbbc3daa5703b01"
-  integrity sha512-o3Z1LGFvvF1hfq9bUsR3Vp4F7VC026LcIOp4Ud455Zlp4d01TZX+7P/+7RiUeuE6HKqU4MToPA21p/wRxEg08g==
+contentful-local-schema@0.0.15:
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/contentful-local-schema/-/contentful-local-schema-0.0.15.tgz#5e00e1438f445b102644188d08edb8b9450b2b0e"
+  integrity sha512-prMkfdwiStz1nX7XXcJ+m90Ngd9QF+LKt/FARLyVkX6MdgPxndhFuzWF8ssQLv/pg+UaQSpYaYDP+WE00Sv9FQ==
   dependencies:
     async-toolbox "^0.7.3"
     graphql ">= 14"

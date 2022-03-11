@@ -49,7 +49,7 @@ const LocalContentNodeConnected = ({
         if (!entry && error) return <ErrorCard error={error} />;
         const coverImageSources = [entry?.art?.url].filter(present);
         const { title, description } = entry || {};
-        const htmlContent = present(description) && marked(description);
+        const htmlContent = (present(description) && marked(description)) || '';
 
         return (
           <>
