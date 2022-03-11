@@ -5,26 +5,25 @@ import PropTypes from 'prop-types';
 import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 import {
   NodeSingleConnected,
-  ThemeMixinConnected,
 } from '@apollosproject/ui-connected';
 
 import { styled } from '@apollosproject/ui-kit';
 
-import NodeSingleInner from '../NodeSingleInner';
-import MapView from './MapView';
+import LocalNodeSingleInner from '../LocalNodeSingleInner';
+// import MapView from './MapView';
 
 const PaddedNodeSingleConnected = styled(({ theme: { sizing } }) => ({
   paddingBottom: sizing.baseUnit * 5,
 }))(NodeSingleConnected);
 
-const ContentSingle = (props) => {
+const LocalContentSingle = (props) => {
   const nodeId = props.route?.params?.itemId;
-  const { data, loading } = useQuery(
+  const { data, error, loading } = useQuery(
     gql`
-      query getContentNodeTitle($nodeId: ID!) {
-        node(id: $nodeId) {
-          id
-          ... on ContentNode {
+      query getLocalNodeTitle($nodeId: ID!) {
+        local @client {
+          entry(id: $nodeId) {
+            sys { id }
             title
           }
         }
@@ -33,25 +32,22 @@ const ContentSingle = (props) => {
     { variables: { nodeId } }
   );
 
-  let content = <PaddedNodeSingleConnected nodeId={nodeId} Component={NodeSingleInner} />;
-  if (nodeId.includes('Location')) content = <MapView nodeId={nodeId} />;
+  let content = (
+    <PaddedNodeSingleConnected nodeId={nodeId} Component={LocalNodeSingleInner} />
+  );
+  // if (nodeId.includes('Location')) content = <MapView nodeId={nodeId} />;
+
+    console.log('entry', data, error, nodeId)
 
   return (
-    <ThemeMixinConnected nodeId={nodeId}>
-      <TrackEventWhenLoaded
-        isLoading={loading}
-        eventName={'View Content'}
-        properties={{
-          title: data?.node?.title,
-          itemId: nodeId,
-        }}
-      />
+    <>
+      
       {content}
-    </ThemeMixinConnected>
+    </>
   );
 };
 
-ContentSingle.propTypes = {
+LocalContentSingle.propTypes = {
   navigation: PropTypes.shape({
     push: PropTypes.func,
   }),
@@ -62,4 +58,4 @@ ContentSingle.propTypes = {
   }),
 };
 
-export default ContentSingle;
+export default LocalContentSingle;

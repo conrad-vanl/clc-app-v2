@@ -21,16 +21,16 @@ export class dataSource extends ContentfulDataSource {
 }
 
 export const schema = gql`
-  type Conference implements Node @cacheControl(maxAge: 3600) {
-    id: ID! @cacheControl(maxAge: 3600)
-    title(hyphenated: Boolean): String @cacheControl(maxAge: 3600)
-    code: String @cacheControl(maxAge: 3600)
-    days: [ConferenceDay] @cacheControl(maxAge: 1800)
-    announcements: ContentItemsConnection @cacheControl(maxAge: 900)
-    tracks: [ConferenceTrack] @cacheControl(maxAge: 1800)
-    maps: [Location] @cacheControl(maxAge: 1800)
-    upNext: ContentItem @cacheControl(maxAge: 300)
-    resources: [Resource] @cacheControl(maxAge: 1800)
+  type Conference implements Node  {
+    id: ID! 
+    title(hyphenated: Boolean): String 
+    code: String 
+    days: [ConferenceDay] 
+    announcements: ContentItemsConnection 
+    tracks: [ConferenceTrack] 
+    maps: [Location] 
+    upNext: ContentItem 
+    resources: [Resource] 
   }
 
   union Resource = Announcement | Link

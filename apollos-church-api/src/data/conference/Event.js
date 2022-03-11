@@ -75,9 +75,9 @@ export const schema = gql`
     audios: [AudioMedia]
     theme: Theme
 
-    capacity: Int @cacheControl(maxAge: 600)
-    registered: Int @cacheControl(maxAge: 5)
-    isRegistered: Boolean @cacheControl(maxAge: 0, scope: PRIVATE)
+    capacity: Int 
+    registered: Int 
+    isRegistered: Boolean 
   }
 `;
 
