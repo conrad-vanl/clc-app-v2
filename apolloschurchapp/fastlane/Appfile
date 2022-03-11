@@ -2,7 +2,7 @@
 app_identifier("org.watermark.clc") # The bundle identifier of your app
 itc_team_id("49398804") # App Store Connect Team ID
 team_id("5Z8S3JU749") # Developer Portal Team ID
-apple_id("cv@utexas.edu")
+apple_id("appstoredev@watermark.org")
 
 # Android
 json_key_file("android/key.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
