@@ -20,9 +20,14 @@ const GET_CONTENT_ITEM_CONTENT = gql`
   query getLocalContentNode($nodeId: ID!) {
     local @client {
       entry(id: $nodeId) {
+        __typename
         sys { id }
         title
         ... on Local_Event {
+          description
+          art { url }
+        }
+        ... on Local_Announcement {
           description
           art { url }
         }

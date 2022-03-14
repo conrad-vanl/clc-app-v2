@@ -88,7 +88,6 @@ const Schedule = ({ navigation }) => {
     () => ({ item }) => (
       <ScheduleItem
         onPress={() => {
-          console.log('doNavigate', item.sys.id)
           navigation.navigate('LocalContentSingle', {
             itemId: item.sys.id,
           })

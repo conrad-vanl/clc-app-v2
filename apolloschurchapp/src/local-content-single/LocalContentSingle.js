@@ -22,6 +22,7 @@ const LocalContentSingle = (props) => {
       query getLocalNodeTitle($nodeId: ID!) {
         local @client {
           entry(id: $nodeId) {
+            __typename
             sys {
               id
             }
@@ -36,6 +37,7 @@ const LocalContentSingle = (props) => {
   const content = (
     <PaddedNodeSingleConnected
       nodeId={nodeId}
+      typename={data?.local?.entry?.__typename}
       Component={LocalNodeSingleInner}
     />
   );

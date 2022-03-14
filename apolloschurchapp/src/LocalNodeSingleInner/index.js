@@ -13,7 +13,11 @@ import LocalContentNodeConnected from './LocalContentNodeConnected';
 
 import LocalActionContainer from './LocalActionContainer';
 
-const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
+const ActionableTypes = [
+  "Local_Event"
+]
+
+const LocalNodeSingleInner = ({ nodeId, typename, ImageWrapperComponent, ...props }) => (
   <View {...props}>
     <Spacer nodeId={nodeId} />
     <LocalContentNodeConnected
@@ -36,10 +40,12 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
     */}
     {/* <ChildContentFeed contentId={nodeId} /> */}
 
-    <LocalActionContainer contentId={nodeId} />
+    {ActionableTypes.includes(typename) && (
+      <LocalActionContainer contentId={nodeId} />
+    )}
 
     <View style={{ height: 200 }} />
   </View>
 );
 
-export default NodeSingleInner;
+export default LocalNodeSingleInner;
