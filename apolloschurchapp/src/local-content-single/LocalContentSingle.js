@@ -1,15 +1,44 @@
 import React from 'react';
 import { gql, useQuery } from '@apollo/client';
+import { Animated } from 'react-native';
 import PropTypes from 'prop-types';
-import { ThemeMixin } from '@apollosproject/ui-kit';
+
+import {
+  styled,
+  BackgroundView,
+  StretchyView,
+  ThemeMixin,
+  named,
+} from '@apollosproject/ui-kit';
 
 import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
-import { NodeSingleConnected } from '@apollosproject/ui-connected';
-
-import { styled } from '@apollosproject/ui-kit';
 
 import LocalNodeSingleInner from '../LocalNodeSingleInner';
-// import MapView from './MapView';
+import LocalMapView from './LocalMapView';
+
+// copied from apollos-ui-connected/src/NodeSingleConnected/index.js
+const FlexedScrollView = styled({ flex: 1 })(Animated.ScrollView);
+
+const NodeSingleConnected = named('ui-connected.NodeSingleConnected')(
+  ({ nodeId, children, Component, ...props }) => (
+    <>
+      <BackgroundView>
+        <StretchyView>
+          {({ Stretchy, ...scrollViewProps }) => (
+            <FlexedScrollView {...scrollViewProps}>
+              <Component
+                nodeId={nodeId}
+                ImageWrapperComponent={Stretchy}
+                {...props}
+              />
+            </FlexedScrollView>
+          )}
+        </StretchyView>
+      </BackgroundView>
+      {children}
+    </>
+  )
+);
 
 const PaddedNodeSingleConnected = styled(({ theme: { sizing } }) => ({
   paddingBottom: sizing.baseUnit * 5,
@@ -22,10 +51,25 @@ const LocalContentSingle = (props) => {
       query getLocalNodeTitle($nodeId: ID!) {
         local @client {
           entry(id: $nodeId) {
+            __typename
             sys {
               id
             }
-            title
+            ... on Local_Event {
+              title
+            }
+            ... on Local_Announcement {
+              title
+            }
+            ... on Local_Breakouts {
+              title
+            }
+            ... on Local_Speaker {
+              title: name
+            }
+            ... on Local_Location {
+              title
+            }
           }
         }
       }
@@ -33,13 +77,15 @@ const LocalContentSingle = (props) => {
     { variables: { nodeId } }
   );
 
-  const content = (
+  const typename = data?.local?.entry?.__typename;
+  let content = (
     <PaddedNodeSingleConnected
       nodeId={nodeId}
+      typename={typename}
       Component={LocalNodeSingleInner}
     />
   );
-  // if (nodeId.includes('Location')) content = <MapView nodeId={nodeId} />;
+  if (typename?.includes('Location')) content = <LocalMapView nodeId={nodeId} />;
 
   return <ThemeMixin>{content}</ThemeMixin>;
 };

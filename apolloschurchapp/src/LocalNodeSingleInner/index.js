@@ -4,16 +4,22 @@ import { View } from 'react-native';
 import Spacer from './Spacer';
 import LocalContentNodeConnected from './LocalContentNodeConnected';
 
-// import Location from './Location';
-// import Speakers from './Speakers';
-// import Time from './Time';
-// import Downloads from './Downloads';
-// import Spacer from './Spacer';
-// import ChildContentFeed from './ChildContentFeed';
+import LocalLocation from './LocalLocation';
+import LocalSpeakers from './LocalSpeakers';
+import LocalTime from './LocalTime';
+import LocalDownloads from './LocalDownloads';
+import HorizontalContentFeed from './LocalChildContentFeed';
 
 import LocalActionContainer from './LocalActionContainer';
 
-const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
+const ActionableTypes = ['Local_Event'];
+
+const LocalNodeSingleInner = ({
+  nodeId,
+  typename,
+  ImageWrapperComponent,
+  ...props
+}) => (
   <View {...props}>
     <Spacer nodeId={nodeId} />
     <LocalContentNodeConnected
@@ -26,20 +32,18 @@ const NodeSingleInner = ({ nodeId, ImageWrapperComponent, ...props }) => (
     <UpNextButtonConnected nodeId={nodeId} />
     */}
 
-    {/* <Time contentId={nodeId} />
-    <Location contentId={nodeId} />
-    <Speakers contentId={nodeId} />
-    <Downloads contentId={nodeId} /> */}
-    {/*
-    <ContentParentFeedConnected nodeId={nodeId} />
-    <ContentChildFeedConnected nodeId={nodeId} />
-    */}
-    {/* <ChildContentFeed contentId={nodeId} /> */}
+    <LocalTime contentId={nodeId} />
+    <LocalLocation contentId={nodeId} />
+    <LocalSpeakers contentId={nodeId} />
+    <LocalDownloads contentId={nodeId} />
+    <HorizontalContentFeed contentId={nodeId} />
 
-    <LocalActionContainer contentId={nodeId} />
+    {ActionableTypes.includes(typename) && (
+      <LocalActionContainer contentId={nodeId} />
+    )}
 
     <View style={{ height: 200 }} />
   </View>
 );
 
-export default NodeSingleInner;
+export default LocalNodeSingleInner;

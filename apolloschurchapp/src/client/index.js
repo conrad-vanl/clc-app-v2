@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider, ApolloClient, ApolloLink } from '@apollo/client';
 import { getVersion, getApplicationName } from 'react-native-device-info';
+import { print } from 'graphql';
 import { mergeTypeDefs } from '@graphql-tools/merge';
 
 import { authLink, buildErrorLink } from '@apollosproject/ui-auth';
@@ -35,7 +36,21 @@ const onAuthError = async () => {
 
 const errorLink = buildErrorLink(onAuthError);
 
-const link = ApolloLink.from([authLink, errorLink, httpLink]);
+const links = [authLink, errorLink, httpLink];
+
+if (process.env.NODE_ENV === 'development') {
+  const logLink = new ApolloLink((operation, forward) => {
+    console.info('request', print(operation.query));
+    return forward(operation).map((result) => {
+      console.info('response', result.data);
+      return result;
+    });
+  });
+
+  links.unshift(logLink);
+}
+
+const link = ApolloLink.from(links);
 
 const mergedSchema = mergeTypeDefs(schema, localSchema);
 
