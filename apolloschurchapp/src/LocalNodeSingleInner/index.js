@@ -13,11 +13,14 @@ import LocalContentNodeConnected from './LocalContentNodeConnected';
 
 import LocalActionContainer from './LocalActionContainer';
 
-const ActionableTypes = [
-  "Local_Event"
-]
+const ActionableTypes = ['Local_Event'];
 
-const LocalNodeSingleInner = ({ nodeId, typename, ImageWrapperComponent, ...props }) => (
+const LocalNodeSingleInner = ({
+  nodeId,
+  typename,
+  ImageWrapperComponent,
+  ...props
+}) => (
   <View {...props}>
     <Spacer nodeId={nodeId} />
     <LocalContentNodeConnected
