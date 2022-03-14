@@ -87,12 +87,12 @@ const Schedule = ({ navigation }) => {
   const renderItem = useMemo(
     () => ({ item }) => (
       <ScheduleItem
-        onPress={() =>
-          navigation.navigate('ContentSingle', {
+        onPress={() => {
+          console.log('doNavigate', item.sys.id)
+          navigation.navigate('LocalContentSingle', {
             itemId: item.sys.id,
-            transitionKey: item.transitionKey,
           })
-        }
+        }}
         {...item}
       />
     ),

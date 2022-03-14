@@ -94,7 +94,8 @@ const ScheduleItem = ({
           ) : null}
         </EventInfo>
         <Actions>
-          <Liked id={id} />
+          {id && <Liked id={id} />}
+          {/* TODO: local likes for client content */}
           {onPress ? <Caret /> : null}
         </Actions>
       </ScheduleCellRowPositioner>

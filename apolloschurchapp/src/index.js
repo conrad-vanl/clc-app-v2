@@ -20,6 +20,7 @@ import { ProtectedRoute } from '@apollosproject/ui-auth';
 
 import Providers from './Providers';
 import ContentSingle from './content-single';
+import LocalContentSingle from './local-content-single';
 import NodeSingle from './node-single';
 import Event from './event';
 import Tabs from './tabs';
@@ -106,6 +107,11 @@ const App = (props) => (
           <Screen
             name="ContentSingle"
             component={ContentSingle}
+            options={{ title: 'Content' }}
+          />
+          <Screen
+            name="LocalContentSingle"
+            component={LocalContentSingle}
             options={{ title: 'Content' }}
           />
           <Screen
