@@ -15,11 +15,11 @@ export const schema = `
   }
 
   type Mutation {
-    cacheMarkLoaded
-    updateDevicePushId(pushId: String!)
-    updatePushPermissions(enabled: Boolean!)
+    cacheMarkLoaded: Boolean
+    updateDevicePushId(pushId: String!): String
+    updatePushPermissions(enabled: Boolean!): Boolean
   }
-${mediaPlayerSchema}
+${mediaPlayerSchema || ''}
 `;
 
 export const defaults = {

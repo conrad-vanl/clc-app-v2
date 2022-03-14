@@ -1,51 +1,42 @@
-import React, { PureComponent, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
-import { StatusBar, SectionList } from 'react-native';
+import { SectionList } from 'react-native';
 import {
   BackgroundView,
-  // TabView,
-  ActivityIndicator,
-  H5,
   H4,
   styled,
-  H6,
-  ThemeMixin,
   withThemeMixin,
-  ErrorCard,
 } from '@apollosproject/ui-kit';
 
-import { TabBar, TabView } from 'react-native-tab-view';
-
-import moment from 'moment';
+import { TabBar } from 'react-native-tab-view';
 
 import ScheduleItem from '../../ui/ScheduleItem';
+import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 const getDays = gql`
   query {
-    conference {
-      days {
-        id
-        title
-        date
-        childContentItemsConnection {
-          edges {
-            node {
-              id
-              title
-              summary
-              htmlContent
-              childContentItemsConnection {
-                pageInfo {
-                  startCursor
+    local @client {
+      conference(id: "doyAUR5XEVx4jK4NGvS8z") {
+        days {
+          items {
+            title
+            date
+            scheduleItem {
+              items {
+                sys {
+                  id
                 }
-              }
-              ... on Event {
-                startTime
-                endTime
-              }
-              ... on Breakouts {
-                startTime
-                endTime
+                ... on Local_Event {
+                  title
+                  summary
+                  startTime
+                  endTime
+                }
+                ... on Local_Breakouts {
+                  title
+                  startTime
+                  endTime
+                }
               }
             }
           }
@@ -69,26 +60,49 @@ const SectionHeader = styled(({ theme }) => ({
   paddingVertical: theme.sizing.baseUnit / 2,
 }))(H4);
 
+function byDate(a, b) {
+  return new Date(a.date) - new Date(b.date);
+}
+function byStartTime(a, b) {
+  return new Date(a.startTime) - new Date(b.startTime);
+}
+
 const Schedule = ({ navigation }) => {
-  const { loading, error, refetch, data } = useQuery(getDays, { fetchPolicy: 'cache-and-network' });
+  const { loading, error, refetch, data } = useQueryAutoRefresh(getDays, {
+    fetchPolicy: 'cache-and-network',
+  });
 
-  const sections = useMemo(() => (data?.conference?.days || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map((day) => ({
-      title: day?.title,
-      data: day?.childContentItemsConnection?.edges.map(({ node }) => node),
-    })
-  ), [data?.conference?.days]);
+  const sections = useMemo(
+    () =>
+      (data?.local?.conference?.days?.items || [])
+        .slice()
+        .sort(byDate)
+        .map((day) => ({
+          title: day?.title,
+          data: (day?.scheduleItem?.items || []).slice().sort(byStartTime),
+        })),
+    [data?.local?.conference?.days]
+  );
 
-  const renderItem = useMemo(() => ({ item }) => (
-    <ScheduleItem
-      onPress={() => navigation.navigate('ContentSingle', {
-        itemId: item.id,
-        transitionKey: item.transitionKey,
-      })}
-      {...item} />
-    ), []);
+  const renderItem = useMemo(
+    () => ({ item }) => (
+      <ScheduleItem
+        onPress={() =>
+          navigation.navigate('ContentSingle', {
+            itemId: item.sys.id,
+            transitionKey: item.transitionKey,
+          })
+        }
+        {...item}
+      />
+    ),
+    []
+  );
 
-  const renderSectionHeader = useMemo(() => ({ section }) => <SectionHeader>{section.title}</SectionHeader>, []);
+  const renderSectionHeader = useMemo(
+    () => ({ section }) => <SectionHeader>{section.title}</SectionHeader>,
+    []
+  );
 
   return (
     <BackgroundView>

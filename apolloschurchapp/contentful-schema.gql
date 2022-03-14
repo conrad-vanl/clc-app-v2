@@ -1,0 +1,250 @@
+type Local_Announcement implements Local_Entry {
+  internalTitle: String
+  title: String
+  summary: String
+  description: String
+  mediaUrl: String
+  publishAt: String
+  art: Local_Asset
+}
+
+type Local_AnnouncementCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Announcement]!
+}
+
+type Local_Asset {
+  sys: Local_Sys
+  contentfulMetadata: Local_ContentfulMetadata
+  title: String
+  description: String
+  contentType: String
+  fileName: String
+  url: String
+  size: Int
+  width: Int
+  height: Int
+}
+
+type Local_AssetCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Asset]!
+}
+
+type Local_Breakouts implements Local_Entry {
+  internalTitle: String
+  title: String
+  summary: String
+  description: String
+  breakouts: Local_EventCollection
+  startTime: String
+  endTime: String
+  art: Local_Asset
+}
+
+type Local_BreakoutsCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Breakouts]!
+}
+
+type Local_Conference implements Local_Entry {
+  internalTitle: String
+  title: String
+  code: String
+  days: Local_DayCollection
+  announcements: Local_AnnouncementCollection
+  tracks: Local_TrackCollection
+  maps: Local_LocationCollection
+  resources: Local_ConferenceResourceCollection
+}
+
+type Local_ConferenceCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Conference]!
+}
+
+union Local_ConferenceResource = Local_Announcement | Local_Link
+
+type Local_ConferenceResourceCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_ConferenceResource]!
+}
+
+type Local_ContentfulMetadata {
+  tags: [Local_ContentfulTag]!
+}
+
+type Local_ContentfulTag {
+  id: String!
+  name: String!
+}
+
+type Local_Day implements Local_Entry {
+  internalTitle: String
+  title: String
+  date: String
+  summary: String
+  scheduleItem: Local_DayScheduleItemCollection
+}
+
+type Local_DayCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Day]!
+}
+
+union Local_DayScheduleItem = Local_Breakouts | Local_Event
+
+type Local_DayScheduleItemCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_DayScheduleItem]!
+}
+
+interface Local_Entry {
+  sys: Local_Sys
+  contentfulMetadata: Local_ContentfulMetadata
+}
+
+type Local_EntryCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Entry]!
+}
+
+type Local_Event implements Local_Entry {
+  internalTitle: String
+  title: String
+  summary: String
+  description: String
+  speakers: Local_SpeakerCollection
+  location: Local_Location
+  downloads: Local_AssetCollection
+  startTime: String
+  endTime: String
+  art: Local_Asset
+  eventType: Local_EventEventType
+  capacity: Int
+}
+
+type Local_EventCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Event]!
+}
+
+enum Local_EventEventType {
+  breakout
+  showcase
+  workshop
+}
+
+type Local_Link implements Local_Entry {
+  title: String
+  url: String
+  useInAppBrowser: Boolean
+}
+
+type Local_LinkCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Link]!
+}
+
+type Local_Location implements Local_Entry {
+  internalTitle: String
+  title: String
+  summary: String
+  map: Local_Asset
+}
+
+type Local_LocationCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Location]!
+}
+
+type local_Query {
+  asset(id: String): Local_Asset
+  assetCollection(skip: String, limit: String): Local_AssetCollection
+  entry(id: String): Local_Entry
+  entryCollection(skip: String, limit: String): Local_EntryCollection
+  announcement(id: String): Local_Announcement
+  announcementCollection(skip: String, limit: String): Local_AnnouncementCollection
+  breakouts(id: String): Local_Breakouts
+  breakoutsCollection(skip: String, limit: String): Local_BreakoutsCollection
+  conference(id: String): Local_Conference
+  conferenceCollection(skip: String, limit: String): Local_ConferenceCollection
+  day(id: String): Local_Day
+  dayCollection(skip: String, limit: String): Local_DayCollection
+  event(id: String): Local_Event
+  eventCollection(skip: String, limit: String): Local_EventCollection
+  link(id: String): Local_Link
+  linkCollection(skip: String, limit: String): Local_LinkCollection
+  location(id: String): Local_Location
+  locationCollection(skip: String, limit: String): Local_LocationCollection
+  speaker(id: String): Local_Speaker
+  speakerCollection(skip: String, limit: String): Local_SpeakerCollection
+  track(id: String): Local_Track
+  trackCollection(skip: String, limit: String): Local_TrackCollection
+}
+
+type Local_Speaker implements Local_Entry {
+  internalTitle: String
+  name: String
+  summary: String
+  biography: String
+  photo: Local_Asset
+  isOnConferenceDirectory: Boolean
+  talks: Local_EventCollection
+}
+
+type Local_SpeakerCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Speaker]!
+}
+
+type Local_Sys {
+  id: String
+  spaceId: String
+  environmentId: String
+}
+
+type Local_Track implements Local_Entry {
+  internalTitle: String
+  title: String
+  summary: String
+  description: String
+  scheduleItems: Local_EventCollection
+  art: Local_Asset
+}
+
+type Local_TrackCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Track]!
+}
+
+type Query {
+  local: local_Query
+}
+
