@@ -61,7 +61,10 @@ const LocalContentNodeConnected = ({
 }) => {
   const { data, loading, error } = useQueryAutoRefresh(
     GET_CONTENT_ITEM_CONTENT,
-    { variables: { nodeId: nodeId || '' } }
+    {
+      fetchPolicy: 'no-cache',
+      variables: { nodeId: nodeId || '' },
+    }
   );
   const { local: { entry } = {} } = data || {};
 

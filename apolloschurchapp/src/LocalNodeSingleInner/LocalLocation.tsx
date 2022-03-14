@@ -32,7 +32,7 @@ const query = gql`
 const LocalLocation = ({ contentId }: { contentId: string }) => {
   const navigation = useNavigation();
   const { loading, data } = useQuery(query, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     variables: { itemId: contentId },
   });
 

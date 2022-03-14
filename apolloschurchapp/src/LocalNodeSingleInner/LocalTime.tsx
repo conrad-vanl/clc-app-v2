@@ -37,7 +37,7 @@ interface Props {
 
 const LocalTime = ({ contentId, condensed }: Props) => {
   const { loading, data } = useQuery(query, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     variables: { itemId: contentId },
   });
 

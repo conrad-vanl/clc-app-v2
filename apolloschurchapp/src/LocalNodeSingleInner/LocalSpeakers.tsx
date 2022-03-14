@@ -63,6 +63,7 @@ const LocalSpeakers = ({ contentId }: { contentId: string }) => {
 
   const { loading, data, error } = useQuery(query, {
     variables: { itemId: contentId },
+    fetchPolicy: 'no-cache'
   });
 
   const node = get(data, 'local.entry')

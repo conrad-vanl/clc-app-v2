@@ -47,6 +47,7 @@ interface Asset {
 const LocalDownloads = ({ contentId }: { contentId: string }) => {
   const { loading, data } = useQuery(query, {
     variables: { itemId: contentId },
+    fetchPolicy: 'no-cache'
   });
 
   const node = get(data, 'local.entry')

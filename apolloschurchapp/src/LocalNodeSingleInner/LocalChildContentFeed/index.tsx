@@ -38,7 +38,7 @@ const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
   const { data, loading, error } = useQuery<GetChildContentLocalData>(
     getChildContent,
     {
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: 'no-cache',
       variables: {
         itemId: contentId,
       },
