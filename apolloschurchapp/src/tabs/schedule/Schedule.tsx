@@ -121,7 +121,7 @@ const Schedule = ({ navigation }: { navigation: any }) => {
   const renderSectionHeader = useMemo(
     () => ({ section }: { section: Day }) => (
       <SectionHeader height={HEADER_HEIGHT}>
-        {section.title} ({section.date})
+        {section.title}
       </SectionHeader>
     ),
     []
