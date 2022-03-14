@@ -24,18 +24,29 @@ const GET_CONTENT_ITEM_CONTENT = gql`
         sys {
           id
         }
-        title
         ... on Local_Event {
+          title
           description
           art {
             url
           }
         }
         ... on Local_Announcement {
+          title
           description
           art {
             url
           }
+        }
+        ... on Local_Speaker {
+          title: name
+          art: photo {
+            url
+          }
+          description: biography
+        }
+        ... on Local_Location {
+          title
         }
       }
     }
@@ -55,8 +66,8 @@ const LocalContentNodeConnected = ({
   const { local: { entry } = {} } = data || {};
 
   if (!nodeId) return <HTMLView isLoading />;
-
   if (!entry && error) return <ErrorCard error={error} />;
+
   const coverImageSources = [entry?.art?.url].filter(present);
   const { title, description } = entry || {};
   const htmlContent = (present(description) && marked(description)) || '';

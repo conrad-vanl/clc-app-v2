@@ -14,7 +14,7 @@ import {
 import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 
 import LocalNodeSingleInner from '../LocalNodeSingleInner';
-// import MapView from './MapView';
+import LocalMapView from './LocalMapView';
 
 // copied from apollos-ui-connected/src/NodeSingleConnected/index.js
 const FlexedScrollView = styled({ flex: 1 })(Animated.ScrollView);
@@ -55,7 +55,21 @@ const LocalContentSingle = (props) => {
             sys {
               id
             }
-            title
+            ... on Local_Event {
+              title
+            }
+            ... on Local_Announcement {
+              title
+            }
+            ... on Local_Breakouts {
+              title
+            }
+            ... on Local_Speaker {
+              title: name
+            }
+            ... on Local_Location {
+              title
+            }
           }
         }
       }
@@ -63,14 +77,15 @@ const LocalContentSingle = (props) => {
     { variables: { nodeId } }
   );
 
-  const content = (
+  const typename = data?.local?.entry?.__typename;
+  let content = (
     <PaddedNodeSingleConnected
       nodeId={nodeId}
-      typename={data?.local?.entry?.__typename}
+      typename={typename}
       Component={LocalNodeSingleInner}
     />
   );
-  // if (nodeId.includes('Location')) content = <MapView nodeId={nodeId} />;
+  if (typename?.includes('Location')) content = <LocalMapView nodeId={nodeId} />;
 
   return <ThemeMixin>{content}</ThemeMixin>;
 };

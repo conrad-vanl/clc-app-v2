@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { get } from 'lodash';
 import { gql, useQuery } from '@apollo/client';
+import { rewriteContentfulUrl } from '../util';
 
 const styles = StyleSheet.create({
   contentContainerStyle: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
@@ -24,22 +25,22 @@ const ImageZoomView = styled({
 })(ScrollView);
 
 const query = gql`
-  query getSpeakers($itemId: ID!) {
-    node(id: $itemId) {
-      ...on ContentItem {
+  query getMapViewLocal($itemId: ID!) {
+    local @client {
+      location(id: $itemId) {
         title
-        coverImage {
-          sources {
-            uri
-          }
+        map {
+          url
         }
       }
     }
   }
 `;
 
-const Location = ({ nodeId }) => {
-  const { loading, data: { node = {} } = {} } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { itemId: nodeId } });
+const LocalMapView = ({ nodeId }) => {
+  const { loading, data } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { itemId: nodeId } });
+  const location = data?.local?.location;
+
   return (
     <>
       <ImageZoomView
@@ -52,13 +53,13 @@ const Location = ({ nodeId }) => {
         contentContainerStyle={styles.contentContainerStyle}
         bouncesZoom
       >
-        <SizedImage source={node?.coverImage?.sources} />
+        <SizedImage source={location?.map?.url && rewriteContentfulUrl(location.map.url)} />
       </ImageZoomView>
     </>
   );
 }
 
-Location.propTypes = {
+LocalMapView.propTypes = {
   content: PropTypes.shape({
     map: PropTypes.shape({
       sources: PropTypes.arrayOf(PropTypes.shape({ uri: PropTypes.string })),
@@ -66,4 +67,4 @@ Location.propTypes = {
   }),
 };
 
-export default Location;
+export default LocalMapView;

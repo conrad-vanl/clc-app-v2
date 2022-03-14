@@ -7,3 +7,7 @@ export function present(value: string | undefined | null | ''): value is string 
   }
   return true
 }
+
+export function rewriteContentfulUrl(url: string): string {
+  return url.replace(/^(https?\:)?\/\//, 'https://')
+}
