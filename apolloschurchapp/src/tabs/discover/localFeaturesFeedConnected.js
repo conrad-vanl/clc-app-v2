@@ -12,10 +12,10 @@ import {
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 const GET_FEATURE_FEED = gql`
-  query getLocalHomeFeatureFeed {
+  query getLocalDiscoverFeatureFeed {
     local @client {
       conference(id: "doyAUR5XEVx4jK4NGvS8z") {
-        announcements {
+        tracks {
           items {
             sys {
               id
@@ -23,8 +23,6 @@ const GET_FEATURE_FEED = gql`
             title
             summary
             description
-            mediaUrl
-            publishAt
             art {
               url
             }
@@ -54,7 +52,7 @@ const LocalFeaturesFeedConnected = ({ onPressActionItem, ...props }) => {
     </TouchableScale>
   );
 
-  const features = get(data, 'local.conference.announcements.items', []);
+  const features = get(data, 'local.conference.tracks.items', []);
   return (
     <FeedView
       error={error}

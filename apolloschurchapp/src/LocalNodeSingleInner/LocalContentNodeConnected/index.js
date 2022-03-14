@@ -48,6 +48,13 @@ const GET_CONTENT_ITEM_CONTENT = gql`
         ... on Local_Location {
           title
         }
+        ... on Local_Track {
+          title
+          description
+          art {
+            url
+          }
+        }
       }
     }
   }

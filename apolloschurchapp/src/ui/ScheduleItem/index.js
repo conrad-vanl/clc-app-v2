@@ -58,7 +58,7 @@ export const Caret = styled(({ theme }) => ({
 
 const SecondaryText = styled({ opacity: 0.6 })(UIText);
 
-const formatTime = (time) => time ? moment(time).format('h:mma') : null;
+const formatTime = (time) => (time ? moment(time).format('h:mma') : null);
 
 const ScheduleItem = ({
   id,
@@ -77,18 +77,28 @@ const ScheduleItem = ({
         {startTime || isLoading ? (
           <TimeContainer>
             <UIText isLoading={isLoading}>{formatTime(startTime)}</UIText>
-            <SecondaryText isLoading={isLoading}>{formatTime(endTime)}</SecondaryText>
+            <SecondaryText isLoading={isLoading}>
+              {formatTime(endTime)}
+            </SecondaryText>
           </TimeContainer>
         ) : null}
         <EventInfo>
           {label || isLoading ? (
-            <LabelText isLoading={isLoading} expired={moment(endTime) < new Date()}>
+            <LabelText
+              isLoading={isLoading}
+              expired={moment(endTime) < new Date()}
+            >
               {label}
             </LabelText>
           ) : null}
-          <H5 isLoading={isLoading} numberOfLines={2}>{title}</H5>
+          <H5 isLoading={isLoading} numberOfLines={2}>
+            {title}
+          </H5>
           {(summary && !label) || isLoading ? (
-            <SecondaryText isLoading={isLoading} numberOfLines={title.length > 30 ? 1 : 2}>
+            <SecondaryText
+              isLoading={isLoading}
+              numberOfLines={title.length > 30 ? 1 : 2}
+            >
               {summary}
             </SecondaryText>
           ) : null}

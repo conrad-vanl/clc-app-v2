@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Query } from '@apollo/client/react/components';
-import { gql, useApolloClient } from '@apollo/client';
+import { useApolloClient } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 
 import {
@@ -10,10 +9,7 @@ import {
   BackgroundView,
   NavigationService,
 } from '@apollosproject/ui-kit';
-import {
-  FEATURE_FEED_ACTION_MAP,
-  RockAuthedWebBrowser,
-} from '@apollosproject/ui-connected';
+import { RockAuthedWebBrowser } from '@apollosproject/ui-connected';
 
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
 
