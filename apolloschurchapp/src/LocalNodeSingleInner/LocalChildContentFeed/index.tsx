@@ -1,15 +1,24 @@
 import React from 'react';
-import { get } from 'lodash';
+import { SectionList } from 'react-native';
+import { get, groupBy } from 'lodash';
+import moment from 'moment';
 import { useQuery } from '@apollo/client';
 
 import { useNavigation } from '@react-navigation/native';
-import { PaddedView, H4 } from '@apollosproject/ui-kit';
+import { PaddedView, H4, styled } from '@apollosproject/ui-kit';
 import ScheduleItem from '../../ui/ScheduleItem';
 
 import getChildContent, {
   GetChildContentLocalData,
   GetChildContentLocalEvent,
 } from './getChildContent';
+
+const SectionHeader = styled(({ theme }: any) => ({
+  backgroundColor: theme.colors.background.paper,
+  color: theme.colors.text.secondary,
+  paddingHorizontal: theme.sizing.baseUnit,
+  paddingVertical: theme.sizing.baseUnit / 2,
+}))(H4);
 
 const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
   const navigation = useNavigation();
@@ -18,19 +27,6 @@ const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
       itemId: item.sys.id,
     });
   };
-
-  const renderItem = (item: GetChildContentLocalEvent) => (
-    <ScheduleItem
-      id={null}
-      isLoading={item.isLoading}
-      title={item.title}
-      summary={item.description}
-      startTime={null}
-      endTime={null}
-      key={item.sys.id}
-      onPress={() => handleOnPressItem(item)}
-    />
-  );
 
   if (!contentId) return null;
 
@@ -47,27 +43,63 @@ const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
 
   if (error) return null;
 
-  console.log('data', data)
+  const typename = data?.local?.entry?.__typename || ''
   const childContent: GetChildContentLocalEvent[] = get(
     data,
-    'local.entry.breakouts.items',
+    'local.entry.events.items',
     []
   );
 
   let content = childContent;
-  if (loading && !content.length && contentId.includes('Breakout')) {
+  if (loading && !content.length && typename.includes('Breakout')) {
     content = [{ isLoading: true }, { isLoading: true }, { isLoading: true }] as any;
+  } else {
+    content = content.sort(byStartTime)    
   }
+  const grouped = groupBy(content, (e) => e.startTime && moment(e.startTime).startOf('day').toISOString() || '')
+  const sections = Object.keys(grouped).sort().map((key) => {
+    return {
+      title: key ? moment(key).format('dddd') : '',
+      data: grouped[key]
+    }
+  })
 
   return (content && content.length) ||
-    (loading && contentId.includes('Breakout')) ? (
+    (loading && typename.includes('Breakout')) ? (
     <React.Fragment>
       <PaddedView vertical={false}>
         <H4 padded>Sessions</H4>
       </PaddedView>
-      {content.map(renderItem)}
+      <SectionList
+        refreshing={loading}
+        sections={sections}
+        renderItem={({item}) => (
+          <ScheduleItem
+            id={null}
+            isLoading={item.isLoading}
+            title={item.title}
+            summary={item.description}
+            label={typename.includes('Breakout') ? undefined : item.eventType}
+            startTime={item.startTime}
+            endTime={item.endTime}
+            key={item.sys.id}
+            onPress={() => handleOnPressItem(item)}
+          />
+        )}
+        renderSectionHeader={({section}: { section: { title: string } }) => {
+          return <SectionHeader>
+            {section.title}
+          </SectionHeader>
+        }}
+        />
     </React.Fragment>
   ) : null;
 };
 
 export default HorizontalContentFeed;
+
+function byStartTime(a: { startTime?: string }, b: { startTime?: string }) {
+  if (!a.startTime || !b.startTime) { return 0 }
+
+  return Date.parse(a.startTime) - Date.parse(b.startTime)
+}

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { withTheme } from '@apollosproject/ui-kit';
 
@@ -9,10 +8,7 @@ const { Navigator, Screen } = createNativeStackNavigator();
 
 const DiscoverNavigator = (props) => (
   <Navigator initialRouteName="Tracks" {...props}>
-    <Screen
-      component={Discover}
-      name="Tracks"
-    />
+    <Screen component={Discover} name="Tracks" />
   </Navigator>
 );
 const EnhancedDiscover = withTheme(({ theme, ...props }) => ({

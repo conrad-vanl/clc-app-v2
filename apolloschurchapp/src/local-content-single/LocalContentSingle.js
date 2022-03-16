@@ -70,6 +70,9 @@ const LocalContentSingle = (props) => {
             ... on Local_Location {
               title
             }
+            ... on Local_Track {
+              title
+            }
           }
         }
       }

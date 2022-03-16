@@ -6,7 +6,6 @@ import {
   BackgroundView,
   H4,
   styled,
-  withThemeMixin,
 } from '@apollosproject/ui-kit';
 
 import ScheduleItem from '../../ui/ScheduleItem';
@@ -85,7 +84,6 @@ const Schedule = ({ navigation }: { navigation: any }) => {
     fetchPolicy: 'no-cache',
   });
   const days: Day[] | undefined = data?.local?.conference?.days?.items
-  console.log(days)
 
   const sections = useMemo(
     () =>
@@ -142,7 +140,6 @@ const Schedule = ({ navigation }: { navigation: any }) => {
     const nextItemIdx = sections[todayIndex].data.findIndex((item) => new Date(item.endTime) > now)
     if (nextItemIdx < 0) {
       // all events for today are done, go to tomorrow at index 0
-    console.log('todayIndex', todayIndex, 0)
       return sectionListRef.current.scrollToLocation({
         sectionIndex: tomorrowIndex,
         itemIndex: 0
@@ -150,7 +147,6 @@ const Schedule = ({ navigation }: { navigation: any }) => {
     }
 
     const prevItemIdx = nextItemIdx - 1;
-    console.log('todayIndex', todayIndex,  Math.max(prevItemIdx, 0))
     sectionListRef.current.scrollToLocation({
       sectionIndex: todayIndex,
       itemIndex: Math.max(prevItemIdx, 0)
