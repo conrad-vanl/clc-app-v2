@@ -166,7 +166,7 @@ const Schedule = ({ navigation }: { navigation: any }) => {
         getItemLayout={useCallback((data: Day[] | null, index: number) => {
           return {
             length: ITEM_HEIGHT,
-            offset: ITEM_HEIGHT * index,
+            offset: ITEM_HEIGHT * index - HEADER_HEIGHT,
             index,
           }
         }, [])}
