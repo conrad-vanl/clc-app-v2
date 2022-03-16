@@ -48,13 +48,34 @@ export const schema = gql`
 
   extend type Query {
     conference(code: String): Conference
+    nodeIdToContentfulId(id: ID!): ID!
   }
 `;
+
+const CONTENTFUL_TYPES = [
+  'Event',
+  'Announcement',
+  'Breakouts',
+  'Conference',
+  'ConferenceDay',
+  'ConferenceTrack',
+  'Event',
+  'Link',
+  'Location',
+  'Speaker',
+]
 
 export const resolver = {
   Query: {
     conference: (_, { code }, { dataSources }) =>
       dataSources.Conference.getFromCode(code),
+    nodeIdToContentfulId: (_, { id }) => {
+      const { id: contentfulId, __type } = parseGlobalId(id);
+      if (CONTENTFUL_TYPES.includes(__type)) {
+        return contentfulId;
+      }
+      return null;
+    },
   },
   Resource: {
     __resolveType: ({ sys }) => {
