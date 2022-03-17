@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import marked from 'marked';
 import { gql } from '@apollo/client';
 import { SectionList } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -10,6 +11,7 @@ import {
 
 import ScheduleItem from '../../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
+import { renderPlain } from '../../markdown';
 
 const getDays = gql`
   query {
@@ -110,7 +112,7 @@ const Schedule = ({ navigation }: { navigation: any }) => {
           });
         }}
         {...item}
-        summary={item.description}
+        summary={item.description && marked(item.description, {renderer: renderPlain()} )}
       />
     ),
     []
