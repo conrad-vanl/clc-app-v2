@@ -12,6 +12,8 @@ import getChildContent, {
   GetChildContentLocalData,
   GetChildContentLocalEvent,
 } from './getChildContent';
+import marked from 'marked';
+import { renderPlain } from '../../markdown';
 
 const SectionHeader = styled(({ theme }: any) => ({
   backgroundColor: theme.colors.background.paper,
@@ -78,7 +80,7 @@ const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
             id={null}
             isLoading={item.isLoading}
             title={item.title}
-            summary={item.description}
+            summary={item.description && marked(item.description, {renderer: renderPlain()} )}
             label={typename.includes('Breakout') ? undefined : item.eventType}
             startTime={item.startTime}
             endTime={item.endTime}
