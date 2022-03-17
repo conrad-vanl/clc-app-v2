@@ -163,15 +163,55 @@ const Schedule = ({ navigation }: { navigation: any }) => {
         sections={sections}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        getItemLayout={useCallback((data: Day[] | null, index: number) => {
+        getItemLayout={useCallback((data, index) => {
+          const offset = calculateOffset(index)
+
           return {
             length: ITEM_HEIGHT,
-            offset: ITEM_HEIGHT * index - HEADER_HEIGHT,
+            offset,
             index,
           }
         }, [])}
       />
     </BackgroundView>
   );
+
+  /**
+   * SectionList flattens headers + items into a single list and gives you the
+   * index into that list - from that you have to add together ITEM_HEIGHT +
+   * HEADER_HEIGHT for each header you pass by or each item you pass by until
+   * you reach the offset.
+   */
+  function calculateOffset(index: number): number {
+    if (!sections || sections.length == 0) { return 0 }
+    const data = [...sections]
+  
+    let offset = 0
+    let day: { data: ScheduleItemData[] } | undefined
+    while(index > 0) {
+      if (!day) {
+        day = data.shift()
+        // out of data
+        if (!day) { return offset }
+  
+        // new day - add in header height
+        offset += HEADER_HEIGHT
+        index -= 1
+      }
+      const dayCount = day.data.length
+      if (index > dayCount) {
+        // skip the rest of this day
+        offset += (ITEM_HEIGHT * dayCount)
+        index -= dayCount
+        day = undefined
+      } else {
+        // skip to the right spot of today
+        offset += (ITEM_HEIGHT * index)
+        index = 0
+      }
+    }
+  
+    return offset
+  }
 };
 export default Schedule;
