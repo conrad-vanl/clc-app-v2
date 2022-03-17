@@ -5,7 +5,7 @@
 import 'fastestsmallesttextencoderdecoder'
 import { URL } from 'whatwg-url';
 import {wait} from 'async-toolbox/wait'
-import type { SyncCollection, Entry, Asset, Sys } from "contentful";
+import { SyncCollection, Entry, Asset, isAsset, DeletedAsset, DeletedEntry, isDeletedAsset, isDeletedEntry, isEntry, SyncResponse, EntryCollection } from "./types";
 
 type Fetch = typeof fetch
 
@@ -64,22 +64,60 @@ export class SimpleContentfulClient {
       deletedEntries.push(...body.items.filter(isDeletedEntry))
     }
     
-    const nextSyncToken = new URL(body.nextSyncUrl!).searchParams.get('sync_token')
+    const nextSyncToken = new URL(body.nextSyncUrl!).searchParams.get('sync_token')!
     return {
       assets,
-      deletedAssets: deletedAssets as Asset[],
+      deletedAssets: deletedAssets as unknown as Asset[],
       entries,
-      deletedEntries: deletedEntries as Entry<any>[],
+      deletedEntries: deletedEntries as unknown as Entry[],
       nextSyncToken,
       toPlainObject() { return this },
       stringifySafe() { return JSON.stringify(this) }
-    }
+    } as SyncCollection
   }
 
-  private async get(path: string, query: Record<string, string> = {}): Promise<Response> {
+  public async *entries(query?: EntriesQuery): AsyncGenerator<Entry, void, void> {
+    const {space, environmentId} = this.options
+
+    if (query) {
+      query = {
+        content_type: query.content_type,
+        ...(query?.fields && Object.keys(query.fields).reduce((h, f) => {
+          if (query?.fields?.hasOwnProperty(f)) {
+            if (f == 'id') {
+              h['sys.id'] = query.fields.id
+            }
+            h[`fields.${f}`] = query.fields[f]
+          }
+          return h
+        }, {} as Record<string, string>))
+      }
+    }
+
+    const q = {
+      ...query,
+      skip: 0,
+      limit: 100
+    }
+    let page: EntryCollection
+    do {
+      const resp = await this.get(`/spaces/${space}/environments/${environmentId}/entries`, q)
+      page = await resp.json()
+
+      for(const item of page.items) {
+        yield item
+      }
+      q.skip = page.skip + page.items.length
+    } while(page.total > q.skip)
+  }
+
+  private async get(path: string, query: Record<string, string | number | undefined> = {}): Promise<Response> {
     const url = new URL(path, this.options.baseUrl)
     Object.keys(query).forEach((k) => {
-      url.searchParams.set(k, query[k])
+      const v = query[k]
+      if (v !== undefined && v !== null) {
+        url.searchParams.set(k, v.toString())
+      }
     })
 
     let resp: Response
@@ -115,43 +153,13 @@ export class SimpleContentfulClient {
   }
 }
 
+interface EntriesQuery {
+  content_type: string,
+
+  // include?: number TODO
+
+  fields?: Record<string, string>
+}
+
 // tslint:disable-next-line: max-classes-per-file
 export class NotFoundError extends Error {}
-
-interface SyncResponse {
-  sys: { type: 'Array' },
-  items: Array<SyncItem>,
-
-  nextSyncUrl?: string,
-  nextPageUrl?: string
-}
-
-type SyncItem =
-  Entry<any> |
-  Asset |
-  DeletedEntry |
-  DeletedAsset
-
-interface DeletedEntry {
-  sys: Sys & { type: 'DeletedEntry' }
-}
-
-interface DeletedAsset {
-  sys: Sys & { type: 'DeletedAsset' }
-}
-  
-function isEntry(e: any): e is Entry<any> {
-  return e && e.sys && e.sys.type == 'Entry'
-}
-
-function isAsset(e: any): e is Asset {
-  return e && e.sys && e.sys.type == 'Asset'
-}
-
-function isDeletedEntry(e: any): e is DeletedEntry {
-  return e && e.sys && e.sys.type == 'DeletedEntry'
-}
-
-function isDeletedAsset(e: any): e is DeletedAsset {
-  return e && e.sys && e.sys.type == 'DeletedAsset'
-}
