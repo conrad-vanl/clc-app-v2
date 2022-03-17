@@ -1,0 +1,115 @@
+#! /usr/bin/env node
+
+const yargs = require('yargs')
+const fetch = require('node-fetch')
+const fs = require('fs-extra')
+const fastcsv = require('fast-csv');
+const {onceAsync} = require('async-toolbox/events')
+
+const argv = yargs.argv
+
+const ConferenceCode = argv[0] || 'CLC2021'
+const DataclipUrl = 'https://data.heroku.com/dataclips/ayaeestfwmdxtmskuowxgfplubju.json'
+
+const contentfulSpaceId = process.env.CONTENTFUL_SPACE || 'vsbnbtnlrnnr'
+const contentfulAccessToken = process.env.CONTENTFUL_REST_KEY || 'k8mCSPw_UbsnK3XgC4JYpPVihDyRNLv5ZRZbfgcM6pg'
+
+async function Main() {
+  const events = await fetchEventMap()
+
+  const dataclip = await fetchDataclip()
+
+  const results = dataclip.map((row) => {
+    const event = events[row.nodeId]
+    if (!event) {
+      // deleted event, we don't care anymore
+      return
+    }
+    
+    return {
+      ...row,
+      title: event?.title,
+      eventType: event?.eventType,
+      startTime: event?.startTime,
+      speakers: event?.speakers?.map((s) => s.name)
+    }
+  }).filter((e) => e)
+
+  const stream =
+    !argv.out || argv.out == '-' ?
+      process.stdout :
+      fs.createWriteStream(argv.out)
+
+  const writer =
+    fastcsv.write(results, {headers: true})
+    .pipe(stream)
+
+  await onceAsync(writer, 'end')
+}
+
+Main()
+  .then(() => process.exit(0))
+  .catch((ex) => {
+    console.error(ex);
+    process.exit(1);
+  })
+
+async function fetchDataclip() {
+  const resp = await fetch(DataclipUrl)
+  if (resp.status != 200) {
+    throw new Error(`Unexpected status code ${resp.status}`)
+  }
+
+  const json = await resp.json()
+  return (json.values || []).map(row => {
+    return row.reduce((hash, value, i) => {
+      hash[json.fields[i]] = value
+      return hash
+    }, {})
+  })
+}
+
+async function fetchEventMap() {
+  const resp = await fetch(
+    `https://cdn.contentful.com/spaces/${contentfulSpaceId}/environments/master/entries?content_type=conference&fields.code=${ConferenceCode}&include=3`,
+    {
+      headers: {
+        Authorization: `Bearer ${contentfulAccessToken}`
+      },
+      redirect: 'follow'
+    }
+  )
+  if (resp.status != 200) {
+    throw new Error(`Unexpected status code ${resp.status}`)
+  }
+
+  const json = await resp.json()
+  const includes = json?.includes?.Entry || []
+
+  const speakers = reduceToHash(includes.filter(isEntryOfType('speaker')))
+  const events = includes.filter(isEntryOfType('event'))
+  return reduceToHash(events, (e) => {
+    return {
+      ...e.fields,
+      speakers: (e.fields.speakers || [])
+        .map((s) =>
+          s && speakers[s.sys.id]
+        ).filter((s) => s)
+    }
+  })
+}
+
+function isEntryOfType(type) {
+  return (e) => e?.sys?.contentType?.sys?.id == type
+}
+
+function reduceToHash(entries, fn) {
+  return entries.reduce((hash, e) => {
+    if (fn) {
+      hash[e.sys.id] = fn(e)
+    } else {
+      hash[e.sys.id] = e
+    }
+    return hash
+  }, {})
+}
