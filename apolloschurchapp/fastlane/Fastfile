@@ -24,7 +24,7 @@ platform :ios do
   desc "Push a new beta build to TestFlight"
   lane :deploy do
     app_store_connect_api_key(
-      key_id: "TTQ5USX2JM",
+      key_id: "66A59C88F8",
       issuer_id: "69a6de80-0c47-47e3-e053-5b8c7c11a4d1",
       key_filepath: "ios/apollos.p8",
     )
