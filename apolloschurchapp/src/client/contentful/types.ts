@@ -38,12 +38,16 @@ export interface Asset {
   }
 }
 
-export interface EntryCollection<TFields = Record<string, any>> {
+export interface EntryCollection<T extends Entry = Entry> {
   sys: { type: 'Array' },
   total: number
   skip: number
   limit: number
-  items: Entry<TFields>[]
+  items: T[]
+  includes: {
+    Entry: Entry<Record<string, any>>[]
+    Asset: Asset[]
+  }
 }
 
 export interface SyncCollection {

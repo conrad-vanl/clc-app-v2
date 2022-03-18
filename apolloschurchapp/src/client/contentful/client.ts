@@ -76,7 +76,7 @@ export class SimpleContentfulClient {
     } as SyncCollection
   }
 
-  public async *entries(query?: EntriesQuery): AsyncGenerator<Entry, void, void> {
+  public async *entries<T extends Entry>(query?: EntriesQuery): AsyncGenerator<EntryCollection<T>, void, void> {
     const {space, environmentId} = this.options
 
     if (query) {
@@ -103,11 +103,9 @@ export class SimpleContentfulClient {
     do {
       const resp = await this.get(`/spaces/${space}/environments/${environmentId}/entries`, q)
       page = await resp.json()
-
-      for(const item of page.items) {
-        yield item
-      }
       q.skip = page.skip + page.items.length
+
+      yield {...page}
     } while(page.total > q.skip)
   }
 
