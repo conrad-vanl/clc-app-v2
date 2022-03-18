@@ -3,7 +3,7 @@ import yargs from 'yargs'
 import { ParallelTransform } from 'async-toolbox/stream'
 import 'isomorphic-fetch'
 
-import {createClient as createManagementClient} from 'contentful-management'
+import {createClient as createManagementClient, Entry as ManagementEntry} from 'contentful-management'
 import {createClient} from './contentful/client'
 import { Pipeline } from 'async-toolbox/pipeline'
 import { createAssetUpload, mergeSpeakers, PersonProps, SpeakerProps, transformPersonToSpeaker } from './transform'
@@ -33,6 +33,26 @@ async function Main() {
   const destSpace = await destinationClient.getSpace(clcAppSpaceId)
   const destEnv = await destSpace.getEnvironment(environmentId || 'master')
 
+  const sourceTeams = sourceClient.entries({
+    content_type: 'team',
+    include: 0,
+  })
+
+  // create a lookup table of team members -> team
+  const personIdToTeam: Record<string, Entry> = {}
+  for await(const page of sourceTeams) {
+    for(const team of page.items) {
+      // only use "Listed" teams
+      if (!team.fields.isListed) {
+        continue
+      }
+
+      for(const memberLink of (team.fields.members || [])) {
+        personIdToTeam[memberLink.sys.id] = team
+      }
+    }
+  }
+
   const pipeline = new Pipeline(
     await extract(),
     await transform(),
@@ -44,31 +64,40 @@ async function Main() {
   })
 
   async function extract() {
-    const destSpeakers = await destEnv.getEntries({
-      content_type: 'speaker',
-      include: 0,
-      limit: 1000
-    })
-
-    const destSpeakerNames = destSpeakers.items
-      .filter((s) => s.fields.name['en-US'])
-      .map((s) => {
-        return (s.fields.name['en-US'] as string).toLowerCase()
+    const destSpeakers: ManagementEntry[] = []
+    let skip = 0
+    while(true) {
+      const page = await destEnv.getEntries({
+        content_type: 'speaker',
+        include: 0,
+        skip
       })
+      destSpeakers.push(...page.items)
+      if (page.total <= page.items.length + skip) {
+        break;
+      }
+      skip += page.items.length
+    }
 
     const sourcePeople = sourceClient.entries({
-      content_type: 'person'
+      content_type: 'person',
+      include: 1,
     })
 
     async function* generator() {
       for await(const page of sourcePeople) {
         for(const person of page.items) {
+          // skip people not on staff
+          if (!person.fields.onStaff) { continue }
           
           const name = `${person.fields.firstName} ${person.fields.lastName}`
           const speaker =
-            destSpeakers.items.find((s) =>
-              s.fields.name['en-US'] && s.fields.name['en-US'] == name.toLowerCase())?.toPlainObject()
+            destSpeakers.find((s) =>
+              s.fields.name['en-US'] && s.fields.name['en-US'].toLowerCase() == name.toLowerCase())?.toPlainObject()
 
+          if (!speaker) {
+            console.error('Creating new speaker for', name)
+          }
           let profileImage: Asset | undefined
           const profileImageId = person.fields.profileImage?.sys?.id
           if (profileImageId) {
@@ -91,7 +120,8 @@ async function Main() {
     return new ParallelTransform({
       objectMode: true,
       async transformAsync(chunk: Chunk) {
-        let newSpeaker = await transformPersonToSpeaker(chunk.person)
+        let newSpeaker = await transformPersonToSpeaker(chunk.person, personIdToTeam)
+
         if (chunk.speaker) {
           newSpeaker = mergeSpeakers(chunk.speaker, newSpeaker)
         }

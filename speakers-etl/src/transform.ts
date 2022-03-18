@@ -1,12 +1,14 @@
 import { Asset, Entry, Link } from "./contentful/types"
 import { present } from "./util"
 
-export function transformPersonToSpeaker(entry: Entry<PersonProps>): any {
+export function transformPersonToSpeaker(entry: Entry<PersonProps>, personIdToTeam: Record<string, Entry>): any {
   const name = [entry.fields.firstName, entry.fields.lastName].filter(present).join(' ')
   const bio = 
     entry.fields.hasProfilePage &&
       `[Read ${entry.fields.firstName}'s Bio](https://www.watermark.org/people/${entry.fields.slug})` ||
       ''
+
+  const team: Entry | undefined = personIdToTeam[entry.sys.id]
 
   return {
     sys: {
@@ -26,7 +28,7 @@ export function transformPersonToSpeaker(entry: Entry<PersonProps>): any {
       summary: { 'en-US': entry.fields.title },
       biography: { 'en-US': bio },
       isOnConferenceDirectory: { 'en-US': entry.fields.onStaff },
-      team: { 'en-US': entry.fields.team },
+      team: { 'en-US': team?.fields?.name || entry.fields.team },
       email: { 'en-US': entry.fields.email }
     }
   }
@@ -37,8 +39,10 @@ export function mergeSpeakers(existing: Entry<SpeakerProps>, newSpeaker: Entry<S
     ...existing,
     fields: {
       ...existing.fields,
-      email: { 'en-US': newSpeaker.fields.email },
-      team: { 'en-US': newSpeaker.fields.team }
+      biography: newSpeaker.fields.biography,
+      email: newSpeaker.fields.email,
+      team: newSpeaker.fields.team,
+      isOnConferenceDirectory: newSpeaker.fields.isOnConferenceDirectory
     }
   }
 }

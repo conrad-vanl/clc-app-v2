@@ -82,6 +82,7 @@ export class SimpleContentfulClient {
     if (query) {
       query = {
         content_type: query.content_type,
+        include: query.include,
         ...(query?.fields && Object.keys(query.fields).reduce((h, f) => {
           if (query?.fields?.hasOwnProperty(f)) {
             if (f == 'id') {
@@ -99,7 +100,7 @@ export class SimpleContentfulClient {
       skip: 0,
       limit: 100
     }
-    let page: EntryCollection
+    let page: EntryCollection<T>
     do {
       const resp = await this.get(`/spaces/${space}/environments/${environmentId}/entries`, q)
       page = await resp.json()
@@ -154,7 +155,7 @@ export class SimpleContentfulClient {
 interface EntriesQuery {
   content_type: string,
 
-  // include?: number TODO
+  include?: number
 
   fields?: Record<string, string>
 }
