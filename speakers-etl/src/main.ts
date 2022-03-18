@@ -1,14 +1,14 @@
 import { Readable } from 'stream'
 import yargs from 'yargs'
-import { ParallelTransform, ParallelWritable } from 'async-toolbox/stream'
+import { ParallelTransform } from 'async-toolbox/stream'
 import 'isomorphic-fetch'
 
 import {createClient as createManagementClient} from 'contentful-management'
 import {createClient} from './contentful/client'
 import { Pipeline } from 'async-toolbox/pipeline'
-// import { Load } from './load'
-import { createAssetUpload, mergeSpeakers, PersonProps, SpeakerProps, transform, transformPersonToSpeaker } from './transform'
+import { createAssetUpload, mergeSpeakers, PersonProps, SpeakerProps, transformPersonToSpeaker } from './transform'
 import { Entry, Asset } from './contentful/types'
+import { Load } from './load'
 
 const argv = yargs.argv
 
@@ -103,10 +103,12 @@ async function Main() {
 
           // link the newSpeaker to the profile image
           newSpeaker.fields.photo = {
-            sys: {
-              type: 'Link',
-              linkType: 'Asset',
-              id: upload.sys.id
+            'en-US': {
+              sys: {
+                type: 'Link',
+                linkType: 'Asset',
+                id: upload.sys.id
+              }
             }
           }
         }
@@ -117,17 +119,11 @@ async function Main() {
   }
 
   function load() {
-    return new ParallelWritable({
-      objectMode: true,
-      async writeAsync(entry) {
-        console.log('write', entry)
-      }
-    })
-    // return new Load({
-    //   spaceId: clcAppSpaceId,
-    //   environmentId,
-    //   managementToken
-    // }).getPipeline()
+    return new Load({
+      spaceId: clcAppSpaceId,
+      environmentId,
+      managementToken
+    }).getPipeline()
   }
 }
 

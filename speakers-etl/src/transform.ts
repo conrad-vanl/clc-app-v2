@@ -1,23 +1,33 @@
 import { Asset, Entry, Link } from "./contentful/types"
 import { present } from "./util"
 
-export async function transformPersonToSpeaker(entry: Entry<PersonProps>): Promise<Entry<SpeakerProps>> {
+export function transformPersonToSpeaker(entry: Entry<PersonProps>): any {
   const name = [entry.fields.firstName, entry.fields.lastName].filter(present).join(' ')
   const bio = 
     entry.fields.hasProfilePage &&
-      `__${entry.fields.title}__\n[Read ${entry.fields.firstName}'s Bio](https://www.watermark.org/people/${entry.fields.slug})` ||
+      `[Read ${entry.fields.firstName}'s Bio](https://www.watermark.org/people/${entry.fields.slug})` ||
       ''
 
   return {
-    ...entry,
+    sys: {
+      id: entry.sys.id,
+      type: 'Entry',
+      contentType: {
+        sys: {
+          type: 'Link',
+          linkType: 'ContentType',
+          id: 'speaker'
+        }
+      }
+    },
     fields: {
-      internalTitle: name,
-      name: name,
-      summary: entry.fields.title,
-      biography: bio,
-      isOnConferenceDirectory: entry.fields.onStaff,
-      team: entry.fields.team,
-      email: entry.fields.email
+      internalTitle: { 'en-US': name },
+      name: { 'en-US': name },
+      summary: { 'en-US': entry.fields.title },
+      biography: { 'en-US': bio },
+      isOnConferenceDirectory: { 'en-US': entry.fields.onStaff },
+      team: { 'en-US': entry.fields.team },
+      email: { 'en-US': entry.fields.email }
     }
   }
 }
@@ -27,8 +37,8 @@ export function mergeSpeakers(existing: Entry<SpeakerProps>, newSpeaker: Entry<S
     ...existing,
     fields: {
       ...existing.fields,
-      email: newSpeaker.fields.email,
-      team: newSpeaker.fields.team
+      email: { 'en-US': newSpeaker.fields.email },
+      team: { 'en-US': newSpeaker.fields.team }
     }
   }
 }
@@ -37,11 +47,13 @@ export function createAssetUpload(asset: Asset) {
   return {
     sys: asset.sys,
     fields: {
-      title: asset.fields.title,
+      title: { 'en-US': asset.fields.title },
       file: {
-        upload: asset.fields.file.url,
-        fileName: asset.fields.file.fileName,
-        contentType: asset.fields.file.contentType,
+        'en-US': {
+          upload: rewriteContentfulUrl(asset.fields.file.url),
+          fileName: asset.fields.file.fileName,
+          contentType: asset.fields.file.contentType,
+        } 
       }
     }
   }
@@ -67,4 +79,8 @@ export interface SpeakerProps {
   biography: string
   photo?: Link<'Asset'>
   isOnConferenceDirectory: boolean
+}
+
+function rewriteContentfulUrl(url: string): string {
+  return url.replace(/^(https?\:)?\/\//, 'https://')
 }
