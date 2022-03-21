@@ -93,7 +93,7 @@ async function Main() {
           const name = `${person.fields.firstName} ${person.fields.lastName}`
           const speaker =
             destSpeakers.find((s) =>
-              s.fields.name['en-US'] && s.fields.name['en-US'].toLowerCase() == name.toLowerCase())?.toPlainObject()
+              s.fields.name && s.fields.name['en-US'] && s.fields.name['en-US'].toLowerCase() == name.toLowerCase())?.toPlainObject()
 
           if (!speaker) {
             console.error('Creating new speaker for', name)
@@ -152,7 +152,8 @@ async function Main() {
     return new Load({
       spaceId: clcAppSpaceId,
       environmentId,
-      managementToken
+      managementToken,
+      publish: argv.publish
     }).getPipeline()
   }
 }
