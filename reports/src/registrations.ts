@@ -1,7 +1,8 @@
 
 import fetch from 'isomorphic-fetch'
-import {write as writeCsv} from 'fast-csv'
+import {format as formatCsv} from 'fast-csv'
 import fs from 'fs-extra'
+import {writeAsync} from 'async-toolbox/stream'
 import {onceAsync} from 'async-toolbox/events'
 
 import {createClient, SimpleContentfulClient} from './contentful/client'
@@ -12,20 +13,25 @@ interface RegistrationsArgs {
   spaceId: string,
   accessToken: string,
   code: string
+  rockToken: string
   out?: string
+  verbose?: boolean
 }
 
 const DataclipUrl = 'https://data.heroku.com/dataclips/ayaeestfwmdxtmskuowxgfplubju.json'
+const RockApiUrl = 'https://rock.watermarkresources.com/api'
 
 export class Registrations {
   private readonly client: SimpleContentfulClient
+  private readonly logger: typeof console['debug']
 
   constructor(private readonly argv: Readonly<RegistrationsArgs>) {
+    this.logger = argv.verbose ? console.error : (() => {})
 
     this.client = createClient({
       accessToken: this.argv.accessToken,
       space: this.argv.spaceId,
-      environmentId: 'dev'
+      logger: this.logger
     })
   }
 
@@ -35,37 +41,51 @@ export class Registrations {
       this.fetchDataclip()
     ])
 
-    const results = dataclip.map((row) => {
+    const out = this.argv.out
+    const outputStream =
+      !out || out == '-' ?
+        process.stdout :
+        fs.createWriteStream(out)
+
+    const writerStream =
+      formatCsv({headers: true})
+
+    const didEnd = onceAsync(
+      writerStream.pipe(outputStream),
+      'end'
+    )
+
+    for(const row of dataclip) {
       if (!row.nodeId) {
-        return
+        continue
       }
 
       const event = events[row.nodeId]
       if (!event) {
         // deleted event, we don't care anymore
-        return
+        continue
       }
-      
-      return {
+
+      let loginInfo: { email?: string, phone?: string } = {}
+      if (row.rockid) {
+        loginInfo = {
+          ...loginInfo,
+          ...await this.fetchUserLogin(row.rockid)
+        }
+      }
+
+      const toWrite = {
         ...row,
+        ...loginInfo,
         title: event?.title,
         eventType: event?.eventType,
         startTime: event?.startTime,
         speakers: event?.speakers?.map((s) => s.fields.name)
       }
-    }).filter(present)
+      await writeAsync(writerStream, toWrite)
+    }
 
-    const out = this.argv.out
-    const stream =
-      !out || out == '-' ?
-        process.stdout :
-        fs.createWriteStream(out)
-
-    const writer =
-      writeCsv(results, {headers: true})
-      .pipe(stream)
-
-    await onceAsync(writer, 'end')
+    await didEnd
   }
 
   private async fetchDataclip(): Promise<DataclipRow[]> {
@@ -107,6 +127,48 @@ export class Registrations {
           ).filter((s) => s)
       }
     })
+  }
+
+  private readonly userLoginCache: Record<string, { email?: string, phone?: string }> = {}
+  private async fetchUserLogin(personId: string) {
+    if (this.userLoginCache[personId]) {
+      return this.userLoginCache[personId]
+    }
+
+    const got = await this._fetchUserLogin(personId)
+    this.userLoginCache[personId] = got
+    return got
+  }
+
+  private async _fetchUserLogin(personId: string): Promise<{ email?: string, phone?: string }> {
+    const url = `${RockApiUrl}/UserLogins?$filter=PersonId%20eq%20${personId}`
+    this.logger(`GET ${url}`)
+    const resp = await fetch(
+      url,
+      {
+        headers: {
+          Accept: 'application/json',
+          'authorization-token': `${this.argv.rockToken}`
+        },
+        redirect: 'follow'
+      }
+    )
+
+    if (resp.status != 200) { throw new Error(`Unexpected status ${resp.status}`) }
+
+    const body = await resp.json()
+    if (body.length == 0) { return {} }
+    const UserName: string | undefined = body[0]?.UserName
+    if (!UserName) { return {} }
+
+    if (UserName == 'administrator') {
+      throw new Error(`Bad query: ${url}`)
+    }
+
+    if (UserName.includes('@')) {
+      return { email: UserName }
+    }
+    return { phone: UserName }
   }
 }
 

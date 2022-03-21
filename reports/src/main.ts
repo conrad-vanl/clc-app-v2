@@ -20,6 +20,22 @@ const _argv = yargs
         type: 'string',
         description: 'Conference code in Contentful',
         default: 'CLC2021'
+      },
+      rockToken: {
+        type: 'string',
+        description: 'Rock API access token',
+        default: process.env.ROCK_TOKEN || ''
+      },
+      out: {
+        type: 'string',
+        alias: 'o',
+        description: 'File to write out CSV output (defaults to stdout)',
+        default: '-'
+      },
+      verbose: {
+        type: 'boolean',
+        alias: 'v',
+        description: 'Set this to print debug output to stderr'
       }
     },
     Main((argv) => new Registrations(argv).run())
