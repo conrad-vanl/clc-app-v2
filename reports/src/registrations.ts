@@ -1,107 +1,166 @@
-const yargs = require('yargs')
-const fetch = require('node-fetch')
-const fs = require('fs-extra')
-const fastcsv = require('fast-csv');
-const {onceAsync} = require('async-toolbox/events')
 
-const argv = yargs.argv
+import fetch from 'isomorphic-fetch'
+import {write as writeCsv} from 'fast-csv'
+import fs from 'fs-extra'
+import {onceAsync} from 'async-toolbox/events'
 
-const ConferenceCode = argv[0] || 'CLC2021'
+import {createClient, SimpleContentfulClient} from './contentful/client'
+import { Entry, Link } from './contentful/types'
+import { assign, present } from "./util"
+
+interface RegistrationsArgs {
+  spaceId: string,
+  accessToken: string,
+  code: string
+  out?: string
+}
+
 const DataclipUrl = 'https://data.heroku.com/dataclips/ayaeestfwmdxtmskuowxgfplubju.json'
 
-const contentfulSpaceId = process.env.CONTENTFUL_SPACE || 'vsbnbtnlrnnr'
-const contentfulAccessToken = process.env.CONTENTFUL_REST_KEY || 'k8mCSPw_UbsnK3XgC4JYpPVihDyRNLv5ZRZbfgcM6pg'
+export class Registrations {
+  private readonly client: SimpleContentfulClient
 
-async function Main() {
-  const events = await fetchEventMap()
+  constructor(private readonly argv: Readonly<RegistrationsArgs>) {
 
-  const dataclip = await fetchDataclip()
-
-  const results = dataclip.map((row) => {
-    const event = events[row.nodeId]
-    if (!event) {
-      // deleted event, we don't care anymore
-      return
-    }
-    
-    return {
-      ...row,
-      title: event?.title,
-      eventType: event?.eventType,
-      startTime: event?.startTime,
-      speakers: event?.speakers?.map((s) => s.name)
-    }
-  }).filter((e) => e)
-
-  const stream =
-    !argv.out || argv.out == '-' ?
-      process.stdout :
-      fs.createWriteStream(argv.out)
-
-  const writer =
-    fastcsv.write(results, {headers: true})
-    .pipe(stream)
-
-  await onceAsync(writer, 'end')
-}
-
-Main()
-  .then(() => process.exit(0))
-  .catch((ex) => {
-    console.error(ex);
-    process.exit(1);
-  })
-
-async function fetchDataclip() {
-  const resp = await fetch(DataclipUrl)
-  if (resp.status != 200) {
-    throw new Error(`Unexpected status code ${resp.status}`)
+    this.client = createClient({
+      accessToken: this.argv.accessToken,
+      space: this.argv.spaceId,
+      environmentId: 'dev'
+    })
   }
 
-  const json = await resp.json()
-  return (json.values || []).map(row => {
-    return row.reduce((hash, value, i) => {
-      hash[json.fields[i]] = value
-      return hash
-    }, {})
-  })
-}
+  public async run() {
+    const [events, dataclip] = await Promise.all([
+      this.fetchEventMap(),
+      this.fetchDataclip()
+    ])
 
-async function fetchEventMap() {
-  const resp = await fetch(
-    `https://cdn.contentful.com/spaces/${contentfulSpaceId}/environments/master/entries?content_type=conference&fields.code=${ConferenceCode}&include=3`,
-    {
-      headers: {
-        Authorization: `Bearer ${contentfulAccessToken}`
-      },
-      redirect: 'follow'
-    }
-  )
-  if (resp.status != 200) {
-    throw new Error(`Unexpected status code ${resp.status}`)
+    const results = dataclip.map((row) => {
+      if (!row.nodeId) {
+        return
+      }
+
+      const event = events[row.nodeId]
+      if (!event) {
+        // deleted event, we don't care anymore
+        return
+      }
+      
+      return {
+        ...row,
+        title: event?.title,
+        eventType: event?.eventType,
+        startTime: event?.startTime,
+        speakers: event?.speakers?.map((s) => s.fields.name)
+      }
+    }).filter(present)
+
+    const out = this.argv.out
+    const stream =
+      !out || out == '-' ?
+        process.stdout :
+        fs.createWriteStream(out)
+
+    const writer =
+      writeCsv(results, {headers: true})
+      .pipe(stream)
+
+    await onceAsync(writer, 'end')
   }
 
-  const json = await resp.json()
-  const includes = json?.includes?.Entry || []
-
-  const speakers = reduceToHash(includes.filter(isEntryOfType('speaker')))
-  const events = includes.filter(isEntryOfType('event'))
-  return reduceToHash(events, (e) => {
-    return {
-      ...e.fields,
-      speakers: (e.fields.speakers || [])
-        .map((s) =>
-          s && speakers[s.sys.id]
-        ).filter((s) => s)
+  private async fetchDataclip(): Promise<DataclipRow[]> {
+    const resp = await fetch(DataclipUrl)
+    if (resp.status != 200) {
+      throw new Error(`Unexpected status code ${resp.status}`)
     }
-  })
+
+    const json = await resp.json() as DataclipJson
+    return (json.values || []).map<DataclipRow>(row => {
+      return row.reduce((hash, value, i) => {
+        (hash as any)[json.fields[i]] = value
+        return hash
+      }, {} as DataclipRow)
+    })
+  }
+
+  private async fetchEventMap() {
+    const resp = this.client.entries({
+      content_type: 'conference',
+      include: 3,
+      fields: {
+        code: this.argv.code,
+      }
+    })
+
+    // should only be one conference - one page
+    const page = (await resp.next()).value
+    if (!page) { throw new Error(`Could not find conference with code ${this.argv.code}`)}
+
+    const speakers = reduceToHash(page.includes.Entry.filter(isSpeaker))
+    const events = page.includes.Entry.filter(isEvent)
+    return reduceToHash(events, (e) => {
+      return {
+        ...e.fields,
+        speakers: (e.fields.speakers || [])
+          .map((s) =>
+            s && speakers[s.sys.id]
+          ).filter((s) => s)
+      }
+    })
+  }
 }
 
-function isEntryOfType(type) {
-  return (e) => e?.sys?.contentType?.sys?.id == type
+interface DataclipJson {
+  title: string,
+  values: Array<Array<string | null>>
+  fields: string[],
+  types: number[],
+  type_names: string[],
+  started_at: string
+  finished_at: string
+  checksum: string
 }
 
-function reduceToHash(entries, fn) {
+interface DataclipRow {
+  firstName: string | null
+  lastName: string | null
+  email: string | null
+  rockid: string | null
+  nodeId: string | null
+  nodeType: string | null
+  registeredAt: string | null
+}
+
+type Event = Entry<EventFields>
+
+interface EventFields {
+  title: string
+  summary?: string
+  description?: string
+  startTime?: string,
+  endTime?: string
+  eventType?: string
+  speakers: Array<Link<'Entry'>>
+}
+
+type Speaker = Entry<SpeakerFields>
+
+interface SpeakerFields {
+  name: string
+}
+
+function isEvent(e: Entry<any>): e is Event {
+  return e?.sys?.contentType?.sys?.id == 'event'
+}
+
+function isSpeaker(e: Entry<any>): e is Speaker {
+  return e?.sys?.contentType?.sys?.id == 'speaker'
+}
+
+function reduceToHash<TEntry extends Entry>(entries: TEntry[]): Record<string, TEntry>
+function reduceToHash<TEntry extends Entry, TValue>(entries: TEntry[], fn: (e: TEntry) => TValue): Record<string, TValue>
+
+function reduceToHash(entries: Entry[], fn?: (e: Entry) => any) {
   return entries.reduce((hash, e) => {
     if (fn) {
       hash[e.sys.id] = fn(e)
@@ -109,5 +168,5 @@ function reduceToHash(entries, fn) {
       hash[e.sys.id] = e
     }
     return hash
-  }, {})
+  }, {} as Record<string, any>)
 }
