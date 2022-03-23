@@ -160,6 +160,9 @@ android {
         resValue "string", "build_config_package", "org.watermark.clc2"
         multiDexEnabled true
     }
+
+    ndkVersion "22.1.7171670"
+
     signingConfigs {
         release {
             storeFile file(String.valueOf(System.getenv("KEYSTORE_FILE")))
