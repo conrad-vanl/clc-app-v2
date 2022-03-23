@@ -73,11 +73,7 @@ export class PublishesEntries extends ParallelTransform {
       if (!err) {
         throw ex
       }
-      if (err.name == 'unique' && err.path.join('.') == 'fields.slug.en-US') {
-        this.emit('warning', entry.sys.id, `skipping publishing for '${entry.fields.slug['en-US']}' - already exists`)
-        this.skippedCount++
-        return
-      } else if (err.name == 'notResolvable') {
+      if (err.name == 'notResolvable') {
         console.error(chalk.gray(`Dependency of ${entry.sys.id} not yet published`))
         // put the entry back on the publish queue - hopefully its dependencies
         // will have been published by the time it gets back around
