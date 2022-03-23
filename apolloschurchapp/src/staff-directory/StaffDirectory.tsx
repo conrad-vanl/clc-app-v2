@@ -58,6 +58,9 @@ export function StaffDirectory() {
   const { data, loading, refetch } = useQueryAutoRefresh<GetSpeakersData>(getSpeakers);
 
   const items = (data?.local?.speakerCollection?.items || [])
+    .filter((s) => s.isOnConferenceDirectory)
+    .slice()
+    .sort(byLastNameFirstName)
 
   return <BackgroundView>
     <FlatList
@@ -110,4 +113,23 @@ function DirectorySpeaker({item, loading}: { item: Speaker, loading: boolean }) 
       <Divider />
     </View>
   </Touchable>
+}
+
+// if a > b return a positive number, if b > a return a negative number
+function byLastNameFirstName(a: { name: string }, b: { name: string }): number {
+
+  const [firstA, ...splitA] = a?.name?.split(/\s+/) || []
+  const lastA = splitA[splitA.length - 1] // Handle "Timothy (TA) Ateek"
+  const [firstB, ...splitB] = b?.name?.split(/\s+/) || []
+  const lastB = splitB[splitB.length - 1]
+
+  // put people without a last name at the end of the list
+  if (lastA && !lastB) { return -1 }
+  if (!lastA && lastB) { return 1 }
+  if (!lastA && !lastB) { return 0 }
+
+  const compare = lastA.localeCompare(lastB)
+  if (compare != 0) { return compare }
+
+  return firstA.localeCompare(firstB)
 }
