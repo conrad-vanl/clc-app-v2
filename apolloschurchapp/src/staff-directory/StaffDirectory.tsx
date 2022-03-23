@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, FlatList } from 'react-native';
 import { gql, useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
+import { throttle } from 'lodash';
 
 import {
   BackgroundView,
@@ -14,8 +15,10 @@ import {
   GradientOverlayImage,
   Divider
 } from '@apollosproject/ui-kit';
+import { SearchInputHeader } from '@apollosproject/ui-connected'
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
+import { present } from '../util';
 
 const getSpeakers = gql`
   query getStaffDirectory {
@@ -56,13 +59,29 @@ interface Speaker {
 
 export function StaffDirectory() {
   const { data, loading, refetch } = useQueryAutoRefresh<GetSpeakersData>(getSpeakers);
+  const [searchText, setSearchText] = useState('');
 
-  const items = (data?.local?.speakerCollection?.items || [])
+  let items = (data?.local?.speakerCollection?.items || [])
     .filter((s) => s.isOnConferenceDirectory)
     .slice()
     .sort(byLastNameFirstName)
 
+  if (present(searchText)) {
+    console.log('filter', searchText)
+    const term = searchText.toLowerCase()
+    items = items.filter((s) => {
+      return s.name.toLowerCase().includes(term) ||
+        s.title?.toLowerCase()?.includes(term)
+    })
+  }
+
   return <BackgroundView>
+    <SearchInputHeader
+      style={{paddingTop: 4}}
+      onChangeText={throttle(setSearchText, 300)}
+      // onFocus={setIsFocused}
+      // inputRef={searchRef}
+    />
     <FlatList
       refreshing={loading}
       onRefresh={refetch}
