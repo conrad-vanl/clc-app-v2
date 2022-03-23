@@ -14,6 +14,8 @@ interface IClientOptions {
   space: string,
   environmentId: string,
   accessToken: string
+
+  logger?: typeof console['debug']
 }
 
 export function createClient(options: Partial<IClientOptions>): SimpleContentfulClient {
@@ -22,6 +24,7 @@ export function createClient(options: Partial<IClientOptions>): SimpleContentful
 
 export class SimpleContentfulClient {
   private options: IClientOptions
+  private logger: typeof console['debug']
 
   constructor(
     options?: Partial<IClientOptions>,
@@ -34,6 +37,7 @@ export class SimpleContentfulClient {
       environmentId: process.env.CONTENTFUL_ENVIRONMENT || 'dev',
       ...options,
     }
+    this.logger = this.options.logger || console.debug
   }
 
   public async sync(query: any): Promise<SyncCollection> {
@@ -122,7 +126,9 @@ export class SimpleContentfulClient {
     let resp: Response
 
     do {
-      console.log('get', url.toString())
+      if (this.logger) {
+        this.logger('get', url.toString())
+      }
       resp = await this.fetch(url.toString(), {
         method: 'GET',
         headers: {
