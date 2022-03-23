@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import marked from 'marked';
-import { View } from 'react-native';
+import { Linking, Platform, View } from 'react-native';
 import gql from 'graphql-tag';
 import HTMLView from '@apollosproject/ui-htmlview';
 import {
@@ -9,13 +9,29 @@ import {
   H2,
   H5,
   GradientOverlayImage,
+  Button,
   named,
+  styled,
 } from '@apollosproject/ui-kit';
 import { safeHandleUrl } from '@apollosproject/ui-connected';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
+
 import { present } from '../../util';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 // import safeOpenUrl from '../safeOpenUrl';
+
+const SummaryText = styled(({ theme }) => ({
+  fontSize: 18,
+  fontWeight: 400,
+  marginTop: -20,
+  marginBottom: 10,
+}))(H5);
 
 const GET_CONTENT_ITEM_CONTENT = gql`
   query getLocalContentNode($nodeId: ID!) {
@@ -84,6 +100,8 @@ const LocalContentNodeConnected = ({
   const { title, summary, description } = entry || {};
   const htmlContent = (present(description) && marked(description)) || '';
 
+  const cta = getCta(entry);
+
   return (
     <>
       {coverImageSources.length || loading ? (
@@ -100,7 +118,7 @@ const LocalContentNodeConnected = ({
         <H2 padded isLoading={!title && loading}>
           {title}
         </H2>
-        {present(summary) && <H5>{summary}</H5>}
+        {present(summary) && <SummaryText>{summary}</SummaryText>}
         <HtmlComponent
           isLoading={!htmlContent && loading}
           onPressAnchor={onPressAnchor}
@@ -108,6 +126,7 @@ const LocalContentNodeConnected = ({
           {htmlContent}
         </HtmlComponent>
       </PaddedView>
+      {cta && <CallToAction {...cta} />}
     </>
   );
 };
@@ -121,3 +140,64 @@ LocalContentNodeConnected.defaultProps = {
 export default named('ui-connected.LocalContentNodeConnected')(
   LocalContentNodeConnected
 );
+
+function getCta(entry) {
+  switch (entry?.__typename) {
+    case 'Local_Speaker':
+      return {
+        url: 'https://rock.watermarkresources.com/TODO',
+        text: 'Schedule a Conversation',
+      };
+
+    default:
+      return undefined;
+  }
+}
+
+const ModalBackgroundView = styled(({ theme }) => ({
+  borderTopLeftRadius: theme.sizing.baseUnit,
+  borderTopRightRadius: theme.sizing.baseUnit,
+  backgroundColor: theme.colors.background.paper,
+  ...Platform.select({ ios: theme.shadows.default.ios }),
+}))(View);
+
+const Container = styled(({ theme }) => ({
+  paddingHorizontal: theme.sizing.baseUnit,
+  flex: 1,
+}))(SafeAreaView);
+
+function CallToAction({ url, text }) {
+  const safeArea = useSafeAreaInsets();
+  const bottomSheetModalRef = useRef();
+  useEffect(
+    () => {
+      bottomSheetModalRef.current?.present();
+    },
+    [bottomSheetModalRef]
+  );
+
+  return (
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      index={0}
+      snapPoints={[90 + safeArea.bottom]}
+      animateOnMount
+      dismissOnPanDown={false}
+      backgroundComponent={(bgProps) => <ModalBackgroundView {...bgProps} />} // eslint-disable-line react/jsx-props-no-spreading
+    >
+      <Container edges={['bottom', 'left', 'right']}>
+        <Button onPress={onPressCta}>
+          <H5>{text}</H5>
+        </Button>
+      </Container>
+    </BottomSheetModal>
+  );
+
+  async function onPressCta() {
+    if (await InAppBrowser.isAvailable()) {
+      InAppBrowser.open(url);
+    } else {
+      Linking.openURL(url);
+    }
+  }
+}

@@ -107,7 +107,7 @@ const TextContainer = styled(({ theme }) => ({
 }))(View);
 
 const SubtitleText = styled(({theme}) => ({
-  color: '#28312F'
+  color: '#6A6A6A'
 }))(CellText)
 
 function DirectorySpeaker({item, loading}: { item: Speaker, loading: boolean }) {
