@@ -29,6 +29,7 @@ const getSpeakers = gql`
           sys { id }
           name
           title: summary
+          team
           photo {
             url
           }
@@ -51,7 +52,8 @@ interface GetSpeakersData {
 interface Speaker {
   sys: { id: string }
   name: string
-  title: string
+  title?: string
+  team?: string
   photo: { url: string }
   isOnConferenceDirectory: boolean
 }
@@ -67,11 +69,11 @@ export function StaffDirectory() {
     .sort(byLastNameFirstName)
 
   if (present(searchText)) {
-    console.log('filter', searchText)
     const term = searchText.toLowerCase()
     items = items.filter((s) => {
       return s.name.toLowerCase().includes(term) ||
-        s.title?.toLowerCase()?.includes(term)
+        s.title?.toLowerCase()?.includes(term) ||
+        s.team?.toLowerCase()?.includes(term)
     })
   }
 

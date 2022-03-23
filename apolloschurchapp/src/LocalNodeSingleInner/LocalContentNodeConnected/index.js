@@ -7,6 +7,7 @@ import {
   ErrorCard,
   PaddedView,
   H2,
+  H5,
   GradientOverlayImage,
   named,
 } from '@apollosproject/ui-kit';
@@ -43,6 +44,7 @@ const GET_CONTENT_ITEM_CONTENT = gql`
           art: photo {
             url
           }
+          summary
           description: biography
         }
         ... on Local_Location {
@@ -79,7 +81,7 @@ const LocalContentNodeConnected = ({
   if (!entry && error) return <ErrorCard error={error} />;
 
   const coverImageSources = [entry?.art?.url].filter(present);
-  const { title, description } = entry || {};
+  const { title, summary, description } = entry || {};
   const htmlContent = (present(description) && marked(description)) || '';
 
   return (
@@ -98,6 +100,7 @@ const LocalContentNodeConnected = ({
         <H2 padded isLoading={!title && loading}>
           {title}
         </H2>
+        {present(summary) && <H5>{summary}</H5>}
         <HtmlComponent
           isLoading={!htmlContent && loading}
           onPressAnchor={onPressAnchor}

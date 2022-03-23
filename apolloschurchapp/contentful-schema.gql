@@ -213,6 +213,8 @@ type Local_Speaker implements Local_Entry {
   photo: Local_Asset
   isOnConferenceDirectory: Boolean
   talks: Local_EventCollection
+  email: String
+  team: String
 }
 
 type Local_SpeakerCollection {

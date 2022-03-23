@@ -58,7 +58,6 @@ const Maps = () => {
   const navigation = useNavigation();
   const { data = {}, loading } = useQuery<GetMapsQueryData>(getMaps, { fetchPolicy: 'no-cache'});
 
-  console.log('data', data)
   const maps = (get(data, 'local.conference.maps.items') || []) as Map[]
 
   return (
@@ -78,7 +77,6 @@ const Maps = () => {
         isLoading={loading}
         loadingStateObject={loadingStateObject}
         renderItem={({item}: any) => {
-          console.log('item', item)
           return <TouchableScale
             key={item.id}
             onPress={() => {
