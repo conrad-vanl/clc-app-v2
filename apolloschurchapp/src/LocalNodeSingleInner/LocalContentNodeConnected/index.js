@@ -62,6 +62,7 @@ const GET_CONTENT_ITEM_CONTENT = gql`
           }
           summary
           description: biography
+          email
         }
         ... on Local_Location {
           title
@@ -144,8 +145,11 @@ export default named('ui-connected.LocalContentNodeConnected')(
 function getCta(entry) {
   switch (entry?.__typename) {
     case 'Local_Speaker':
+      if (!entry.email) {
+        return undefined;
+      }
       return {
-        url: 'https://rock.watermarkresources.com/TODO',
+        url: `https://my.watermark.org/WatermarkForms/848?Email=${entry.email}`,
         text: 'Schedule a Conversation',
       };
 
