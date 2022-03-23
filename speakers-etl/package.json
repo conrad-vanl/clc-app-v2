@@ -1,0 +1,17 @@
+{
+  "name": "speakers-etl",
+  "dependencies": {
+    "@babel/register": "^7.12.1",
+    "@babel/core": "^7.12.1",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
+    "yargs": "^17.3.1",
+    "async-toolbox": "^0.7.6",
+    "fastestsmallesttextencoderdecoder": "^1.0.22",
+    "whatwg-url": "^11.0.0",
+    "isomorphic-fetch": "^3.0.0",
+    "contentful-management": "^8.2.2",
+    "fs-extra": "^10.0.1",
+    "lodash": "^4.17.21"
+  }
+}
