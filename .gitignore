@@ -13,3 +13,4 @@ node_modules/
 yalc.lock
 yarn-error.log
 lerna-debug.log
+dump.rdb
