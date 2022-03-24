@@ -85,7 +85,7 @@ Array [
                   collapsable={false}
                   style={
                     Object {
-                      "opacity": 0,
+                      "opacity": 1,
                     }
                   }
                 >
@@ -110,6 +110,7 @@ Array [
                     }
                     type="text"
                     underlineColorAndroid="transparent"
+                    value="Isaac"
                   />
                 </View>
                 <View
@@ -120,12 +121,12 @@ Array [
                     Object {
                       "bottom": 0,
                       "justifyContent": "center",
-                      "opacity": 1,
+                      "opacity": 0.8,
                       "position": "absolute",
                       "top": 0,
                       "transform": Array [
                         Object {
-                          "scale": 1,
+                          "scale": 0.8,
                         },
                         Object {
                           "translateX": 0,
@@ -189,7 +190,7 @@ Array [
                     "right": 0,
                     "transform": Array [
                       Object {
-                        "scaleX": 0.0001,
+                        "scaleX": 1,
                       },
                     ],
                   }
@@ -246,7 +247,7 @@ Array [
                   collapsable={false}
                   style={
                     Object {
-                      "opacity": 0,
+                      "opacity": 1,
                     }
                   }
                 >
@@ -271,6 +272,7 @@ Array [
                     }
                     type="text"
                     underlineColorAndroid="transparent"
+                    value="Hardy"
                   />
                 </View>
                 <View
@@ -281,12 +283,12 @@ Array [
                     Object {
                       "bottom": 0,
                       "justifyContent": "center",
-                      "opacity": 1,
+                      "opacity": 0.8,
                       "position": "absolute",
                       "top": 0,
                       "transform": Array [
                         Object {
-                          "scale": 1,
+                          "scale": 0.8,
                         },
                         Object {
                           "translateX": 0,
@@ -350,7 +352,7 @@ Array [
                     "right": 0,
                     "transform": Array [
                       Object {
-                        "scaleX": 0.0001,
+                        "scaleX": 1,
                       },
                     ],
                   }
@@ -407,7 +409,7 @@ Array [
                   collapsable={false}
                   style={
                     Object {
-                      "opacity": 0,
+                      "opacity": 1,
                     }
                   }
                 >
@@ -435,6 +437,7 @@ Array [
                     }
                     type="email"
                     underlineColorAndroid="transparent"
+                    value="isaac.hardy@newspring.cc"
                   />
                 </View>
                 <View
@@ -445,12 +448,12 @@ Array [
                     Object {
                       "bottom": 0,
                       "justifyContent": "center",
-                      "opacity": 1,
+                      "opacity": 0.8,
                       "position": "absolute",
                       "top": 0,
                       "transform": Array [
                         Object {
-                          "scale": 1,
+                          "scale": 0.8,
                         },
                         Object {
                           "translateX": 0,
@@ -514,7 +517,7 @@ Array [
                     "right": 0,
                     "transform": Array [
                       Object {
-                        "scaleX": 0.0001,
+                        "scaleX": 1,
                       },
                     ],
                   }

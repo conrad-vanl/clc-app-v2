@@ -28,6 +28,7 @@ import LandingScreen from './ui/LandingScreen';
 import Onboarding from './ui/Onboarding';
 import Search from './ui/Search';
 import Auth from './auth';
+import StaffDirectory from './staff-directory';
 
 enableScreens(); // improves performance for react-navigation
 
@@ -138,6 +139,11 @@ const App = (props) => (
             name="Passes"
             component={Passes}
             options={{ title: 'Check-In Pass' }}
+          />
+          <Screen
+            name="StaffDirectory"
+            component={StaffDirectory}
+            options={{ title: 'Staff Directory' }}
           />
           <Screen
             name="Onboarding"

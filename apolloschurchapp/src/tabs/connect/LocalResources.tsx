@@ -92,6 +92,18 @@ const Resources = () => {
         <H5 padded>Resources</H5>
       </PaddedView>
       <TableView>
+          <React.Fragment>
+            <Touchable onPress={() => navigation.push('StaffDirectory')}>
+              <Cell>
+                <CellText>
+                  <UIText>Watermark Staff</UIText>
+                </CellText>
+                <Caret />
+              </Cell>
+            </Touchable>
+
+            <Divider />
+          </React.Fragment>
           {(data?.local?.conference?.resources?.items || []).map((resource) => (
             <React.Fragment key={resource.sys.id}>
               <Touchable

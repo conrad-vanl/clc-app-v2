@@ -781,6 +781,26 @@
             ],
             "linkType": "Entry"
           }
+        },
+        {
+          "id": "email",
+          "name": "Email",
+          "type": "Symbol",
+          "localized": false,
+          "required": false,
+          "validations": [],
+          "disabled": false,
+          "omitted": false
+        },
+        {
+          "id": "team",
+          "name": "Team",
+          "type": "Symbol",
+          "localized": false,
+          "required": false,
+          "validations": [],
+          "disabled": false,
+          "omitted": false
         }
       ]
     },
@@ -1233,6 +1253,10 @@
           "widgetId": "markdown"
         },
         {
+          "fieldId": "email",
+          "widgetId": "singleLine"
+        },
+        {
           "fieldId": "internalTitle",
           "widgetId": "singleLine"
         },
@@ -1261,6 +1285,10 @@
             "bulkEditing": false
           },
           "widgetId": "entryLinksEditor"
+        },
+        {
+          "fieldId": "team",
+          "widgetId": "singleLine"
         }
       ]
     },

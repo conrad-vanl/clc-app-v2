@@ -76,7 +76,6 @@ const Feed = () => {
 
     const contentfulId = data.nodeIdToContentfulId;
     if (contentfulId) {
-      console.log('Local!')
       navigation.push('LocalContentSingle', {
         itemId: contentfulId,
       });
