@@ -15,7 +15,7 @@ import { present } from '../../util';
 const getMaps = gql`
   query getLocalMaps {
     local @client {
-      conference(id: "doyAUR5XEVx4jK4NGvS8z") {
+      conference(id: "7pE6FgpSVhbx3u105MMZFz") {
         maps {
           items {
             sys { id }

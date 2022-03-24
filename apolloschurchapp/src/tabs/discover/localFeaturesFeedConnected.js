@@ -14,7 +14,7 @@ import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 const GET_FEATURE_FEED = gql`
   query getLocalDiscoverFeatureFeed {
     local @client {
-      conference(id: "doyAUR5XEVx4jK4NGvS8z") {
+      conference(id: "7pE6FgpSVhbx3u105MMZFz") {
         tracks {
           items {
             sys {

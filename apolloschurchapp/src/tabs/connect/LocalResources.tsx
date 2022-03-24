@@ -20,7 +20,7 @@ import InAppBrowser from 'react-native-inappbrowser-reborn';
 const getResources = gql`
   query getLocalResources {
     local @client {
-      conference(id: "doyAUR5XEVx4jK4NGvS8z") {
+      conference(id: "7pE6FgpSVhbx3u105MMZFz") {
         resources {
           items {
             __typename
