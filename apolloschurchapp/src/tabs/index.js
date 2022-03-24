@@ -17,7 +17,9 @@ const TabNavigator = (props) => (
     <Screen
       name="Home"
       component={Home}
-      options={{ tabBarIcon: tabBarIcon('home') }}
+      options={{
+        tabBarIcon: tabBarIcon('home'),
+      }}
     />
     <Screen
       name="Schedule"

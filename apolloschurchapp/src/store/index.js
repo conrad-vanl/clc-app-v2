@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-
+import AsyncStorage from '@react-native-community/async-storage';
 import { schema as mediaPlayerSchema } from '@apollosproject/ui-media-player';
 import { updatePushId } from '@apollosproject/ui-notifications';
 import CACHE_LOADED from '../client/getCacheLoaded'; // eslint-disable-line
@@ -18,6 +18,16 @@ export const schema = `
     cacheMarkLoaded: Boolean
     updateDevicePushId(pushId: String!): String
     updatePushPermissions(enabled: Boolean!): Boolean
+
+    markNotificationRead(id: ID!): Boolean
+  }
+
+  extend type NotificationHistory {
+    read: Int!
+  }
+
+  extend type Notification {
+    read: Boolean
   }
 ${mediaPlayerSchema || ''}
 `;
@@ -67,5 +77,27 @@ export const resolvers = {
       }
       return null;
     },
+    markNotificationRead: async (root, args) => {
+      const readCount = parseInt(
+        (await AsyncStorage.getItem('Notification/readCount')) || '0',
+        10
+      );
+
+      await AsyncStorage.multiSet([
+        ['Notification/readCount', (readCount + 1).toString(10)],
+        [`Notification/${args.id}/read`, 'true'],
+      ]);
+    },
+  },
+  NotificationHistory: {
+    read: async () =>
+      parseInt(
+        (await AsyncStorage.getItem('Notification/readCount')) || '0',
+        10
+      ),
+  },
+  Notification: {
+    read: async ({ id }) =>
+      (await AsyncStorage.getItem(`Notification/${id}/read`)) == 'true',
   },
 };

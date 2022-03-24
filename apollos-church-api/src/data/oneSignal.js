@@ -21,7 +21,7 @@ export const schema = gql`
   }
 
   extend type Query {
-    oneSignalHistory: NotificationHistory
+    oneSignalHistory(pushId: String): NotificationHistory
   }
 `;
 
@@ -29,7 +29,8 @@ export const resolver = {
   ...OneSignalOriginal.resolver,
   Query: {
     ...OneSignalOriginal.resolver.Query,
-    oneSignalHistory: async (_query, _args, { dataSources }) => {
+    oneSignalHistory: async (_query, args, { dataSources }) => {
+      console.log('pushId', args.pushId);
       const cacheKey = `oneSignalHistory`;
       const cached = await dataSources.Cache.get({ key: cacheKey });
       if (cached !== undefined && cached !== null) {

@@ -15,6 +15,7 @@ import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding'
 
 import { ONBOARDING_VERSION } from '../../ui/Onboarding';
 import LocalFeaturesFeedConnected from './localFeaturesFeedConnected';
+import {UnreadNotificationsButton} from '../unread-notifications-button'
 
 const LogoTitle = styled(({ theme }) => ({
   height: theme.sizing.baseUnit * 2,
@@ -52,6 +53,7 @@ const Home = () => {
               ListHeaderComponent={
                 <>
                   <LogoTitle source={require('./wordmark.png')} />
+                  <UnreadNotificationsButton />
                 </>
               }
             />
