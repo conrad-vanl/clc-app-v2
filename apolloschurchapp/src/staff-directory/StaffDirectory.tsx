@@ -18,7 +18,7 @@ import {
 import { SearchInputHeader } from '@apollosproject/ui-connected'
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
-import { present } from '../util';
+import { present, parseName } from '../util';
 
 const getSpeakers = gql`
   query getStaffDirectory {
@@ -139,18 +139,11 @@ function DirectorySpeaker({item, loading}: { item: Speaker, loading: boolean }) 
 // if a > b return a positive number, if b > a return a negative number
 function byLastNameFirstName(a: { name: string }, b: { name: string }): number {
 
-  const [firstA, ...splitA] = a?.name?.split(/\s+/) || []
-  const lastA = splitA[splitA.length - 1] // Handle "Timothy (TA) Ateek"
-  const [firstB, ...splitB] = b?.name?.split(/\s+/) || []
-  const lastB = splitB[splitB.length - 1]
+  const nameA = parseName(a?.name)
+  const nameB = parseName(b?.name)
 
-  // put people without a last name at the end of the list
-  if (lastA && !lastB) { return -1 }
-  if (!lastA && lastB) { return 1 }
-  if (!lastA && !lastB) { return 0 }
-
-  const compare = lastA.localeCompare(lastB)
+  const compare = nameA.last!.localeCompare(nameB.last!)
   if (compare != 0) { return compare }
 
-  return firstA.localeCompare(firstB)
+  return nameA.first.localeCompare(nameB.first)
 }

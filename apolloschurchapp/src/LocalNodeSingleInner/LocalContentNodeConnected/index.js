@@ -21,7 +21,7 @@ import {
 } from 'react-native-safe-area-context';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 
-import { present } from '../../util';
+import { present, parseName } from '../../util';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 // import safeOpenUrl from '../safeOpenUrl';
@@ -144,15 +144,16 @@ export default named('ui-connected.LocalContentNodeConnected')(
 
 function getCta(entry) {
   switch (entry?.__typename) {
-    case 'Local_Speaker':
+    case 'Local_Speaker': {
       if (!entry.email) {
         return undefined;
       }
+      const name = parseName(entry?.title);
       return {
-        url: `https://my.watermark.org/WatermarkForms/848?Email=${entry.email}`,
+        url: `https://my.watermark.org/WatermarkForms/848?Email=${entry.email}&StaffFirstName=${name.first}&StaffLastName=${name.last}`,
         text: 'Schedule a Conversation',
       };
-
+    }
     default:
       return undefined;
   }
