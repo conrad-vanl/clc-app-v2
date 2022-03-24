@@ -30,7 +30,6 @@ export const resolver = {
   Query: {
     ...OneSignalOriginal.resolver.Query,
     oneSignalHistory: async (_query, args, { dataSources }) => {
-      console.log('pushId', args.pushId);
       const cacheKey = `oneSignalHistory`;
       const cached = await dataSources.Cache.get({ key: cacheKey });
       if (cached !== undefined && cached !== null) {
@@ -39,7 +38,7 @@ export const resolver = {
 
       const data = await dataSources.OneSignal.getHistory();
       const result = {
-        total: data.total_count,
+        total: data.notifications.length,
         items: data.notifications
           .filter((n) => !n.include_player_ids) // not specifically targeted
           .map((n) => formatNotification(n)),

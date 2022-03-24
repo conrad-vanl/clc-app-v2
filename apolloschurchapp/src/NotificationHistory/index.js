@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { ModalCloseButton, ModalBackButton } from '@apollosproject/ui-kit';
 
-import { StaffDirectory } from './StaffDirectory';
+import { ModalCloseButton, ModalBackButton } from '@apollosproject/ui-kit';
+import { NotificationHistory } from './NotificationHistory';
 
 const { Screen, Navigator } = createNativeStackNavigator();
 
-const StaffDirectoryNavigator = ({ route, navigation, ...props }) => (
+const NotificationHistoryNavigator = ({ route, navigation, ...props }) => (
   <BottomSheetModalProvider>
     <Navigator
       {...props}
@@ -19,24 +19,23 @@ const StaffDirectoryNavigator = ({ route, navigation, ...props }) => (
         headerHideShadow: true,
         headerRight: ModalCloseButton,
         headerLeft: ModalBackButton,
-        headerTitle: 'Staff Directory',
-        headerTopInsetEnabled: false,
+        headerTitle: 'Notifications',
+        headerTopInsetEnabled: true,
       }}
     >
       <Screen
-        name="StaffDirectory"
-        component={StaffDirectory}
-        options={{ title: 'Staff Directory' }}
+        name="NotificationHistory"
+        component={NotificationHistory}
         initialParams={route.params}
       />
     </Navigator>
   </BottomSheetModalProvider>
 );
 
-StaffDirectoryNavigator.propTypes = {
+NotificationHistoryNavigator.propTypes = {
   route: PropTypes.shape({
     params: PropTypes.shape({}),
   }),
 };
 
-export default StaffDirectoryNavigator;
+export default NotificationHistoryNavigator;

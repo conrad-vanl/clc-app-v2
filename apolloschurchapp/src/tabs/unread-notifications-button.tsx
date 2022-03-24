@@ -52,7 +52,7 @@ export function UnreadNotificationsButton() {
   return (
     <Touchable
       onPress={() => {
-        navigation.navigate('Schedule');
+        navigation.navigate('NotificationHistory');
       }}
     >
       <Placeholder.Media size={24} hasRadius onReady={!loading}>
