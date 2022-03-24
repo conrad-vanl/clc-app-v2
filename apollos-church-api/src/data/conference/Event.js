@@ -38,6 +38,7 @@ export const schema = gql`
   }
   extend type Query {
     myScheduleFeed: FeatureFeed
+    eventByContentfulId(contentfulId: ID!): Event
   }
   type Registration {
     node: Event
@@ -75,9 +76,9 @@ export const schema = gql`
     audios: [AudioMedia]
     theme: Theme
 
-    capacity: Int @cacheControl(maxAge: 600)
-    registered: Int @cacheControl(maxAge: 5)
-    isRegistered: Boolean @cacheControl(maxAge: 0, scope: PRIVATE)
+    capacity: Int 
+    registered: Int 
+    isRegistered: Boolean 
   }
 `;
 
@@ -126,6 +127,10 @@ export const resolver = {
     },
   },
   Query: {
+    eventByContentfulId: async (root, args, { dataSources: { Event } }) => {
+      // eslint-disable-next-line no-return-await
+      return await Event.getFromId(args.contentfulId);
+    },
     myScheduleFeed: (root, args, { dataSources: { FeatureFeed } }) =>
       FeatureFeed.getFeed({
         type: 'apollosConfig',

@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { ApolloProvider, ApolloClient, ApolloLink } from '@apollo/client';
 import { getVersion, getApplicationName } from 'react-native-device-info';
+import { print } from 'graphql';
+import { mergeTypeDefs } from '@graphql-tools/merge';
 
 import { authLink, buildErrorLink } from '@apollosproject/ui-auth';
 
@@ -11,6 +13,11 @@ import { resolvers, schema, defaults, GET_ALL_DATA } from '../store';
 import httpLink from './httpLink';
 import cache, { ensureCacheHydration } from './cache';
 import MARK_CACHE_LOADED from './markCacheLoaded';
+import {
+  localSchema,
+  localResolvers,
+  ensureContentfulLoaded,
+} from './contentful';
 
 const goToAuth = () => NavigationService.resetToAuth();
 const wipeData = () =>
@@ -29,15 +36,34 @@ const onAuthError = async () => {
 
 const errorLink = buildErrorLink(onAuthError);
 
-const link = ApolloLink.from([authLink, errorLink, httpLink]);
+const links = [authLink, errorLink, httpLink];
+
+if (process.env.NODE_ENV === 'development') {
+  const logLink = new ApolloLink((operation, forward) => {
+    console.info('request', print(operation.query));
+    return forward(operation).map((result) => {
+      console.info('response', result.data);
+      return result;
+    });
+  });
+
+  links.unshift(logLink);
+}
+
+const link = ApolloLink.from(links);
+
+const mergedSchema = mergeTypeDefs(schema, localSchema);
 
 export const client = new ApolloClient({
   link,
   cache,
   queryDeduplication: false,
   shouldBatch: true,
-  resolvers,
-  typeDefs: schema,
+  resolvers: {
+    ...resolvers,
+    ...localResolvers,
+  },
+  typeDefs: mergedSchema,
   name: getApplicationName(),
   version: getVersion(),
   // NOTE: this is because we have some very taxing queries that we want to avoid running twice
@@ -83,7 +109,7 @@ class ClientProvider extends PureComponent {
 
   async componentDidMount() {
     try {
-      await ensureCacheHydration;
+      await Promise.all([ensureCacheHydration, ensureContentfulLoaded]);
     } catch (e) {
       throw e;
     } finally {

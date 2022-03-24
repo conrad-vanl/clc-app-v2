@@ -95,8 +95,12 @@ class PersonalDetails extends PureComponent {
   render() {
     return (
       <Query query={GET_USER_PROFILE} fetchPolicy="cache-and-network">
-        {({ data: { currentUser = { profile: {} } } = {} }) => {
-          const { firstName, lastName, email } = currentUser.profile;
+        {({ data, loading }) => {
+          const currentUser = data?.currentUser || {};
+          const { firstName, lastName, email } = currentUser.profile || {};
+          if (loading) {
+            return null;
+          }
 
           return (
             <Mutation
@@ -121,6 +125,7 @@ class PersonalDetails extends PureComponent {
               {(updateDetails) => (
                 <Formik
                   initialValues={{ firstName, lastName, email }}
+                  enableReinitialize
                   validationSchema={Yup.object().shape({
                     firstName: Yup.string().required('First Name is required!'),
                     lastName: Yup.string().required('Last Name is required!'),

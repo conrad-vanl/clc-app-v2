@@ -20,6 +20,7 @@ import { ProtectedRoute } from '@apollosproject/ui-auth';
 
 import Providers from './Providers';
 import ContentSingle from './content-single';
+import LocalContentSingle from './local-content-single';
 import NodeSingle from './node-single';
 import Event from './event';
 import Tabs from './tabs';
@@ -27,6 +28,7 @@ import LandingScreen from './ui/LandingScreen';
 import Onboarding from './ui/Onboarding';
 import Search from './ui/Search';
 import Auth from './auth';
+import StaffDirectory from './staff-directory';
 
 enableScreens(); // improves performance for react-navigation
 
@@ -109,6 +111,11 @@ const App = (props) => (
             options={{ title: 'Content' }}
           />
           <Screen
+            name="LocalContentSingle"
+            component={LocalContentSingle}
+            options={{ title: 'Content' }}
+          />
+          <Screen
             name="NodeSingle"
             component={NodeSingle}
             options={{ title: 'Node' }}
@@ -132,6 +139,11 @@ const App = (props) => (
             name="Passes"
             component={Passes}
             options={{ title: 'Check-In Pass' }}
+          />
+          <Screen
+            name="StaffDirectory"
+            component={StaffDirectory}
+            options={{ title: 'Staff Directory' }}
           />
           <Screen
             name="Onboarding"

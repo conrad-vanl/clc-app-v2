@@ -10,7 +10,6 @@ import {
 
 import { styled } from '@apollosproject/ui-kit';
 
-import ActionContainer from './ActionContainer';
 import NodeSingleInner from '../NodeSingleInner';
 import MapView from './MapView';
 

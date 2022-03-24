@@ -1,34 +1,33 @@
 import React, { PureComponent } from 'react';
 import { ScrollView } from 'react-native';
-import PropTypes from 'prop-types';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
-import { HorizontalLikedContentFeedConnected } from '@apollosproject/ui-connected';
-import { BackgroundView } from '@apollosproject/ui-kit';
+import {
+  BackgroundView,
+  H5,
+  UIText,
+  TableView,
+  Touchable,
+  Cell,
+  CellText,
+  Divider,
+} from '@apollosproject/ui-kit';
+import { Caret } from '../../ui/ScheduleItem';
 
-import ActionTable from './ActionTable';
-import ActionBar from './ActionBar';
+import Maps from './LocalMaps';
+import Resources from './LocalResources';
 
-import Maps from './Maps';
-import Resources from './Resources';
+function Connect() {
+  const navigation = useNavigation()
 
-class Connect extends PureComponent {
-  static propTypes = {
-    navigation: PropTypes.shape({
-      navigate: PropTypes.func,
-    }),
-  };
-
-  render() {
-    return (
-      <BackgroundView>
-        <ScrollView style={{ flex: 1 }}>
-          <Maps />
-          <Resources />
-        </ScrollView>
-      </BackgroundView>
-    );
-  }
+  return (
+    <BackgroundView>
+      <ScrollView style={{ flex: 1 }}>
+        <Maps />
+        <Resources />
+      </ScrollView>
+    </BackgroundView>
+  );
 }
 
 export default Connect;
