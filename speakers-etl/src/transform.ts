@@ -4,7 +4,7 @@ import { present } from "./util"
 export function transformPersonToSpeaker(entry: Entry<PersonProps>, personIdToTeam: Record<string, Entry>): any {
   const name = [entry.fields.firstName, entry.fields.lastName].filter(present).join(' ')
   const bio = 
-    entry.fields.hasProfilePage &&
+    entry.fields.hasProfilePage !== false &&
       `[Read ${entry.fields.firstName}'s Bio](https://www.watermark.org/people/${entry.fields.slug})` ||
       ''
 
