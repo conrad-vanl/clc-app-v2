@@ -30,13 +30,26 @@ export const resolver = {
   Query: {
     ...OneSignalOriginal.resolver.Query,
     oneSignalHistory: async (_query, _args, { dataSources }) => {
+      const cacheKey = `oneSignalHistory`;
+      const cached = await dataSources.Cache.get({ key: cacheKey });
+      if (cached !== undefined && cached !== null) {
+        return cached;
+      }
+
       const data = await dataSources.OneSignal.getHistory();
-      return {
+      const result = {
         total: data.total_count,
         items: data.notifications
           .filter((n) => !n.include_player_ids) // not specifically targeted
           .map((n) => formatNotification(n)),
       };
+
+      await dataSources.Cache.set({
+        key: cacheKey,
+        data: result,
+        expiresIn: 60,
+      });
+      return result;
     },
   },
 };
