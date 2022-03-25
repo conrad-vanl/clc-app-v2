@@ -10,7 +10,7 @@ jobs:
       run:
         working-directory: apolloschurchapp
 
-    runs-on: macos-10
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v2
@@ -111,6 +111,9 @@ jobs:
 
       - name: Decrypt Keystore
         run: (cd .. && yarn secrets -d ${{ secrets.ENCRYPTION_PASSWORD }})
+
+      - name: Ensure no changes to repo
+        run: git diff && [ -z "$(git status --porcelain)" ]
 
       - name: Fastlane Deploy
         run: bundle exec fastlane android deploy
