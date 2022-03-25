@@ -10,7 +10,7 @@ jobs:
       run:
         working-directory: apolloschurchapp
 
-    runs-on: macos-latest
+    runs-on: macos-10
 
     steps:
       - uses: actions/checkout@v2
@@ -55,7 +55,7 @@ jobs:
         run: (cd .. && yarn secrets -d ${{ secrets.ENCRYPTION_PASSWORD }})
 
       - name: Ensure no changes to repo
-        run: git diff && git status --porcelain
+        run: git diff && [ -z "$(git status --porcelain)" ]
 
       - name: Fastlane Deploy
         run: bundle exec fastlane ios deploy
