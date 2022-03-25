@@ -54,6 +54,9 @@ jobs:
       - name: Decrypt Secrets
         run: (cd .. && yarn secrets -d ${{ secrets.ENCRYPTION_PASSWORD }})
 
+      - name: Ensure no changes to repo
+        run: git diff && git status --porcelain
+
       - name: Fastlane Deploy
         run: bundle exec fastlane ios deploy
         env:
