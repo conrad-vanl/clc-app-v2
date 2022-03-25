@@ -63,7 +63,6 @@
     "@apollosproject/ui-htmlview": "^2.10.0",
     "@apollosproject/ui-kit": "^2.10.0",
     "@apollosproject/ui-mapview": "^2.10.0",
-    "@apollosproject/ui-media-player": "^2.10.0",
     "@apollosproject/ui-notifications": "^2.10.0",
     "@apollosproject/ui-onboarding": "^2.10.0",
     "@apollosproject/ui-passes": "^2.10.0",

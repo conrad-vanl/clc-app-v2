@@ -1,6 +1,5 @@
 import gql from 'graphql-tag';
 
-import { schema as mediaPlayerSchema } from '@apollosproject/ui-media-player';
 import { updatePushId } from '@apollosproject/ui-notifications';
 import CACHE_LOADED from '../client/getCacheLoaded'; // eslint-disable-line
 
@@ -19,7 +18,6 @@ export const schema = `
     updateDevicePushId(pushId: String!): String
     updatePushPermissions(enabled: Boolean!): Boolean
   }
-${mediaPlayerSchema || ''}
 `;
 
 export const defaults = {
