@@ -1,7 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-iphoneos_deployment_target = '11.0'
+iphoneos_deployment_target = '10.0'
 
 platform :ios, iphoneos_deployment_target
 target 'CLC' do
@@ -41,12 +41,6 @@ target 'CLC' do
          target.build_phases << phase
          target.build_phases.move(phase,0)
        end
-      end
-
-      installer.pods_project.targets.each do |target|
-        target.build_configurations.each do |config|
-          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = iphoneos_deployment_target
-        end
       end
   end
 end

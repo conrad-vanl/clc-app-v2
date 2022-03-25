@@ -205,11 +205,6 @@ PODS:
     - glog
     - RCT-Folly (= 2021.06.28.00-v2)
     - React-jsi/Default (= 0.67.3)
-  - React-jsi/Default (0.67.3):
-    - boost (= 1.76.0)
-    - DoubleConversion
-    - glog
-    - RCT-Folly (= 2021.06.28.00-v2)
   - React-jsiexecutor (0.67.3):
     - DoubleConversion
     - glog
@@ -220,7 +215,7 @@ PODS:
   - React-jsinspector (0.67.3)
   - React-logger (0.67.3):
     - glog
-  - react-native-apollos-player (2.10.0):
+  - react-native-apollos-player (2.45.0):
     - React
   - react-native-config (0.11.7):
     - React
@@ -613,7 +608,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 15ea57ead631a11fad57634ff69f78e797113a39
   React-jsinspector: 1e1e03345cf6d47779e2061d679d0a87d9ae73d8
   React-logger: 1e10789cb84f99288479ba5f20822ce43ced6ffe
-  react-native-apollos-player: 8ae695218e6f855ae1c1fdd1f94f5a49d4f8bdfc
+  react-native-apollos-player: 923e427b199f91106a713f5fc4212127fa815013
   react-native-config: 55548054279d92e0e4566ea15a8b9b81028ec342
   react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9
   react-native-geolocation-service: f33626f1ae12381ca2ae60f98b2f5edd676bf95a
@@ -657,6 +652,6 @@ SPEC CHECKSUMS:
   RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
   Yoga: 90dcd029e45d8a7c1ff059e8b3c6612ff409061a
 
-PODFILE CHECKSUM: 66fffbdd7a4512fee7c9b31db0cb0f9922c7116d
+PODFILE CHECKSUM: 593bed199ec08c13209610cd91098cc49e1b3959
 
 COCOAPODS: 1.11.2
