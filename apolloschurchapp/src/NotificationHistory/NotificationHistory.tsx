@@ -43,7 +43,7 @@ const GET_NOTIFICATION_HISTORY = gql`
   }
 `
 
-const MARK_NOTIFICATIONS_READ = gql`
+export const MARK_NOTIFICATIONS_READ = gql`
   mutation markNotificationsRead($ids: [String]!) {
     markNotificationsRead(ids: $ids) @client 
   }
