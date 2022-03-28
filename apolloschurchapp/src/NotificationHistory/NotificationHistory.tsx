@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
+import URL from 'url';
+import querystring from 'querystring';
 import {gql, useMutation, useQuery} from '@apollo/client';
 
 import { FlatList, View, Text } from 'react-native'
@@ -15,6 +17,7 @@ import {
   PaddedView,
   ButtonLink,
   withTheme,
+  NavigationService
 } from '@apollosproject/ui-kit';
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
@@ -65,17 +68,23 @@ interface NotificationHistoryItem {
 export function NotificationHistory() {
   const {data, loading, refetch} = useQueryAutoRefresh<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY,
       { fetchPolicy: 'cache-and-network' });
-  const [markNotificationsRead, { loading: loadingMarkNotificationsRead }] = useMutation<{ read: number}, { ids: string[] }>(MARK_NOTIFICATIONS_READ)
+  const [markNotificationsRead, { loading: loadingMarkNotificationsRead }] = useMutation<{ read: number}, { ids: string[] }>(MARK_NOTIFICATIONS_READ, {
+    refetchQueries: ['getNotificationHistory']
+  })
+  const [markingAsRead, setMarkingAsRead] = useState<string[]>([])
 
   let items = (data?.oneSignalHistory?.items || [])
     .slice()
     .sort(byCompletedAtDesc)
 
-  const unreadIds = items.filter((n) => !n.read).map((n) => n.id)
+  const unreadIds = items
+    .filter((n) => !n.read).map((n) => n.id)
+    .filter((id) => !markingAsRead.includes(id))
 
   return <BackgroundView>
     <PaddedView style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-      <H5>{unreadIds.length > 0 ? `${unreadIds.length} unread notifications` : 'No unread notifications'}</H5>
+      {!loading &&
+        <H5>{unreadIds.length > 0 ? `${unreadIds.length} unread notifications` : 'No unread notifications'}</H5>}
       {unreadIds.length > 0 &&
         <ButtonLink onPress={markAllAsRead}>
           {loadingMarkNotificationsRead ?
@@ -88,9 +97,34 @@ export function NotificationHistory() {
       onRefresh={refetch}
       style={{ flex: 1 }}
       data={items}
-      renderItem={(props) => <NotificationListItem item={props.item} loading={loading} />}
+      renderItem={({item}) =>
+        <NotificationListItem item={{
+          ...item,
+          read: item.read || markingAsRead.includes(item.id)
+        }} loading={loading} onPress={() => onPress(item)} />}
     />
   </BackgroundView>
+
+  function onPress(item: NotificationHistoryItem) {
+    if (!item.read) {
+      setMarkingAsRead([...markingAsRead, item.id])
+      markNotificationsRead({
+        variables: { ids: [item.id] }
+      })
+    }
+
+    const rawUrl = item.url
+    // copied from packages/apollos-ui-notifications/src/Provider.js
+    if (!rawUrl) return;
+    const url = URL.parse(rawUrl);
+    const route = url.pathname!.substring(1);
+    const cleanedRoute = route.includes('/app-link/')
+      ? route
+      : route.split('app-link/')[1];
+    const args = querystring.parse(url.query || '');
+    console.log('Navigate to', cleanedRoute)
+    NavigationService.navigate(cleanedRoute, args);
+  }
 
   function markAllAsRead(){
     markNotificationsRead({
@@ -99,17 +133,17 @@ export function NotificationHistory() {
   }
 }
 
-function NotificationListItem({item, loading}: { item: NotificationHistoryItem, loading: boolean }) {
+function NotificationListItem({item, loading, onPress}: { item: NotificationHistoryItem, loading: boolean, onPress: () => void }) {
   return <Touchable
-    onPress={() => {
-      // TODO
-    }}
+    onPress={onPress}
     key={item?.id}
   >
     <View>
       <Cell>
-        <CellText isLoading={loading}><H4>{item?.headings}</H4></CellText>
-        <Caret />
+        <CellText isLoading={loading}>
+          <H4  style={item.read ? { color: 'green' } : {}}>{item?.headings}</H4>
+        </CellText>
+        {item.url ? <Caret /> : null}
       </Cell>
       <Divider />
     </View>
