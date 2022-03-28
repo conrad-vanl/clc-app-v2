@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import URL from 'url';
 import querystring from 'querystring';
-import {gql, useMutation, useQuery} from '@apollo/client';
+import {gql, useMutation} from '@apollo/client';
 
 import { FlatList, View, Linking } from 'react-native'
 import {
@@ -12,11 +12,9 @@ import {
   Touchable,
   Cell,
   CellText,
-  GradientOverlayImage,
   Divider,
   PaddedView,
   ButtonLink,
-  withTheme,
   NavigationService
 } from '@apollosproject/ui-kit';
 import { Caret } from '../ui/ScheduleItem';
@@ -129,6 +127,24 @@ interface NotificationListItemProps {
   onPress: () => void
 }
 
+const LabelText = styled(({ theme, read }) => ({
+  ...(!read ? { fontWeight: 'bold', fontSize: 18 } : { fontWeight: 'normal', fontSize: 16 }),
+}))(H4);
+
+const ItemCell = styled(({ theme, read, expanded }) => ({
+  backgroundColor: theme.colors.background.transparent,
+  ...(expanded ? { backgroundColor: theme.colors.background.paper } : {})
+}))(Cell);
+
+const ItemText = styled(({ theme }) => ({
+  fontWeight: 'normal',
+  fontSize: 14,
+}))(CellText);
+
+const LinkCaret = styled(({ theme }) => ({
+  alignSelf: 'flex-end'
+}))(Caret)
+
 function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
   const [expanded, setExpanded] = React.useState(false)
 
@@ -137,18 +153,18 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
     key={item?.id}
   >
     <View>
-      <Cell>
-        <CellText isLoading={loading}>
-          <H4  style={item.read ? { color: 'green' } : {}}>{item?.headings}</H4>
-        </CellText>
-      </Cell>
+      <ItemCell expanded={expanded} read={item.read}>
+        <LabelText read={item.read}>
+          {item?.headings}
+        </LabelText>
+      </ItemCell>
       {expanded &&
-        <Cell>
-          <CellText isLoading={loading}>
+        <ItemCell  expanded={expanded} read={item.read}>
+          <ItemText>
             {item.contents}
-          </CellText>
-          {item.url ? <Caret /> : null}
-        </Cell>}
+          </ItemText>
+          {item.url && expanded ? <LinkCaret /> : null}
+        </ItemCell>}
       <Divider />
     </View>
   </Touchable>
