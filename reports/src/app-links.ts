@@ -50,7 +50,7 @@ export class AppLinks {
     const Tabs: AppLinkRow[] = [
       { type: 'Tab', title: 'Home', link: 'clc://clc/app-link/Home'},
       { type: 'Tab', title: 'Schedule', link:  'clc://clc/app-link/Schedule' },
-      { type: 'Tab', title: 'My CLC', link:  '	clc://clc/app-link/My-CLC' },
+      { type: 'Tab', title: 'My CLC', link:  'clc://clc/app-link/My-CLC' },
       { type: 'Tab', title: 'Tracks', link:  'clc://clc/app-link/Tracks' },
       { type: 'Tab', title: 'Connect', link:  'clc://clc/app-link/Connect' },
       { type: 'Tab', title: 'Staff Directory', link:  'clc://clc/app-link/StaffDirectory' },
