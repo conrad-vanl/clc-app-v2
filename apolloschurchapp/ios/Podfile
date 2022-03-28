@@ -36,12 +36,9 @@ target 'CLC' do
          target.build_phases << phase
          target.build_phases.move(phase,0)
        end
-
-       # https://fluttercorner.com/warning-the-ios-deployment-target-iphoneos_deployment_target-is-set-to-8-0/
-       target.build_configurations.each do |config|
-        config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
-       end
       end
+
+      __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end
 
