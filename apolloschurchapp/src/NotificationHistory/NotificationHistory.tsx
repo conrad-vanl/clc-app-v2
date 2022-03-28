@@ -1,5 +1,5 @@
 import React from 'react'
-import {gql, useQuery} from '@apollo/client';
+import {gql, useMutation, useQuery} from '@apollo/client';
 
 import { FlatList, View, Text } from 'react-native'
 import {
@@ -13,7 +13,8 @@ import {
   GradientOverlayImage,
   Divider,
   PaddedView,
-  ButtonLink
+  ButtonLink,
+  withTheme,
 } from '@apollosproject/ui-kit';
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
@@ -38,6 +39,12 @@ const GET_NOTIFICATION_HISTORY = gql`
   }
 `
 
+const MARK_NOTIFICATIONS_READ = gql`
+  mutation markNotificationsRead($ids: [String]!) {
+    markNotificationsRead(ids: $ids) @client 
+  }
+`
+
 interface GetNotificationHistoryData {
   oneSignalHistory: {
     total: number,
@@ -56,7 +63,9 @@ interface NotificationHistoryItem {
 }
 
 export function NotificationHistory() {
-  const {data, loading, refetch} = useQueryAutoRefresh<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY);
+  const {data, loading, refetch} = useQueryAutoRefresh<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY,
+      { fetchPolicy: 'cache-and-network' });
+  const [markNotificationsRead, { loading: loadingMarkNotificationsRead }] = useMutation<{ read: number}, { ids: string[] }>(MARK_NOTIFICATIONS_READ)
 
   let items = (data?.oneSignalHistory?.items || [])
     .slice()
@@ -66,10 +75,13 @@ export function NotificationHistory() {
 
   return <BackgroundView>
     <PaddedView style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-      <H5>{unreadIds.length > 0 ? `${unreadIds.length} unread notifications` : ''}</H5>
-      <ButtonLink onPress={markAllAsRead}>
-        <Text>Mark as read</Text>
-      </ButtonLink>
+      <H5>{unreadIds.length > 0 ? `${unreadIds.length} unread notifications` : 'No unread notifications'}</H5>
+      {unreadIds.length > 0 &&
+        <ButtonLink onPress={markAllAsRead}>
+          {loadingMarkNotificationsRead ?
+            'Please wait...' :
+            'Mark as read'}
+        </ButtonLink>}
     </PaddedView>
     <FlatList
       refreshing={loading}
@@ -81,7 +93,9 @@ export function NotificationHistory() {
   </BackgroundView>
 
   function markAllAsRead(){
-
+    markNotificationsRead({
+      variables: { ids: unreadIds }
+    })
   }
 }
 

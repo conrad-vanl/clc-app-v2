@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { schema as mediaPlayerSchema } from '@apollosproject/ui-media-player';
 import { updatePushId } from '@apollosproject/ui-notifications';
 import CACHE_LOADED from '../client/getCacheLoaded'; // eslint-disable-line
+import { present } from '../util';
 
 // TODO: this will require more organization...ie...not keeping everything in one file.
 // But this is simple while our needs our small.
@@ -19,7 +20,7 @@ export const schema = `
     updateDevicePushId(pushId: String!): String
     updatePushPermissions(enabled: Boolean!): Boolean
 
-    markNotificationRead(id: ID!): Boolean
+    markNotificationsRead(ids: [String]!): Int
   }
 
   extend type NotificationHistory {
@@ -77,16 +78,21 @@ export const resolvers = {
       }
       return null;
     },
-    markNotificationRead: async (root, args) => {
+    markNotificationsRead: async (root, args) => {
       const readCount = parseInt(
         (await AsyncStorage.getItem('Notification/readCount')) || '0',
         10
       );
 
+      const ids = (args.ids || []).filter(present);
+      const newReadCount = readCount + ids.length;
+
       await AsyncStorage.multiSet([
-        ['Notification/readCount', (readCount + 1).toString(10)],
-        [`Notification/${args.id}/read`, 'true'],
+        ...ids.map((id) => [`Notification/${id}/read`, 'true']),
+        ['Notification/readCount', newReadCount.toString(10)],
       ]);
+
+      return newReadCount;
     },
   },
   NotificationHistory: {
