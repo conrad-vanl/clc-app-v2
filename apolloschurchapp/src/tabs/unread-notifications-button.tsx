@@ -3,6 +3,7 @@ import { useQuery, gql } from '@apollo/client';
 import { Touchable, Placeholder, makeIcon } from '@apollosproject/ui-kit';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 
 const COUNT_UNREAD_NOTIFICATIONS = gql`
 query countUnreadNotificationsQuery($pushId: String) {
@@ -45,14 +46,16 @@ const UnreadNotificationsIcon = makeIcon(
   )
 );
 
-export function UnreadNotificationsButton() {
+export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const navigation = useNavigation();
-  const { data, loading } = useQuery(COUNT_UNREAD_NOTIFICATIONS);
+  const { data, loading } = useQueryAutoRefresh(COUNT_UNREAD_NOTIFICATIONS, {
+    fetchPolicy: 'cache-and-network'
+  });
 
   const {total, read} = data?.oneSignalHistory || {}
 
   let Icon = NotificationsIcon
-  if (total && read && total > read) {
+  if ((typeof total != 'undefined') && (typeof read != 'undefined') && total > read) {
     Icon = UnreadNotificationsIcon
   }
 
@@ -62,8 +65,8 @@ export function UnreadNotificationsButton() {
         navigation.navigate('NotificationHistory');
       }}
     >
-      <Placeholder.Media size={32} hasRadius onReady={!loading}>
-        <Icon size={32} />
+      <Placeholder.Media size={size} hasRadius onReady={true}>
+        <Icon size={size} />
       </Placeholder.Media>
     </Touchable>
   );

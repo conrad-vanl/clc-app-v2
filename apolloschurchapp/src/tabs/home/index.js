@@ -58,7 +58,8 @@ const Home = () => {
                     source={require('./wordmark.png')}
                     style={{ width: 32, flex: 1, left: 16 }}
                   />
-                  <UnreadNotificationsButton />
+                  <UnreadNotificationsButton size={24} />
+                  <View style={{ width: 8 }} />
                 </View>
               }
             />

@@ -70,7 +70,7 @@ export function NotificationHistory() {
   const {data, loading, refetch} = useQueryAutoRefresh<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY,
       { fetchPolicy: 'cache-and-network' });
   const [markNotificationsRead, { loading: loadingMarkNotificationsRead }] = useMutation<{ read: number}, { ids: string[] }>(MARK_NOTIFICATIONS_READ, {
-    refetchQueries: ['getNotificationHistory']
+    refetchQueries: ['getNotificationHistory', 'countUnreadNotificationsQuery']
   })
   const [markingAsRead, setMarkingAsRead] = useState<string[]>([])
 
