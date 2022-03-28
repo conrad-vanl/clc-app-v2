@@ -1,6 +1,7 @@
 import * as OneSignalOriginal from '@apollosproject/data-connector-onesignal';
 import gql from 'graphql-tag';
 import ApollosConfig from '@apollosproject/config';
+import { present, tryParseDate } from '../util';
 
 const { ONE_SIGNAL } = ApollosConfig;
 
@@ -54,11 +55,22 @@ export const resolver = {
   },
 };
 
+const HIDE_NOTIFICATIONS_BEFORE =
+  present(process.env.HIDE_NOTIFICATIONS_BEFORE) &&
+  tryParseDate(process.env.HIDE_NOTIFICATIONS_BEFORE);
+
 export class dataSource extends OneSignalOriginal.dataSource {
   async getHistory() {
-    return this.get(`notifications`, {
+    const data = await this.get(`notifications`, {
       app_id: ONE_SIGNAL.APP_ID,
     });
+
+    if (HIDE_NOTIFICATIONS_BEFORE) {
+      data.notifications = data.notifications.filter(
+        (n) => (n.send_after || 0) * 1000 > HIDE_NOTIFICATIONS_BEFORE
+      );
+    }
+    return data;
   }
 }
 
@@ -71,3 +83,4 @@ function formatNotification(n) {
     url: n.url,
   };
 }
+
