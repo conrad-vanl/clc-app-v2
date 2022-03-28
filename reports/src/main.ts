@@ -21,7 +21,7 @@ const common = {
   code: {
     type: 'string',
     description: 'Conference code in Contentful',
-    default: 'CLC2021'
+    default: 'CLC2022'
   },
   out: {
     type: 'string',
