@@ -11,6 +11,7 @@ import { assign, present } from "./util"
 
 interface RegistrationsArgs {
   spaceId: string,
+  environmentId?: string
   accessToken: string,
   code: string
   rockToken: string
@@ -31,6 +32,7 @@ export class Registrations {
     this.client = createClient({
       accessToken: this.argv.accessToken,
       space: this.argv.spaceId,
+      environmentId: this.argv.environmentId || 'master',
       logger: this.logger
     })
   }
@@ -52,7 +54,7 @@ export class Registrations {
 
     const didEnd = onceAsync(
       writerStream.pipe(outputStream),
-      'end'
+      'finish'
     )
 
     for(const row of dataclip) {
@@ -85,6 +87,7 @@ export class Registrations {
       await writeAsync(writerStream, toWrite)
     }
 
+    writerStream.end()
     await didEnd
   }
 
