@@ -3,7 +3,7 @@ import URL from 'url';
 import querystring from 'querystring';
 import {gql, useMutation, useQuery} from '@apollo/client';
 
-import { FlatList, View, Text } from 'react-native'
+import { FlatList, View, Linking } from 'react-native'
 import {
   BackgroundView,
   H4,
@@ -21,6 +21,7 @@ import {
 } from '@apollosproject/ui-kit';
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
+import { present } from '../util';
 
 const GET_NOTIFICATION_HISTORY = gql`
   query getNotificationHistory($pushId: String) {
@@ -112,18 +113,6 @@ export function NotificationHistory() {
         variables: { ids: [item.id] }
       })
     }
-
-    const rawUrl = item.url
-    // copied from packages/apollos-ui-notifications/src/Provider.js
-    if (!rawUrl) return;
-    const url = URL.parse(rawUrl);
-    const route = url.pathname!.substring(1);
-    const cleanedRoute = route.includes('/app-link/')
-      ? route
-      : route.split('app-link/')[1];
-    const args = querystring.parse(url.query || '');
-    console.log('Navigate to', cleanedRoute)
-    NavigationService.navigate(cleanedRoute, args);
   }
 
   function markAllAsRead(){
@@ -133,9 +122,18 @@ export function NotificationHistory() {
   }
 }
 
-function NotificationListItem({item, loading, onPress}: { item: NotificationHistoryItem, loading: boolean, onPress: () => void }) {
+interface NotificationListItemProps {
+  item: NotificationHistoryItem,
+  loading: boolean,
+
+  onPress: () => void
+}
+
+function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
+  const [expanded, setExpanded] = React.useState(false)
+
   return <Touchable
-    onPress={onPress}
+    onPress={_onPress}
     key={item?.id}
   >
     <View>
@@ -143,13 +141,46 @@ function NotificationListItem({item, loading, onPress}: { item: NotificationHist
         <CellText isLoading={loading}>
           <H4  style={item.read ? { color: 'green' } : {}}>{item?.headings}</H4>
         </CellText>
-        {item.url ? <Caret /> : null}
       </Cell>
+      {expanded &&
+        <Cell>
+          <CellText isLoading={loading}>
+            {item.contents}
+          </CellText>
+          {item.url ? <Caret /> : null}
+        </Cell>}
       <Divider />
     </View>
   </Touchable>
+
+  function _onPress() {
+    onPress()
+
+    if (!expanded && present(item.contents)) {
+      setExpanded(true)
+    } else {
+      if (!item.url) return;
+      if (/^http(s)?\:\/\//.test(item.url)) {
+        Linking.openURL(item.url);
+      } else {
+        navigateInApp(item.url)
+      }
+    }
+  }
 }
 
 function byCompletedAtDesc(a: { completed_at: number }, b: { completed_at: number }): number {
   return b.completed_at - a.completed_at
+}
+
+function navigateInApp(rawUrl: string) {
+  // copied from packages/apollos-ui-notifications/src/Provider.js
+  const url = URL.parse(rawUrl);
+  const route = url.pathname!.substring(1);
+  const cleanedRoute = route.includes('/app-link/')
+    ? route
+    : route.split('app-link/')[1];
+  const args = querystring.parse(url.query || '');
+  console.log('Navigate to', cleanedRoute)
+  NavigationService.navigate(cleanedRoute, args);
 }
