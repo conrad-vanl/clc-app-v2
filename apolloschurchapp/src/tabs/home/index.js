@@ -1,5 +1,6 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect } from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useApolloClient } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
@@ -8,12 +9,14 @@ import {
   styled,
   BackgroundView,
   NavigationService,
+  H4,
 } from '@apollosproject/ui-kit';
 import { RockAuthedWebBrowser } from '@apollosproject/ui-connected';
 
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
 
 import { ONBOARDING_VERSION } from '../../ui/Onboarding';
+import { UnreadNotificationsButton } from '../unread-notifications-button';
 import LocalFeaturesFeedConnected from './localFeaturesFeedConnected';
 
 const LogoTitle = styled(({ theme }) => ({
@@ -50,9 +53,14 @@ const Home = () => {
                 });
               }}
               ListHeaderComponent={
-                <>
-                  <LogoTitle source={require('./wordmark.png')} />
-                </>
+                <View style={{ display: 'flex', flexDirection: 'row' }}>
+                  <LogoTitle
+                    source={require('./wordmark.png')}
+                    style={{ width: 32, flex: 1, left: 16 }}
+                  />
+                  <UnreadNotificationsButton size={24} />
+                  <View style={{ width: 8 }} />
+                </View>
               }
             />
           </SafeAreaView>

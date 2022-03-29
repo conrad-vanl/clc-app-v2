@@ -29,6 +29,7 @@ import Onboarding from './ui/Onboarding';
 import Search from './ui/Search';
 import Auth from './auth';
 import StaffDirectory from './staff-directory';
+import NotificationHistory from './NotificationHistory/index';
 
 enableScreens(); // improves performance for react-navigation
 
@@ -144,6 +145,11 @@ const App = (props) => (
             name="StaffDirectory"
             component={StaffDirectory}
             options={{ title: 'Staff Directory' }}
+          />
+          <Screen
+            name="NotificationHistory"
+            component={NotificationHistory}
+            options={{ title: 'Notifications' }}
           />
           <Screen
             name="Onboarding"

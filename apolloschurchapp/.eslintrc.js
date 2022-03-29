@@ -8,5 +8,6 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'no-use-before-define': 'off',
     'consistent-return': 'off',
+    eqeqeq: 'off',
   },
 };
