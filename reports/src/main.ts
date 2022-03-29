@@ -1,44 +1,62 @@
 import yargs from 'yargs'
+import { AppLinks } from './app-links';
 import { Registrations } from './registrations';
+
+const common = {
+  spaceId: {
+    type: 'string',
+    description: 'Contentful space ID of CLC app',
+    default: process.env.CONTENTFUL_SPACE || 'vsbnbtnlrnnr'
+  },
+  environmentId: {
+    type: 'string',
+    description: 'Contentful environment ID',
+    default: 'master'
+  },
+  accessToken: { 
+    type: 'string',
+    description: 'Contentful CDN access token',
+    default: process.env.CONTENTFUL_REST_KEY || 'k8mCSPw_UbsnK3XgC4JYpPVihDyRNLv5ZRZbfgcM6pg'
+  },
+  code: {
+    type: 'string',
+    description: 'Conference code in Contentful',
+    default: 'CLC2022'
+  },
+  out: {
+    type: 'string',
+    alias: 'o',
+    description: 'File to write out CSV output (defaults to stdout)',
+    default: '-'
+  },
+  verbose: {
+    type: 'boolean',
+    alias: 'v',
+    description: 'Set this to print debug output to stderr'
+  }
+} as const
 
 const _argv = yargs
   .command(
     'registrations [code]',
     'Download registrations info from Heroku dataclip',
     {
-      spaceId: {
-        type: 'string',
-        description: 'Contentful space ID of CLC app',
-        default: process.env.CONTENTFUL_SPACE || 'vsbnbtnlrnnr'
-      },
-      accessToken: { 
-        type: 'string',
-        description: 'Contentful CDN access token',
-        default: process.env.CONTENTFUL_REST_KEY || 'k8mCSPw_UbsnK3XgC4JYpPVihDyRNLv5ZRZbfgcM6pg'
-      },
-      code: {
-        type: 'string',
-        description: 'Conference code in Contentful',
-        default: 'CLC2021'
-      },
+      ...common,
       rockToken: {
         type: 'string',
         description: 'Rock API access token',
         default: process.env.ROCK_TOKEN || ''
       },
-      out: {
-        type: 'string',
-        alias: 'o',
-        description: 'File to write out CSV output (defaults to stdout)',
-        default: '-'
-      },
-      verbose: {
-        type: 'boolean',
-        alias: 'v',
-        description: 'Set this to print debug output to stderr'
-      }
     },
     Main((argv) => new Registrations(argv).run())
+  )
+  .command(
+    'app-links [code]',
+    'Produce CSV of app links for all Contentful content',
+    {
+      ...common,
+    },
+    Main((argv) => new AppLinks(argv).run())
   )
   .demandCommand()
   .argv
