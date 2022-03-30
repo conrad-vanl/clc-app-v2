@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import URL from 'url';
 import querystring from 'querystring';
+import moment from 'moment';
 import {gql, useMutation} from '@apollo/client';
 
 import { FlatList, View, Linking } from 'react-native'
@@ -59,7 +60,7 @@ interface NotificationHistoryItem {
   id: string
   headings?: string
   contents?: string
-  completed_at: number
+  completed_at: string
   url?: string
   read?: boolean
 }
@@ -128,43 +129,61 @@ interface NotificationListItemProps {
 }
 
 const LabelText = styled(({ theme, read }) => ({
-  ...(!read ? { fontWeight: 'bold', fontSize: 18 } : { fontWeight: 'normal', fontSize: 16 }),
+  fontWeight: 'bold',
+  fontSize: 18,
+  ...(read && { opacity: 0.6 })
 }))(H4);
 
-const ItemCell = styled(({ theme, read, expanded }) => ({
-  backgroundColor: theme.colors.background.transparent,
-  ...(expanded ? { backgroundColor: theme.colors.background.paper } : {})
+const ItemCell = styled(({ theme, read }) => ({
+  backgroundColor: theme.colors.background.paper
 }))(Cell);
 
-const ItemText = styled(({ theme }) => ({
+const HeaderCell = styled(({ theme, read }) => ({
+  backgroundColor: theme.colors.background.paper,
+  flexDirection: 'column',
+  alignItems: 'flex-start'
+}))(Cell);
+
+const ItemText = styled(({ theme, read }) => ({
   fontWeight: 'normal',
   fontSize: 14,
+  ...(read && { opacity: 0.6 })
+}))(CellText);
+
+const FooterText = styled(({ theme, read }) => ({
+  fontWeight: 'normal',
+  fontSize: 10,
+  ...(read && { opacity: 0.6 })
 }))(CellText);
 
 const LinkCaret = styled(({ theme }) => ({
   alignSelf: 'flex-end'
 }))(Caret)
 
-function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
-  const [expanded, setExpanded] = React.useState(false)
 
+const formatTime = (time: string) => (time ? moment(time).format('MMM D, h:mm A') : null);
+
+function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
+  console.log('completedAt:', item.completed_at)
   return <Touchable
     onPress={_onPress}
     key={item?.id}
   >
     <View>
-      <ItemCell expanded={expanded} read={item.read}>
+      <HeaderCell read={item.read}>
         <LabelText read={item.read}>
           {item?.headings}
         </LabelText>
+        <FooterText read={item.read}>
+          {formatTime(item.completed_at)}
+        </FooterText>
+      </HeaderCell>
+      <ItemCell read={item.read}>
+        <ItemText read={item.read}>
+          {item.contents}
+        </ItemText>
+        {item.url ? <LinkCaret /> : null}
       </ItemCell>
-      {expanded &&
-        <ItemCell  expanded={expanded} read={item.read}>
-          <ItemText>
-            {item.contents}
-          </ItemText>
-          {item.url && expanded ? <LinkCaret /> : null}
-        </ItemCell>}
       <Divider />
     </View>
   </Touchable>
@@ -172,10 +191,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
   function _onPress() {
     onPress()
 
-    if (!expanded && present(item.contents)) {
-      setExpanded(true)
-    } else {
-      if (!item.url) return;
+    if (present(item.url)) {
       if (/^http(s)?\:\/\//.test(item.url)) {
         Linking.openURL(item.url);
       } else {
@@ -185,8 +201,8 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
   }
 }
 
-function byCompletedAtDesc(a: { completed_at: number }, b: { completed_at: number }): number {
-  return b.completed_at - a.completed_at
+function byCompletedAtDesc(a: { completed_at: string }, b: { completed_at: string }): number {
+  return Date.parse(b.completed_at) - Date.parse(a.completed_at)
 }
 
 function navigateInApp(rawUrl: string) {
