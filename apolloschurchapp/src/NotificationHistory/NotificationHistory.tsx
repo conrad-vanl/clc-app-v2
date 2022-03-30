@@ -89,7 +89,7 @@ export function NotificationHistory() {
         <ButtonLink onPress={markAllAsRead}>
           {loadingMarkNotificationsRead ?
             'Please wait...' :
-            'Mark as read'}
+            'Mark all as read'}
         </ButtonLink>}
     </PaddedView>
     <FlatList
