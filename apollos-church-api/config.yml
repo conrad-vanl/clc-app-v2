@@ -21,6 +21,10 @@ DATABASE:
     pool:
       max: 39
       min: 1
+    dialectOptions:
+      ssl:
+        require: false
+        rejectUnauthorized: false
 BUGSNAG:
   ## Optional, but you'll need to remove references to @apollosproject/bugsnag if you don't wish to use.
   API_KEY: ${BUGSNAG_KEY}

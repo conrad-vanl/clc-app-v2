@@ -21,6 +21,7 @@ import {
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 import { present } from '../util';
+import { uniq } from 'lodash';
 
 const GET_NOTIFICATION_HISTORY = gql`
   query getNotificationHistory($pushId: String) {
@@ -89,7 +90,7 @@ export function NotificationHistory() {
         <ButtonLink onPress={markAllAsRead}>
           {loadingMarkNotificationsRead ?
             'Please wait...' :
-            'Mark as read'}
+            'Mark all as read'}
         </ButtonLink>}
     </PaddedView>
     <FlatList
@@ -107,7 +108,7 @@ export function NotificationHistory() {
 
   function onPress(item: NotificationHistoryItem) {
     if (!item.read) {
-      setMarkingAsRead([...markingAsRead, item.id])
+      setMarkingAsRead(uniq([...markingAsRead, item.id]))
       markNotificationsRead({
         variables: { ids: [item.id] }
       })
@@ -115,6 +116,7 @@ export function NotificationHistory() {
   }
 
   function markAllAsRead(){
+    setMarkingAsRead(uniq([...markingAsRead, ...unreadIds]))
     markNotificationsRead({
       variables: { ids: unreadIds }
     })
@@ -135,13 +137,15 @@ const LabelText = styled(({ theme, read }) => ({
 }))(H4);
 
 const ItemCell = styled(({ theme, read }) => ({
-  backgroundColor: theme.colors.background.paper
+  backgroundColor: theme.colors.background.paper,
+  flex: 1,
 }))(Cell);
 
 const HeaderCell = styled(({ theme, read }) => ({
   backgroundColor: theme.colors.background.paper,
   flexDirection: 'column',
-  alignItems: 'flex-start'
+  alignItems: 'flex-start',
+  flex: 1,
 }))(Cell);
 
 const ItemText = styled(({ theme, read }) => ({
@@ -157,9 +161,13 @@ const FooterText = styled(({ theme, read }) => ({
 }))(CellText);
 
 const LinkCaret = styled(({ theme }) => ({
-  alignSelf: 'flex-end'
+  backgroundColor: theme.colors.background.paper,
 }))(Caret)
 
+const Wrapper = styled(({ theme, read }) => ({
+  display: 'flex',
+  backgroundColor: theme.colors.background.paper,
+}))(View);
 
 const formatTime = (time: string) => (time ? moment(time).format('MMM D, h:mm A') : null);
 
@@ -169,23 +177,26 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
     onPress={_onPress}
     key={item?.id}
   >
-    <View>
-      <HeaderCell read={item.read}>
-        <LabelText read={item.read}>
-          {item?.headings}
-        </LabelText>
-        <FooterText read={item.read}>
-          {formatTime(item.completed_at)}
-        </FooterText>
-      </HeaderCell>
-      <ItemCell read={item.read}>
-        <ItemText read={item.read}>
-          {item.contents}
-        </ItemText>
-        {item.url ? <LinkCaret /> : null}
-      </ItemCell>
-      <Divider />
-    </View>
+    <Wrapper style={{ flexDirection: 'row', width: '100%' }}>
+      <Wrapper style={{ flexDirection: 'column', width: '90%' }}>
+        <HeaderCell read={item.read}>
+          <LabelText read={item.read}>
+            {item?.headings}
+          </LabelText>
+          <FooterText read={item.read}>
+            {formatTime(item.completed_at)}
+          </FooterText>
+        </HeaderCell>
+        <ItemCell read={item.read}>
+          <ItemText read={item.read}>
+            {item.contents}
+          </ItemText>
+        </ItemCell>
+      </Wrapper>
+
+      {item.url ? <LinkCaret style={{width: '10%'}} /> : null}
+    </Wrapper>
+    <Divider />
   </Touchable>
 
   function _onPress() {
