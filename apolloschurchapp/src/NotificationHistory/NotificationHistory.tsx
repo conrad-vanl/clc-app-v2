@@ -21,6 +21,7 @@ import {
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 import { present } from '../util';
+import { uniq } from 'lodash';
 
 const GET_NOTIFICATION_HISTORY = gql`
   query getNotificationHistory($pushId: String) {
@@ -107,7 +108,7 @@ export function NotificationHistory() {
 
   function onPress(item: NotificationHistoryItem) {
     if (!item.read) {
-      setMarkingAsRead([...markingAsRead, item.id])
+      setMarkingAsRead(uniq([...markingAsRead, item.id]))
       markNotificationsRead({
         variables: { ids: [item.id] }
       })
@@ -115,6 +116,7 @@ export function NotificationHistory() {
   }
 
   function markAllAsRead(){
+    setMarkingAsRead(uniq([...markingAsRead, ...unreadIds]))
     markNotificationsRead({
       variables: { ids: unreadIds }
     })
