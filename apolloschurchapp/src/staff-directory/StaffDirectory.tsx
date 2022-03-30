@@ -58,6 +58,10 @@ interface Speaker {
   isOnConferenceDirectory: boolean
 }
 
+const Spacer = styled(({ theme }) => ({
+  backgroundColor: theme.colors.background.paper,
+  height: 4
+}))(View);
 
 export function StaffDirectory() {
   const { data, loading, refetch } = useQueryAutoRefresh<GetSpeakersData>(getSpeakers);
@@ -78,8 +82,8 @@ export function StaffDirectory() {
   }
 
   return <BackgroundView>
+    <Spacer />
     <SearchInputHeader
-      style={{paddingTop: 4}}
       onChangeText={throttle(setSearchText, 300)}
       // onFocus={setIsFocused}
       // inputRef={searchRef}
