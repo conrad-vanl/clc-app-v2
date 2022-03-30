@@ -38,11 +38,13 @@ export const resolver = {
       }
 
       const data = await dataSources.OneSignal.getHistory();
+      const notifications = data.notifications.filter(
+        (n) => !n.include_player_ids // not specifically targeted
+      );
+
       const result = {
-        total: data.notifications.length,
-        items: data.notifications
-          .filter((n) => !n.include_player_ids) // not specifically targeted
-          .map((n) => formatNotification(n)),
+        total: notifications.length,
+        items: notifications.map((n) => formatNotification(n)),
       };
 
       await dataSources.Cache.set({
