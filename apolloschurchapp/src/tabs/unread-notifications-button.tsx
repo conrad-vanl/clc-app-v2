@@ -6,11 +6,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 
 const COUNT_UNREAD_NOTIFICATIONS = gql`
-query countUnreadNotificationsQuery($pushId: String) {
-  # https://www.apollographql.com/docs/react/local-state/managing-state-with-field-policies/#using-local-only-fields-as-graphql-variables
-  pushId @client @export(as: "pushId")
-
-  oneSignalHistory(pushId: $pushId) {
+query countUnreadNotificationsQuery {
+  oneSignalHistory {
     total
     read @client
   }
@@ -55,7 +52,7 @@ export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const {total, read} = data?.oneSignalHistory || {}
 
   let Icon = NotificationsIcon
-  if ((typeof total != 'undefined') && (typeof read != 'undefined') && total > read) {
+  if (!loading && (typeof total != 'undefined') && (typeof read != 'undefined') && (total > read)) {
     Icon = UnreadNotificationsIcon
   }
 

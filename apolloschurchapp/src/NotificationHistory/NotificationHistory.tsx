@@ -24,11 +24,8 @@ import { present } from '../util';
 import { uniq } from 'lodash';
 
 const GET_NOTIFICATION_HISTORY = gql`
-  query getNotificationHistory($pushId: String) {
-    # https://www.apollographql.com/docs/react/local-state/managing-state-with-field-policies/#using-local-only-fields-as-graphql-variables
-    pushId @client @export(as: "pushId")
-
-    oneSignalHistory(pushId: $pushId) {
+  query getNotificationHistory {
+    oneSignalHistory {
       total
       read @client
       items {
