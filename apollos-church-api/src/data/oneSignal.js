@@ -12,7 +12,7 @@ export const schema = gql`
     id: ID!
     headings: String
     contents: String
-    completed_at: Int!
+    completed_at: String!
     url: String
   }
 
@@ -79,8 +79,9 @@ function formatNotification(n) {
     id: n.id,
     headings: n.headings?.en,
     contents: n.contents?.en,
-    completed_at: n.completed_at,
+    completed_at: n.completed_at
+      ? new Date(n.completed_at * 1000).toISOString()
+      : '',
     url: n.url,
   };
 }
-

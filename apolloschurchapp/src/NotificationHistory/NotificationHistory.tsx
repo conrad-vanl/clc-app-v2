@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import URL from 'url';
 import querystring from 'querystring';
+import moment from 'moment';
 import {gql, useMutation} from '@apollo/client';
 
 import { FlatList, View, Linking } from 'react-native'
@@ -59,7 +60,7 @@ interface NotificationHistoryItem {
   id: string
   headings?: string
   contents?: string
-  completed_at: number
+  completed_at: string
   url?: string
   read?: boolean
 }
@@ -137,9 +138,21 @@ const ItemCell = styled(({ theme, read }) => ({
   backgroundColor: theme.colors.background.paper
 }))(Cell);
 
+const HeaderCell = styled(({ theme, read }) => ({
+  backgroundColor: theme.colors.background.paper,
+  flexDirection: 'column',
+  alignItems: 'flex-start'
+}))(Cell);
+
 const ItemText = styled(({ theme, read }) => ({
   fontWeight: 'normal',
   fontSize: 14,
+  ...(read && { opacity: 0.6 })
+}))(CellText);
+
+const FooterText = styled(({ theme, read }) => ({
+  fontWeight: 'normal',
+  fontSize: 10,
   ...(read && { opacity: 0.6 })
 }))(CellText);
 
@@ -147,18 +160,24 @@ const LinkCaret = styled(({ theme }) => ({
   alignSelf: 'flex-end'
 }))(Caret)
 
-function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
 
+const formatTime = (time: string) => (time ? moment(time).format('MMM D, h:mm A') : null);
+
+function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
+  console.log('completedAt:', item.completed_at)
   return <Touchable
     onPress={_onPress}
     key={item?.id}
   >
     <View>
-      <ItemCell read={item.read}>
+      <HeaderCell read={item.read}>
         <LabelText read={item.read}>
           {item?.headings}
         </LabelText>
-      </ItemCell>
+        <FooterText read={item.read}>
+          {formatTime(item.completed_at)}
+        </FooterText>
+      </HeaderCell>
       <ItemCell read={item.read}>
         <ItemText read={item.read}>
           {item.contents}
@@ -182,8 +201,8 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
   }
 }
 
-function byCompletedAtDesc(a: { completed_at: number }, b: { completed_at: number }): number {
-  return b.completed_at - a.completed_at
+function byCompletedAtDesc(a: { completed_at: string }, b: { completed_at: string }): number {
+  return Date.parse(b.completed_at) - Date.parse(a.completed_at)
 }
 
 function navigateInApp(rawUrl: string) {
