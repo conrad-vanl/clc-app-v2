@@ -128,17 +128,19 @@ interface NotificationListItemProps {
 }
 
 const LabelText = styled(({ theme, read }) => ({
-  ...(!read ? { fontWeight: 'bold', fontSize: 18 } : { fontWeight: 'normal', fontSize: 16 }),
+  fontWeight: 'bold',
+  fontSize: 18,
+  ...(read && { opacity: 0.6 })
 }))(H4);
 
-const ItemCell = styled(({ theme, read, expanded }) => ({
-  backgroundColor: theme.colors.background.transparent,
-  ...(expanded ? { backgroundColor: theme.colors.background.paper } : {})
+const ItemCell = styled(({ theme, read }) => ({
+  backgroundColor: theme.colors.background.paper
 }))(Cell);
 
-const ItemText = styled(({ theme }) => ({
+const ItemText = styled(({ theme, read }) => ({
   fontWeight: 'normal',
   fontSize: 14,
+  ...(read && { opacity: 0.6 })
 }))(CellText);
 
 const LinkCaret = styled(({ theme }) => ({
@@ -146,25 +148,23 @@ const LinkCaret = styled(({ theme }) => ({
 }))(Caret)
 
 function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
-  const [expanded, setExpanded] = React.useState(false)
 
   return <Touchable
     onPress={_onPress}
     key={item?.id}
   >
     <View>
-      <ItemCell expanded={expanded} read={item.read}>
+      <ItemCell read={item.read}>
         <LabelText read={item.read}>
           {item?.headings}
         </LabelText>
       </ItemCell>
-      {expanded &&
-        <ItemCell  expanded={expanded} read={item.read}>
-          <ItemText>
-            {item.contents}
-          </ItemText>
-          {item.url && expanded ? <LinkCaret /> : null}
-        </ItemCell>}
+      <ItemCell read={item.read}>
+        <ItemText read={item.read}>
+          {item.contents}
+        </ItemText>
+        {item.url ? <LinkCaret /> : null}
+      </ItemCell>
       <Divider />
     </View>
   </Touchable>
@@ -172,10 +172,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
   function _onPress() {
     onPress()
 
-    if (!expanded && present(item.contents)) {
-      setExpanded(true)
-    } else {
-      if (!item.url) return;
+    if (present(item.url)) {
       if (/^http(s)?\:\/\//.test(item.url)) {
         Linking.openURL(item.url);
       } else {
