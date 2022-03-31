@@ -1,10 +1,9 @@
 import React from 'react';
-import { useQuery, gql } from '@apollo/client';
 import { Touchable, Placeholder, makeIcon } from '@apollosproject/ui-kit';
 import Svg, { Path, Circle } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
-import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { GET_NOTIFICATION_HISTORY } from '../NotificationHistory/NotificationHistory';
+import { useQuery } from '@apollo/client';
 
 const NotificationsIcon = makeIcon(
   ({ size = 32, fill = undefined, ...otherProps } = {}) => (
@@ -37,9 +36,10 @@ const UnreadNotificationsIcon = makeIcon(
 
 export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const navigation = useNavigation();
-  const { data, loading } = useQueryAutoRefresh(GET_NOTIFICATION_HISTORY, {
+  const { data, loading, refetch } = useQuery(GET_NOTIFICATION_HISTORY, {
     fetchPolicy: 'cache-and-network'
   });
+  useFocusEffect(() => { refetch() })
 
   const {total, read} = data?.oneSignalHistory || {}
 
