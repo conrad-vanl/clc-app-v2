@@ -18,7 +18,7 @@ import {
 import { SearchInputHeader } from '@apollosproject/ui-connected'
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
-import { present, parseName } from '../util';
+import { present, parseName, rewriteContentfulUrl } from '../util';
 
 const getSpeakers = gql`
   query getStaffDirectory {
@@ -117,6 +117,8 @@ const SubtitleText = styled(({theme}) => ({
 function DirectorySpeaker({item, loading}: { item: Speaker, loading: boolean }) {
   const navigation = useNavigation();
 
+  const photoUrl = item?.photo?.url && rewriteContentfulUrl(item?.photo?.url, { w: 100 })
+
   return <Touchable
     onPress={() => navigation.push('LocalContentSingle', {
       itemId: item.sys.id,
@@ -127,7 +129,7 @@ function DirectorySpeaker({item, loading}: { item: Speaker, loading: boolean }) 
       <Cell>
         <Avatar
           isLoading={loading}
-          source={item?.photo?.url}
+          source={photoUrl}
         />
         <TextContainer>
           <CellText isLoading={loading}><H4>{item?.name}</H4></CellText>

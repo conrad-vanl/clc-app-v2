@@ -8,7 +8,12 @@ import { gql, useQuery } from '@apollo/client';
 import { rewriteContentfulUrl } from '../util';
 
 const styles = StyleSheet.create({
-  contentContainerStyle: { width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' },
+  contentContainerStyle: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 const SizedImage = styled({
@@ -38,7 +43,10 @@ const query = gql`
 `;
 
 const LocalMapView = ({ nodeId }) => {
-  const { loading, data } = useQuery(query, { fetchPolicy: 'cache-and-network', variables: { itemId: nodeId } });
+  const { loading, data } = useQuery(query, {
+    fetchPolicy: 'cache-and-network',
+    variables: { itemId: nodeId },
+  });
   const location = data?.local?.location;
 
   return (
@@ -53,11 +61,13 @@ const LocalMapView = ({ nodeId }) => {
         contentContainerStyle={styles.contentContainerStyle}
         bouncesZoom
       >
-        <SizedImage source={location?.map?.url && rewriteContentfulUrl(location.map.url)} />
+        <SizedImage
+          source={location?.map?.url && rewriteContentfulUrl(location.map.url)}
+        />
       </ImageZoomView>
     </>
   );
-}
+};
 
 LocalMapView.propTypes = {
   content: PropTypes.shape({

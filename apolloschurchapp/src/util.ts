@@ -1,3 +1,4 @@
+import URL from 'url';
 
 export function present(value: string | undefined | null | ''): value is string {
   if (!value) { return false }
@@ -8,8 +9,12 @@ export function present(value: string | undefined | null | ''): value is string 
   return true
 }
 
-export function rewriteContentfulUrl(url: string): string {
-  return url.replace(/^(https?\:)?\/\//, 'https://')
+export function rewriteContentfulUrl(url: string, query: Record<string, any> = {}): string {
+  url = url.replace(/^(https?\:)?\/\//, 'https://')
+  const parsed = URL.parse(url, true)
+  Object.assign(parsed.query, query)
+
+  return URL.format(parsed)
 }
 
 export function parseName(name: string): { first: string, last?: string } {
