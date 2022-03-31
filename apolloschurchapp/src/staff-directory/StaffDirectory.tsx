@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Text } from 'react-native';
 import { gql, useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
@@ -65,10 +65,18 @@ interface Speaker {
   isOnConferenceDirectory: boolean
 }
 
-const Spacer = styled(({ theme }) => ({
+const PaperView = styled(({ theme }) => ({
   backgroundColor: theme.colors.background.paper,
-  height: 4
 }))(View);
+
+const ModalButton = styled(({theme}) => ({
+  backgroundColor: theme.colors.background.paper,
+  borderColor: theme.colors.background.paper
+}))(Button)
+
+const ModalButtonText = styled(({theme}) => ({
+  color: theme.colors.action.secondary,
+}))(Text)
 
 export function StaffDirectory() {
   const { data, loading, refetch } = useQueryAutoRefresh<GetSpeakersData>(getSpeakers);
@@ -96,18 +104,19 @@ export function StaffDirectory() {
   }
 
   return <BackgroundView>
-    <Spacer />
-    <View style={{ display: 'flex', flexDirection: 'row'}}>
+    <PaperView style={{height: 4}} />
+    <PaperView style={{ display: 'flex', flexDirection: 'row'}}>
       <SearchInputHeader
         style={{ flex: 3 }}
         onChangeText={throttle(setSearchText, 300)}
         // onFocus={setIsFocused}
         // inputRef={searchRef}
       />
-      <Button style={{flex: 1}} title={teamFilter || 'Team...'} type={'secondary'}
+      <ModalButton style={{flex: 1}}
           onPress={() => { bottomSheetModalRef?.current?.present()}}>
-      </Button>
-    </View>
+        <ModalButtonText>{teamFilter || 'Team...'}</ModalButtonText>
+      </ModalButton>
+    </PaperView>
     <FlatList
       refreshing={loading}
       onRefresh={refetch}
@@ -145,7 +154,6 @@ function PickerModal(props: PickerModalProps, ref: React.ForwardedRef<BottomShee
         snapPoints={['33%']}
         dismissOnPanDown={true}>
       <Container edges={['bottom', 'left', 'right']}>
-        <H4>Filter by team</H4>
         <Picker
           selectedValue={selectedItem}
           onValueChange={onValueChange}>
