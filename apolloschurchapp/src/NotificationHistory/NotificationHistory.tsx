@@ -23,7 +23,7 @@ import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 import { present } from '../util';
 import { uniq } from 'lodash';
 
-const GET_NOTIFICATION_HISTORY = gql`
+export const GET_NOTIFICATION_HISTORY = gql`
   query getNotificationHistory {
     oneSignalHistory {
       total
@@ -67,7 +67,7 @@ export function NotificationHistory() {
   const {data, loading, refetch} = useQueryAutoRefresh<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY,
       { fetchPolicy: 'cache-and-network' });
   const [markNotificationsRead, { loading: loadingMarkNotificationsRead }] = useMutation<{ read: number}, { ids: string[] }>(MARK_NOTIFICATIONS_READ, {
-    refetchQueries: ['getNotificationHistory', 'countUnreadNotificationsQuery']
+    refetchQueries: ['getNotificationHistory']
   })
   const [markingAsRead, setMarkingAsRead] = useState<string[]>([])
 
@@ -169,7 +169,7 @@ const Wrapper = styled(({ theme, read }) => ({
 const formatTime = (time: string) => (time ? moment(time).format('MMM D, h:mm A') : null);
 
 function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
-  console.log('completedAt:', item.completed_at)
+
   return <Touchable
     onPress={_onPress}
     key={item?.id}

@@ -4,15 +4,7 @@ import { Touchable, Placeholder, makeIcon } from '@apollosproject/ui-kit';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
-
-const COUNT_UNREAD_NOTIFICATIONS = gql`
-query countUnreadNotificationsQuery {
-  oneSignalHistory {
-    total
-    read @client
-  }
-}
-`;
+import { GET_NOTIFICATION_HISTORY } from '../NotificationHistory/NotificationHistory';
 
 const NotificationsIcon = makeIcon(
   ({ size = 32, fill = undefined, ...otherProps } = {}) => (
@@ -45,7 +37,7 @@ const UnreadNotificationsIcon = makeIcon(
 
 export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const navigation = useNavigation();
-  const { data, loading } = useQueryAutoRefresh(COUNT_UNREAD_NOTIFICATIONS, {
+  const { data, loading } = useQueryAutoRefresh(GET_NOTIFICATION_HISTORY, {
     fetchPolicy: 'cache-and-network'
   });
 
