@@ -2,7 +2,7 @@ import React from 'react';
 import { Touchable, Placeholder, makeIcon } from '@apollosproject/ui-kit';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { GET_NOTIFICATION_HISTORY } from '../NotificationHistory/NotificationHistory';
+import { GetNotificationHistoryData, GET_NOTIFICATION_HISTORY } from '../NotificationHistory/NotificationHistory';
 import { useQuery } from '@apollo/client';
 
 const NotificationsIcon = makeIcon(
@@ -36,16 +36,20 @@ const UnreadNotificationsIcon = makeIcon(
 
 export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const navigation = useNavigation();
-  const { data, loading, refetch } = useQuery(GET_NOTIFICATION_HISTORY, {
+  const { data, loading, refetch } = useQuery<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY, {
     fetchPolicy: 'cache-and-network'
   });
   useFocusEffect(() => { refetch() })
 
-  const {total, read} = data?.oneSignalHistory || {}
+  const {total, items} = data?.oneSignalHistory || {}
 
   let Icon = NotificationsIcon
-  if (!loading && (typeof total != 'undefined') && (typeof read != 'undefined') && (total > read)) {
-    Icon = UnreadNotificationsIcon
+  // If we have finished loading the query
+  if ((typeof total != 'undefined') && (typeof items != 'undefined')) {
+    // If any item is not read
+    if (items.find((i) => !i.read)) {
+      Icon = UnreadNotificationsIcon
+    }
   }
 
   return (

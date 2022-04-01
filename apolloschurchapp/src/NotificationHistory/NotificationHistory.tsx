@@ -27,7 +27,6 @@ export const GET_NOTIFICATION_HISTORY = gql`
   query getNotificationHistory {
     oneSignalHistory {
       total
-      read @client
       items {
         id
         headings
@@ -46,7 +45,7 @@ export const MARK_NOTIFICATIONS_READ = gql`
   }
 `
 
-interface GetNotificationHistoryData {
+export interface GetNotificationHistoryData {
   oneSignalHistory: {
     total: number,
     read: number,

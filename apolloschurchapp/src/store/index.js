@@ -20,11 +20,7 @@ export const schema = `
     updateDevicePushId(pushId: String!): String
     updatePushPermissions(enabled: Boolean!): Boolean
 
-    markNotificationsRead(ids: [String]!): Int
-  }
-
-  extend type NotificationHistory {
-    read: Int!
+    markNotificationsRead(ids: [String]!): Boolean
   }
 
   extend type Notification {
@@ -79,28 +75,14 @@ export const resolvers = {
       return null;
     },
     markNotificationsRead: async (root, args) => {
-      const readCount = parseInt(
-        (await AsyncStorage.getItem('Notification/readCount')) || '0',
-        10
+      const ids = (args.ids || []).filter(present);
+
+      await AsyncStorage.multiSet(
+        ids.map((id) => [`Notification/${id}/read`, 'true'])
       );
 
-      const ids = (args.ids || []).filter(present);
-      const newReadCount = readCount + ids.length;
-
-      await AsyncStorage.multiSet([
-        ...ids.map((id) => [`Notification/${id}/read`, 'true']),
-        ['Notification/readCount', newReadCount.toString(10)],
-      ]);
-
-      return newReadCount;
+      return true;
     },
-  },
-  NotificationHistory: {
-    read: async () =>
-      parseInt(
-        (await AsyncStorage.getItem('Notification/readCount')) || '0',
-        10
-      ),
   },
   Notification: {
     read: async ({ id }) =>
