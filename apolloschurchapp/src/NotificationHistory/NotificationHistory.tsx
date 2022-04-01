@@ -86,6 +86,7 @@ export function NotificationHistory() {
         properties={{
           title: 'Notification History',
           itemId: 'NotificationHistory',
+          type: 'tab'
         }}
       />
 
