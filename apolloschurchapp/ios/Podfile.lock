@@ -1,4 +1,5 @@
 PODS:
+  - Amplitude-iOS (4.3.1)
   - AstronomerAnalytics (3.6.9)
   - boost (1.76.0)
   - BVLinearGradient (2.5.6):
@@ -220,6 +221,9 @@ PODS:
   - React-jsinspector (0.67.3)
   - React-logger (0.67.3):
     - glog
+  - react-native-amplitude-analytics (0.3.0):
+    - Amplitude-iOS (~> 4.3.1)
+    - React
   - react-native-apollos-player (2.45.0):
     - React
   - react-native-config (0.11.7):
@@ -409,6 +413,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-amplitude-analytics (from `../node_modules/react-native-amplitude-analytics`)
   - "react-native-apollos-player (from `../node_modules/@apollosproject/ui-media-player`)"
   - react-native-config (from `../node_modules/react-native-config`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
@@ -455,6 +460,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Amplitude-iOS
     - AstronomerAnalytics
     - fmt
     - google-cast-sdk
@@ -501,6 +507,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-amplitude-analytics:
+    :path: "../node_modules/react-native-amplitude-analytics"
   react-native-apollos-player:
     :path: "../node_modules/@apollosproject/ui-media-player"
   react-native-config:
@@ -589,6 +597,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  Amplitude-iOS: df355e2be58972041acde9576a2ae97c217bf941
   AstronomerAnalytics: 36f48678a387e41481650edd6247c6c95d994131
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
@@ -613,6 +622,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 15ea57ead631a11fad57634ff69f78e797113a39
   React-jsinspector: 1e1e03345cf6d47779e2061d679d0a87d9ae73d8
   React-logger: 1e10789cb84f99288479ba5f20822ce43ced6ffe
+  react-native-amplitude-analytics: a6513b42f3e84ef46a487aa4ebaa28e60ba36c3f
   react-native-apollos-player: 923e427b199f91106a713f5fc4212127fa815013
   react-native-config: 55548054279d92e0e4566ea15a8b9b81028ec342
   react-native-geolocation: c956aeb136625c23e0dce0467664af2c437888c9

@@ -88,9 +88,23 @@ const LocalContentSingle = (props) => {
       Component={LocalNodeSingleInner}
     />
   );
-  if (typename?.includes('Location')) content = <LocalMapView nodeId={nodeId} />;
+  if (typename?.includes('Location'))
+    content = <LocalMapView nodeId={nodeId} />;
 
-  return <ThemeMixin>{content}</ThemeMixin>;
+  return (
+    <ThemeMixin>
+      <TrackEventWhenLoaded
+        isLoading={loading}
+        eventName={'View Content'}
+        properties={{
+          title: data?.local?.entry?.title,
+          type: typename,
+          itemId: nodeId,
+        }}
+      />
+      {content}
+    </ThemeMixin>
+  );
 };
 
 LocalContentSingle.propTypes = {

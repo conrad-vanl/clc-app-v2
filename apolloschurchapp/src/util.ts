@@ -1,9 +1,9 @@
 import URL from 'url';
 
-export function present(value: string | undefined | null | ''): value is string {
+export function present<T>(value: T | undefined | null | ''): value is T {
   if (!value) { return false }
 
-  if (!/\S/.test(value)) {
+  if (typeof value == 'string' && !/\S/.test(value)) {
     return false
   }
   return true

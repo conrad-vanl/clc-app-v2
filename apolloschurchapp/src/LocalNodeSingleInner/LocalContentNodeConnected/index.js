@@ -28,7 +28,7 @@ import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 const SummaryText = styled(({ theme }) => ({
   fontSize: 18,
-  fontWeight: 400,
+  fontWeight: '400',
   marginTop: -20,
   marginBottom: 10,
 }))(H5);

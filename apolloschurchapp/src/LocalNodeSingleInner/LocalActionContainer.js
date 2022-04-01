@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { useTrack } from '@apollosproject/ui-analytics';
 
 import { styled, ChannelLabel, H6, Button } from '@apollosproject/ui-kit';
 
@@ -15,6 +16,7 @@ const QUERY = gql`
   query getRegistrationStatusByContentfulId($contentfulId: ID!) {
     node: eventByContentfulId(contentfulId: $contentfulId) {
       id
+      title
       registered
       capacity
       isRegistered
@@ -64,6 +66,7 @@ const Container = styled(({ theme }) => ({
 const LocalActionContianer = ({ contentId }) => {
   const safeArea = useSafeAreaInsets();
   const bottomSheetModalRef = useRef();
+  const track = useTrack();
 
   const { data, error, loading } = useQuery(QUERY, {
     fetchPolicy: 'cache-and-network',
@@ -78,12 +81,22 @@ const LocalActionContianer = ({ contentId }) => {
 
   const handleButtonPress = useCallback(
     () => {
+      const nodeId = data?.node?.id;
       const variables = {
-        nodeId: data?.node?.id,
+        nodeId,
       };
-      return data?.node?.isRegistered
-        ? unregister({ variables })
-        : register({ variables });
+      const isRegistered = data?.node?.isRegistered;
+      if (track) {
+        track({
+          eventName: isRegistered ? 'Unregister' : 'Register',
+          properties: {
+            title: data?.node?.title,
+            itemId: nodeId,
+          },
+        });
+      }
+
+      return isRegistered ? unregister({ variables }) : register({ variables });
     },
     [data?.node?.isRegistered, register, unregister]
   );
