@@ -3,10 +3,10 @@ import ApollosConfig from '@apollosproject/config';
 import { Providers, NavigationService } from '@apollosproject/ui-kit';
 import { AuthProvider } from '@apollosproject/ui-auth';
 import { AnalyticsProvider } from '@apollosproject/ui-analytics';
-import { NotificationsProvider } from '@apollosproject/ui-notifications';
 import { LiveProvider } from '@apollosproject/ui-connected';
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
 import RNAmplitude from 'react-native-amplitude-analytics';
+import { NotificationsProvider } from './Providers/notificationsProvider';
 import NotificationListener from './Providers/notificationListener';
 
 import ClientProvider, { client } from './client';
