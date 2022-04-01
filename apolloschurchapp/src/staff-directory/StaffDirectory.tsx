@@ -23,7 +23,7 @@ import {
   Button
 } from '@apollosproject/ui-kit';
 import { SearchInputHeader } from '@apollosproject/ui-connected'
-import { useTrack } from '@apollosproject/ui-analytics';
+import { useTrack, TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
@@ -109,6 +109,15 @@ export function StaffDirectory() {
   }
 
   return <BackgroundView>
+    <TrackEventWhenLoaded
+      isLoading={loading}
+      eventName={'View Content'}
+      properties={{
+        title: 'Staff Directory',
+        itemId: 'staffDirectory',
+        type: 'tab'
+      }}
+    />
     <PaperView style={{height: 4}} />
     <PaperView style={{ display: 'flex', flexDirection: 'row'}}>
       <SearchInputHeader
@@ -136,7 +145,8 @@ export function StaffDirectory() {
                 title: item.name,
                 itemId: item.sys.id,
                 search: searchText,
-                filter: teamFilter
+                filter: teamFilter,
+                on: 'staffDirectory'
               }
             })
           }

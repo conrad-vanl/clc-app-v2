@@ -17,6 +17,7 @@ import {
   styled,
   Touchable,
 } from '@apollosproject/ui-kit';
+import { useTrack } from '@apollosproject/ui-analytics';
 import { Caret } from '../ui/ScheduleItem';
 import { rewriteContentfulUrl } from '../util';
 
@@ -27,6 +28,7 @@ const query = gql`
         ... on Local_Event {
           downloads {
             items {
+              sys { id }
               description
               title
               url
@@ -39,6 +41,7 @@ const query = gql`
 `;
 
 interface Asset {
+  sys: { id: string }
   title: string
   description: string
   url?: string
@@ -49,11 +52,14 @@ const LocalDownloads = ({ contentId }: { contentId: string }) => {
     variables: { itemId: contentId },
     fetchPolicy: 'no-cache'
   });
+  const track = useTrack();
 
   const node = get(data, 'local.entry')
   const downloads = get(node, 'downloads.items') || [];
 
   if (node !== null && !downloads.length) return null;
+
+  
 
   return (
     <>
@@ -79,7 +85,22 @@ const LocalDownloads = ({ contentId }: { contentId: string }) => {
 
           const url = item.url
           if (url) {
-            return <Touchable onPress={() => Linking.openURL(rewriteContentfulUrl(url))} key={item.id}>
+            return <Touchable key={item.sys.id} onPress={() => {
+              const u = rewriteContentfulUrl(url)
+              if(track) {
+                track({
+                  eventName: 'Click',
+                  properties: {
+                    title: item.title,
+                    itemId: item.sys.id,
+                    on: contentId,
+                    url: u,
+                  },
+                });
+              }
+
+              Linking.openURL(u)
+            }} >
               {rendered}
             </Touchable>
           }

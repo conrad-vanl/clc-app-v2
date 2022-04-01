@@ -85,7 +85,7 @@ export function NotificationHistory() {
         eventName={'View Content'}
         properties={{
           title: 'Notification History',
-          itemId: 'NotificationHistory',
+          itemId: 'notificationHistory',
           type: 'tab'
         }}
       />
@@ -216,7 +216,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
         properties: {
           title: item.headings,
           itemId: item.id,
-          type: 'OneSignalNotification',
+          on: 'notificationHistory',
           url: item.url
         }
       })

@@ -8,6 +8,7 @@ import {
   H4,
   styled,
 } from '@apollosproject/ui-kit';
+import { useTrack } from '@apollosproject/ui-analytics';
 
 import ScheduleItem from '../../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
@@ -101,12 +102,26 @@ const Schedule = ({ navigation }: { navigation: any }) => {
   );
 
   const renderItem = useMemo(
-    () => ({ item }: { item: ScheduleItemData }) => (
-      <ScheduleItem
+    () => ({ item }: { item: ScheduleItemData }) => {
+      const track = useTrack();
+
+      return <ScheduleItem
         height={ITEM_HEIGHT}
         id={null}
         isLoading={false}
         onPress={() => {
+
+          if (track) {
+            track({
+              eventName: 'Click',
+              properties: {
+                title: item.title,
+                itemId: item.sys.id,
+                on: 'schedule'
+              }
+            })
+          }
+
           navigation.navigate('LocalContentSingle', {
             itemId: item.sys.id,
           });
@@ -114,7 +129,7 @@ const Schedule = ({ navigation }: { navigation: any }) => {
         {...item}
         summary={item.description && marked(item.description, {renderer: renderPlain()} )}
       />
-    ),
+    },
     []
   );
 

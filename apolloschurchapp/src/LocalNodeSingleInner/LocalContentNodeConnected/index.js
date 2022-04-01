@@ -14,6 +14,7 @@ import {
   styled,
 } from '@apollosproject/ui-kit';
 import { safeHandleUrl } from '@apollosproject/ui-connected';
+import { useTrack } from '@apollosproject/ui-analytics';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import {
   SafeAreaView,
@@ -85,6 +86,7 @@ const LocalContentNodeConnected = ({
   onPressAnchor,
   ImageWrapperComponent,
 }) => {
+  const track = useTrack();
   const { data, loading, error } = useQueryAutoRefresh(
     GET_CONTENT_ITEM_CONTENT,
     {
@@ -122,14 +124,31 @@ const LocalContentNodeConnected = ({
         {present(summary) && <SummaryText>{summary}</SummaryText>}
         <HtmlComponent
           isLoading={!htmlContent && loading}
-          onPressAnchor={onPressAnchor}
+          onPressAnchor={_onPressAnchor}
         >
           {htmlContent}
         </HtmlComponent>
       </PaddedView>
-      {cta && <CallToAction {...cta} />}
+      {cta && <CallToAction {...cta} context={nodeId} />}
     </>
   );
+
+  function _onPressAnchor(...args) {
+    const [url] = args;
+    if (present(url) && track) {
+      track({
+        eventName: 'Click',
+        properties: {
+          title: 'href',
+          itemId: url,
+          on: nodeId,
+          url,
+        },
+      });
+    }
+
+    onPressAnchor(...args);
+  }
 };
 
 LocalContentNodeConnected.defaultProps = {
@@ -171,9 +190,11 @@ const Container = styled(({ theme }) => ({
   flex: 1,
 }))(SafeAreaView);
 
-function CallToAction({ url, text }) {
+function CallToAction({ url, text, context }) {
   const safeArea = useSafeAreaInsets();
   const bottomSheetModalRef = useRef();
+  const track = useTrack();
+
   useEffect(
     () => {
       bottomSheetModalRef.current?.present();
@@ -199,6 +220,18 @@ function CallToAction({ url, text }) {
   );
 
   async function onPressCta() {
+    if (track) {
+      track({
+        eventName: 'Click',
+        properties: {
+          title: text,
+          itemId: url,
+          on: context,
+          url,
+        },
+      });
+    }
+
     if (await InAppBrowser.isAvailable()) {
       InAppBrowser.open(url);
     } else {
