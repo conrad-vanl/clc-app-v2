@@ -31,7 +31,7 @@ export const resolver = {
   Query: {
     ...OneSignalOriginal.resolver.Query,
     oneSignalHistory: async (_query, args, { dataSources }) => {
-      const cacheKey = `oneSignalHistory`;
+      const cacheKey = `oneSignalHistory/1`;
       const cached = await dataSources.Cache.get({ key: cacheKey });
       if (cached !== undefined && cached !== null) {
         return cached;
@@ -48,7 +48,7 @@ export const resolver = {
       await dataSources.Cache.set({
         key: cacheKey,
         data: result,
-        expiresIn: 60,
+        expires: 30,
       });
       return result;
     },
