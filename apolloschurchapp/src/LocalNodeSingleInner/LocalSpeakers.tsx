@@ -16,6 +16,7 @@ import {
   styled,
   Touchable,
 } from '@apollosproject/ui-kit';
+import { useTrack } from '@apollosproject/ui-analytics';
 import { Caret } from '../ui/ScheduleItem';
 
 const query = gql`
@@ -56,10 +57,24 @@ interface Speaker {
 
 const LocalSpeakers = ({ contentId }: { contentId: string }) => {
   const navigation = useNavigation();
-  const handleOnPress = (item: { sys: { id: string } }) =>
+  const track = useTrack();
+
+  const handleOnPress = (item: { sys: { id: string }, name: string }) => {
+    if (track) {
+      track({
+        eventName: 'Click',
+        properties: {
+          title: item.name,
+          itemId: item.sys.id,
+          on: contentId,
+        },
+      });
+    }
+
     navigation.push('LocalContentSingle', {
       itemId: item.sys.id,
     });
+  }
 
   const { loading, data, error } = useQuery(query, {
     variables: { itemId: contentId },

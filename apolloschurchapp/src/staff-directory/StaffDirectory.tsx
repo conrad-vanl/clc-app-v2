@@ -23,6 +23,8 @@ import {
   Button
 } from '@apollosproject/ui-kit';
 import { SearchInputHeader } from '@apollosproject/ui-connected'
+import { useTrack, TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
+
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 import { present, parseName, rewriteContentfulUrl } from '../util';
@@ -83,6 +85,9 @@ export function StaffDirectory() {
   const [searchText, setSearchText] = useState('');
   const [teamFilter, setTeamFilter] = useState<string>();
   const bottomSheetModalRef = React.useRef<BottomSheetModal>();
+  const track = useTrack();
+  const navigation = useNavigation();
+
 
   let items = (data?.local?.speakerCollection?.items || [])
     .filter((s) => s.isOnConferenceDirectory)
@@ -104,6 +109,15 @@ export function StaffDirectory() {
   }
 
   return <BackgroundView>
+    <TrackEventWhenLoaded
+      isLoading={loading}
+      eventName={'View Content'}
+      properties={{
+        title: 'Staff Directory',
+        itemId: 'staffDirectory',
+        type: 'tab'
+      }}
+    />
     <PaperView style={{height: 4}} />
     <PaperView style={{ display: 'flex', flexDirection: 'row'}}>
       <SearchInputHeader
@@ -122,7 +136,24 @@ export function StaffDirectory() {
       onRefresh={refetch}
       style={{ flex: 1 }}
       data={items}
-      renderItem={(props) => <DirectorySpeaker item={props.item} loading={loading} />}
+      renderItem={({item}) =>
+        <DirectorySpeaker item={item} loading={loading} onPress={() => {
+          if (track) {
+            track({
+              eventName: 'Click',
+              properties: {
+                title: item.name,
+                itemId: item.sys.id,
+                search: searchText,
+                filter: teamFilter,
+                on: 'staffDirectory'
+              }
+            })
+          }
+          navigation.push('LocalContentSingle', {
+            itemId: item.sys.id,
+          })
+        }} />}
     />
     
     <ForwardedPickerModal
@@ -146,7 +177,6 @@ const Container = styled(({ theme }) => ({
 
 function PickerModal(props: PickerModalProps, ref: React.ForwardedRef<BottomSheetModal>) {
   const { items, selectedItem } = props
-  console.log('items', items)
 
   return <BottomSheetModal
         ref={ref}
@@ -195,15 +225,18 @@ const SubtitleText = styled(({theme}) => ({
   color: '#6A6A6A'
 }))(CellText)
 
-function DirectorySpeaker({item, loading}: { item: Speaker, loading: boolean }) {
-  const navigation = useNavigation();
+interface DirectorySpeakerProps {
+  item: Speaker,
+  loading: boolean,
+  onPress: () => void
+}
+
+function DirectorySpeaker({item, loading, onPress}: DirectorySpeakerProps) {
 
   const photoUrl = item?.photo?.url && rewriteContentfulUrl(item?.photo?.url, { w: 100 })
 
   return <Touchable
-    onPress={() => navigation.push('LocalContentSingle', {
-      itemId: item.sys.id,
-    })}
+    onPress={onPress}
     key={item?.sys?.id}
   >
     <View>

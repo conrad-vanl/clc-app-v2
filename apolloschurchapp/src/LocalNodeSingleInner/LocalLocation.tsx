@@ -11,6 +11,7 @@ import {
   styled,
   Touchable,
 } from '@apollosproject/ui-kit';
+import { useTrack } from '@apollosproject/ui-analytics';
 import { Caret } from '../ui/ScheduleItem';
 
 const OpaqueIcon = styled({ opacity: 0.8 })(Icon);
@@ -35,8 +36,20 @@ const LocalLocation = ({ contentId }: { contentId: string }) => {
     fetchPolicy: 'no-cache',
     variables: { itemId: contentId },
   });
+  const track = useTrack();
 
-  const handlePress = (item: { sys: { id: string } }) => {
+  const handlePress = (item: { sys: { id: string }, title: string }) => {
+    if (track) {
+      track({
+        eventName: 'Click',
+        properties: {
+          title: item.title,
+          itemId: item.sys.id,
+          on: contentId,
+        },
+      });
+    }
+
     navigation.push('LocalContentSingle', {
       itemId: item.sys.id,
     });

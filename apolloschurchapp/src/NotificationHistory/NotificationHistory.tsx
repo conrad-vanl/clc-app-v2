@@ -18,6 +18,7 @@ import {
   ButtonLink,
   NavigationService
 } from '@apollosproject/ui-kit';
+import { TrackEventWhenLoaded, useTrack } from '@apollosproject/ui-analytics';
 import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 import { present } from '../util';
@@ -79,6 +80,16 @@ export function NotificationHistory() {
     .filter((id) => !markingAsRead.includes(id))
 
   return <BackgroundView>
+    <TrackEventWhenLoaded
+        isLoading={loading}
+        eventName={'View Content'}
+        properties={{
+          title: 'Notification History',
+          itemId: 'notificationHistory',
+          type: 'tab'
+        }}
+      />
+
     <PaddedView style={{flexDirection: 'row', justifyContent: 'space-between'}}>
       {!loading &&
         <H5>{unreadIds.length > 0 ? `${unreadIds.length} unread notifications` : 'No unread notifications'}</H5>}
@@ -168,6 +179,7 @@ const Wrapper = styled(({ theme, read }) => ({
 const formatTime = (time: string) => (time ? moment(time).format('MMM D, h:mm A') : null);
 
 function NotificationListItem({item, loading, onPress}: NotificationListItemProps) {
+  const track = useTrack();
 
   return <Touchable
     onPress={_onPress}
@@ -197,6 +209,18 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
 
   function _onPress() {
     onPress()
+
+    if (track) {
+      track({
+        eventName: 'Click',
+        properties: {
+          title: item.headings,
+          itemId: item.id,
+          on: 'notificationHistory',
+          url: item.url
+        }
+      })
+    }
 
     if (present(item.url)) {
       if (/^http(s)?\:\/\//.test(item.url)) {

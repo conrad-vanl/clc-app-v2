@@ -10,6 +10,7 @@ import {
   FEATURE_FEED_ACTION_MAP,
   RockAuthedWebBrowser,
 } from '@apollosproject/ui-connected';
+import { useTrack } from '@apollosproject/ui-analytics';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 const nodeIdToContentfulID = gql`
@@ -31,6 +32,7 @@ export const GET_FEED_FEED = gql`
 
 const Feed = () => {
   const navigation = useNavigation();
+  const track = useTrack();
 
   const client = useApolloClient();
   const { data } = useQueryAutoRefresh(GET_FEED_FEED);
@@ -76,6 +78,17 @@ const Feed = () => {
 
     const contentfulId = data.nodeIdToContentfulId;
     if (contentfulId) {
+      if (track) {
+        track({
+          eventName: 'Click',
+          properties: {
+            title: props?.title,
+            itemId: contentfulId,
+            on: 'my-clc',
+          },
+        });
+      }
+
       navigation.push('LocalContentSingle', {
         itemId: contentfulId,
       });

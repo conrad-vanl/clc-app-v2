@@ -2,6 +2,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { withTheme } from '@apollosproject/ui-kit';
+import { useTrack } from '@apollosproject/ui-analytics';
 
 import Connect from './connect';
 import Home from './home';
@@ -12,40 +13,104 @@ import tabBarIcon from './tabBarIcon';
 
 const { Navigator, Screen } = createBottomTabNavigator();
 
-const TabNavigator = (props) => (
-  <Navigator {...props} lazy>
-    <Screen
-      name="Home"
-      component={Home}
-      options={{
-        tabBarIcon: tabBarIcon('home'),
-      }}
-    />
-    <Screen
-      name="Schedule"
-      component={Schedule}
-      options={{ tabBarIcon: tabBarIcon('calendar') }}
-    />
-    <Screen
-      name="My-CLC"
-      component={MySchedule}
-      options={{
-        tabBarIcon: tabBarIcon('circle-outline-check-mark'),
-        title: 'My CLC',
-      }}
-    />
-    <Screen
-      name="Tracks"
-      component={Discover}
-      options={{ tabBarIcon: tabBarIcon('sections') }}
-    />
-    <Screen
-      name="Connect"
-      component={Connect}
-      options={{ tabBarIcon: tabBarIcon('profile') }}
-    />
-  </Navigator>
-);
+const TabNavigator = (props) => {
+  const track = useTrack();
+
+  return (
+    <Navigator {...props} lazy>
+      <Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarIcon: tabBarIcon('home'),
+        }}
+        listeners={{
+          focus: () => {
+            track({
+              eventName: 'View Content',
+              properties: {
+                title: 'Home',
+                id: 'home',
+                type: 'tab',
+              },
+            });
+          },
+        }}
+      />
+      <Screen
+        name="Schedule"
+        component={Schedule}
+        options={{ tabBarIcon: tabBarIcon('calendar') }}
+        listeners={{
+          focus: () => {
+            track({
+              eventName: 'View Content',
+              properties: {
+                title: 'Schedule',
+                id: 'schedule',
+                type: 'tab',
+              },
+            });
+          },
+        }}
+      />
+      <Screen
+        name="My-CLC"
+        component={MySchedule}
+        options={{
+          tabBarIcon: tabBarIcon('circle-outline-check-mark'),
+          title: 'My CLC',
+        }}
+        listeners={{
+          focus: () => {
+            track({
+              eventName: 'View Content',
+              properties: {
+                title: 'My CLC',
+                id: 'my-clc',
+                type: 'tab',
+              },
+            });
+          },
+        }}
+      />
+      <Screen
+        name="Tracks"
+        component={Discover}
+        options={{ tabBarIcon: tabBarIcon('sections') }}
+        listeners={{
+          focus: () => {
+            track({
+              eventName: 'View Content',
+              properties: {
+                title: 'Tracks',
+                id: 'tracks',
+                type: 'tab',
+              },
+            });
+          },
+        }}
+      />
+      <Screen
+        name="Connect"
+        component={Connect}
+        options={{ tabBarIcon: tabBarIcon('profile') }}
+        listeners={{
+          focus: () => {
+            track({
+              eventName: 'View Content',
+              properties: {
+                title: 'Connect',
+                id: 'connect',
+                type: 'tab',
+              },
+            });
+          },
+        }}
+      />
+    </Navigator>
+  );
+};
 
 const ThemedTabNavigator = withTheme(({ theme }) => ({
   tabBarOptions: {

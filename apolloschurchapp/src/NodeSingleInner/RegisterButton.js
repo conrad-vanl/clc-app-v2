@@ -1,7 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { Button, H5, Icon } from '@apollosproject/ui-kit';
 
-const RegisterButton = ({ isRegistered, isCapacityEvent, capacityRemaining, ...buttonProps }) => {
+const RegisterButton = ({
+  isRegistered,
+  isCapacityEvent,
+  capacityRemaining,
+  ...buttonProps
+}) => {
   const icon = isRegistered ? 'check' : 'circle-outline-plus';
 
   let buttonText = 'Add to my schedule';
@@ -11,7 +16,10 @@ const RegisterButton = ({ isRegistered, isCapacityEvent, capacityRemaining, ...b
   return (
     <Button {...buttonProps}>
       <Icon name={icon} size={18} />
-      <H5>{'  '}{buttonText}</H5>
+      <H5>
+        {'  '}
+        {buttonText}
+      </H5>
     </Button>
   );
 };

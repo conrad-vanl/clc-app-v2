@@ -6,6 +6,7 @@ import { useQuery } from '@apollo/client';
 
 import { useNavigation } from '@react-navigation/native';
 import { PaddedView, H4, styled } from '@apollosproject/ui-kit';
+import { useTrack } from '@apollosproject/ui-analytics';
 import ScheduleItem from '../../ui/ScheduleItem';
 
 import getChildContent, {
@@ -23,8 +24,21 @@ const SectionHeader = styled(({ theme }: any) => ({
 }))(H4);
 
 const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
+  const track = useTrack();
   const navigation = useNavigation();
-  const handleOnPressItem = (item: { sys: { id: string } }) => {
+  const handleOnPressItem = (item: GetChildContentLocalEvent) => {
+
+    if (track) {
+      track({
+        eventName: 'Click',
+        properties: {
+          title: item.title,
+          itemId: item.sys.id,
+          on: contentId
+        }
+      })
+    }
+
     navigation.push('LocalContentSingle', {
       itemId: item.sys.id,
     });

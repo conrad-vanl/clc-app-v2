@@ -39,7 +39,6 @@ export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const { data, loading, refetch } = useQuery<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY, {
     fetchPolicy: 'cache-and-network'
   });
-  useFocusEffect(() => { refetch() })
 
   const {total, items} = data?.oneSignalHistory || {}
 

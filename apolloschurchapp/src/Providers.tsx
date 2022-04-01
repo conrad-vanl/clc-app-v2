@@ -6,10 +6,16 @@ import { AnalyticsProvider } from '@apollosproject/ui-analytics';
 import { NotificationsProvider } from '@apollosproject/ui-notifications';
 import { LiveProvider } from '@apollosproject/ui-connected';
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
+import RNAmplitude from 'react-native-amplitude-analytics';
 import NotificationListener from './Providers/notificationListener';
 
 import ClientProvider, { client } from './client';
 import customTheme, { customIcons } from './theme';
+import { present } from './util';
+
+const amplitude =
+  present(ApollosConfig.AMPLITUDE_API_KEY) &&
+  new RNAmplitude(ApollosConfig.AMPLITUDE_API_KEY);
 
 const AppProviders: React.FunctionComponent<any> = (props) => {
   const { children, ...remaining } = props;
@@ -30,7 +36,19 @@ const AppProviders: React.FunctionComponent<any> = (props) => {
             })
           }
         >
-          <AnalyticsProvider>
+          <AnalyticsProvider
+            // Not using server-side analytics (segment, GA, rock), using Amplitude instead
+            useServerAnalytics={false}
+            trackFunctions={[
+              process.env.NODE_ENV === 'development' &&
+                (({ eventName, properties }) => {
+                  console.debug('analytics:', eventName, properties);
+                }),
+              amplitude &&
+                (({ eventName, properties }) =>
+                  amplitude.logEvent(eventName, properties)),
+            ].filter(present)}
+          >
             <LiveProvider>
               <Providers
                 themeInput={customTheme}
