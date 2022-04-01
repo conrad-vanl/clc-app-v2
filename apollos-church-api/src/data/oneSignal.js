@@ -38,9 +38,7 @@ export const resolver = {
       }
 
       const data = await dataSources.OneSignal.getHistory();
-      const notifications = data.notifications.filter(
-        (n) => !n.include_player_ids // not specifically targeted
-      );
+      const { notifications } = data;
 
       const result = {
         total: notifications.length,
