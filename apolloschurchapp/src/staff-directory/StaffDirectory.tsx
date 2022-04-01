@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Text } from 'react-native';
 import { gql, useQuery } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
-import { throttle } from 'lodash';
+import {Picker} from '@react-native-picker/picker';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { throttle, uniq } from 'lodash';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import {
   BackgroundView,
@@ -13,7 +19,8 @@ import {
   Cell,
   CellText,
   GradientOverlayImage,
-  Divider
+  Divider,
+  Button
 } from '@apollosproject/ui-kit';
 import { SearchInputHeader } from '@apollosproject/ui-connected'
 import { Caret } from '../ui/ScheduleItem';
@@ -58,36 +65,58 @@ interface Speaker {
   isOnConferenceDirectory: boolean
 }
 
-const Spacer = styled(({ theme }) => ({
+const PaperView = styled(({ theme }) => ({
   backgroundColor: theme.colors.background.paper,
-  height: 4
 }))(View);
+
+const ModalButton = styled(({theme}) => ({
+  backgroundColor: theme.colors.background.paper,
+  borderColor: theme.colors.background.paper
+}))(Button)
+
+const ModalButtonText = styled(({theme}) => ({
+  color: theme.colors.action.secondary,
+}))(Text)
 
 export function StaffDirectory() {
   const { data, loading, refetch } = useQueryAutoRefresh<GetSpeakersData>(getSpeakers);
   const [searchText, setSearchText] = useState('');
+  const [teamFilter, setTeamFilter] = useState<string>();
+  const bottomSheetModalRef = React.useRef<BottomSheetModal>();
 
   let items = (data?.local?.speakerCollection?.items || [])
     .filter((s) => s.isOnConferenceDirectory)
     .slice()
     .sort(byLastNameFirstName)
 
+  const teams = uniq(items.map((s) => s.team).filter(present))
+
+  if (present(teamFilter)) {
+    items = items.filter((s) => s.team == teamFilter)
+  }
+
   if (present(searchText)) {
     const term = searchText.toLowerCase()
     items = items.filter((s) => {
       return s.name.toLowerCase().includes(term) ||
-        s.title?.toLowerCase()?.includes(term) ||
-        s.team?.toLowerCase()?.includes(term)
+        s.title?.toLowerCase()?.includes(term)
     })
   }
 
   return <BackgroundView>
-    <Spacer />
-    <SearchInputHeader
-      onChangeText={throttle(setSearchText, 300)}
-      // onFocus={setIsFocused}
-      // inputRef={searchRef}
-    />
+    <PaperView style={{height: 4}} />
+    <PaperView style={{ display: 'flex', flexDirection: 'row'}}>
+      <SearchInputHeader
+        style={{ flex: 3 }}
+        onChangeText={throttle(setSearchText, 300)}
+        // onFocus={setIsFocused}
+        // inputRef={searchRef}
+      />
+      <ModalButton style={{flex: 1}}
+          onPress={() => { bottomSheetModalRef?.current?.present()}}>
+        <ModalButtonText>{teamFilter || 'Team...'}</ModalButtonText>
+      </ModalButton>
+    </PaperView>
     <FlatList
       refreshing={loading}
       onRefresh={refetch}
@@ -95,8 +124,60 @@ export function StaffDirectory() {
       data={items}
       renderItem={(props) => <DirectorySpeaker item={props.item} loading={loading} />}
     />
+    
+    <ForwardedPickerModal
+      ref={bottomSheetModalRef}
+      items={teams}
+      selectedItem={teamFilter}
+      onValueChange={setTeamFilter} />
   </BackgroundView>;
 }
+
+interface PickerModalProps {
+  items: string[],
+  selectedItem?: string
+  onValueChange(item: string | undefined): void
+}
+
+const Container = styled(({ theme }) => ({
+  paddingHorizontal: theme.sizing.baseUnit,
+  flex: 1,
+}))(SafeAreaView);
+
+function PickerModal(props: PickerModalProps, ref: React.ForwardedRef<BottomSheetModal>) {
+  const { items, selectedItem } = props
+  console.log('items', items)
+
+  return <BottomSheetModal
+        ref={ref}
+        index={0}
+        snapPoints={['33%']}
+        dismissOnPanDown={true}>
+      <Container edges={['bottom', 'left', 'right']}>
+        <Picker
+          selectedValue={selectedItem}
+          onValueChange={onValueChange}>
+
+          <Picker.Item value='' label='No Filter' />
+          {items.map((t) =>
+            <Picker.Item key={t} label={t} value={t} />)}
+        </Picker>
+      </Container>
+    </BottomSheetModal>
+
+  function onValueChange(value: number | string) {
+    if (!value) {
+      return props.onValueChange(undefined)
+    }
+    if (typeof value == 'string') {
+      props.onValueChange(value)
+    } else {
+      // the Picker.Item array has the placeholder at zero index
+      props.onValueChange(items[value - 1])
+    }
+  }
+}
+const ForwardedPickerModal = React.forwardRef(PickerModal)
 
 const Avatar = styled(({ theme }: any) => ({
   width: theme.sizing.baseUnit * 2.5,
