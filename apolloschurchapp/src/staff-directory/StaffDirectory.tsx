@@ -94,7 +94,7 @@ export function StaffDirectory() {
     .slice()
     .sort(byLastNameFirstName)
 
-  const teams = uniq(items.map((s) => s.team).filter(present))
+  const teams = uniq(items.map((s) => s.team).filter(present)).sort()
 
   if (present(teamFilter)) {
     items = items.filter((s) => s.team == teamFilter)
