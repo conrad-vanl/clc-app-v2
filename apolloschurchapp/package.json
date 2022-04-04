@@ -92,7 +92,7 @@
     "apollo3-cache-persist": "^0.8.0",
     "buffer": "^5.4.3",
     "color": "3.0.0",
-    "contentful-local-schema": "0.0.17",
+    "contentful-local-schema": "0.0.18",
     "core-js": "^3.7.0",
     "dotenv": "^6.2.0",
     "events": "^3.0.0",
