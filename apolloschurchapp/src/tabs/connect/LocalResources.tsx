@@ -104,6 +104,20 @@ const Resources = () => {
 
             <Divider />
           </React.Fragment>
+
+          <React.Fragment>
+            <Touchable onPress={() => navigation.push('ConsequenceGenerator')}>
+              <Cell>
+                <CellText>
+                  <UIText>Farkle Consequence Generator</UIText>
+                </CellText>
+                <Caret />
+              </Cell>
+            </Touchable>
+
+            <Divider />
+          </React.Fragment>
+
           {(data?.local?.conference?.resources?.items || []).map((resource) => (
             <React.Fragment key={resource.sys.id}>
               <Touchable

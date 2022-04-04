@@ -30,6 +30,7 @@ import Search from './ui/Search';
 import Auth from './auth';
 import StaffDirectory from './staff-directory';
 import NotificationHistory from './NotificationHistory/index';
+import ConsequenceGenerator from './consequence-generator';
 
 enableScreens(); // improves performance for react-navigation
 
@@ -145,6 +146,11 @@ const App = (props) => (
             name="StaffDirectory"
             component={StaffDirectory}
             options={{ title: 'Staff Directory' }}
+          />
+          <Screen
+            name="ConsequenceGenerator"
+            component={ConsequenceGenerator}
+            options={{ title: 'Farkle Consequence Generator' }}
           />
           <Screen
             name="NotificationHistory"
