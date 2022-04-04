@@ -93,14 +93,14 @@ export function NotificationHistory() {
     <PaddedView style={{flexDirection: 'row', justifyContent: 'space-between'}}>
       {!loading &&
         <H5>{unreadIds.length > 0 ? `${unreadIds.length} unread notifications` : 'No unread notifications'}</H5>}
-      {unreadIds.length > 0 &&
+      {!loading && unreadIds.length > 0 &&
         <ButtonLink onPress={markAllAsRead}>
           {loadingMarkNotificationsRead ?
             'Please wait...' :
             'Mark all as read'}
         </ButtonLink>}
     </PaddedView>
-    <FlatList
+    {!loading && <FlatList
       refreshing={loading}
       onRefresh={refetch}
       style={{ flex: 1 }}
@@ -110,7 +110,7 @@ export function NotificationHistory() {
           ...item,
           read: item.read || markingAsRead.includes(item.id)
         }} loading={loading} onPress={() => onPress(item)} />}
-    />
+    />}
   </BackgroundView>
 
   function onPress(item: NotificationHistoryItem) {
