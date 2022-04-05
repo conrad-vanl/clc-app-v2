@@ -1,5 +1,6 @@
 import React from 'react';
-import { Touchable, Placeholder, makeIcon } from '@apollosproject/ui-kit';
+import {TouchableOpacity} from 'react-native';
+import { Placeholder, makeIcon } from '@apollosproject/ui-kit';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { GetNotificationHistoryData, GET_NOTIFICATION_HISTORY } from '../NotificationHistory/NotificationHistory';
@@ -51,15 +52,17 @@ export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
     }
   }
 
+  console.log('render btn', size)
   return (
-    <Touchable
+    <TouchableOpacity
       onPress={() => {
+        console.log('pressed!!!')
         navigation.navigate('NotificationHistory');
       }}
     >
       <Placeholder.Media size={size} hasRadius onReady={true}>
         <Icon size={size} />
       </Placeholder.Media>
-    </Touchable>
+    </TouchableOpacity>
   );
 }
