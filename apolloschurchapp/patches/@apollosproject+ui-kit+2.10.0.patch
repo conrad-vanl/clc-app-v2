@@ -1,0 +1,12 @@
+diff --git a/node_modules/@apollosproject/ui-kit/src/inputs/Picker/index.android.js b/node_modules/@apollosproject/ui-kit/src/inputs/Picker/index.android.js
+index 8703f8c..7aa54f4 100644
+--- a/node_modules/@apollosproject/ui-kit/src/inputs/Picker/index.android.js
++++ b/node_modules/@apollosproject/ui-kit/src/inputs/Picker/index.android.js
+@@ -1,6 +1,6 @@
+ import React from 'react';
+ import PropTypes from 'prop-types';
+-import { Animated, Picker as NativePicker } from 'react-native';
++import { Animated, Picker as NativePicker } from '@react-native-picker/picker';
+ import { mapProps } from 'recompose';
+ 
+ import InputUnderline from '../InputUnderline';
