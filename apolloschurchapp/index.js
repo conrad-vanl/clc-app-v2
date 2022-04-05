@@ -1,3 +1,4 @@
+import './shim';
 import './loadConfig';
 import { AppRegistry, YellowBox } from 'react-native';
 import ApollosConfig from '@apollosproject/config';
