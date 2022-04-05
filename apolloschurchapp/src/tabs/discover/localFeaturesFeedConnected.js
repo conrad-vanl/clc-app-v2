@@ -8,6 +8,7 @@ import {
   TouchableScale,
   named,
 } from '@apollosproject/ui-kit';
+import { rewriteContentfulUrl } from '../../util';
 
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
@@ -44,7 +45,7 @@ const LocalFeaturesFeedConnected = ({ onPressActionItem, ...props }) => {
   const Feature = ({ item }) => (
     <TouchableScale onPress={() => onPressActionItem(item)}>
       <DefaultCard
-        coverImage={item.art.url}
+        coverImage={rewriteContentfulUrl(item.art.url, { w: 1000 })}
         title={item.title}
         summary={item.summary}
         isLoading={loading}

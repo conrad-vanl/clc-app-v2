@@ -22,7 +22,7 @@ import {
 } from 'react-native-safe-area-context';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 
-import { present, parseName } from '../../util';
+import { present, parseName, rewriteContentfulUrl } from '../../util';
 import { useQueryAutoRefresh } from '../../client/hooks/useQueryAutoRefresh';
 
 // import safeOpenUrl from '../safeOpenUrl';
@@ -99,7 +99,9 @@ const LocalContentNodeConnected = ({
   if (!nodeId) return <HTMLView isLoading />;
   if (!entry && error) return <ErrorCard error={error} />;
 
-  const coverImageSources = [entry?.art?.url].filter(present);
+  const coverImageSources = [entry?.art?.url]
+    .filter(present)
+    .map((u) => rewriteContentfulUrl(u, { w: 1000 }));
   const { title, summary, description } = entry || {};
   const htmlContent = (present(description) && marked(description)) || '';
 
@@ -169,7 +171,9 @@ function getCta(entry) {
       }
       const name = parseName(entry?.title);
       return {
-        url: `https://my.watermark.org/WatermarkForms/848?Email=${entry.email}&StaffFirstName=${name.first}&StaffLastName=${name.last}`,
+        url: `https://my.watermark.org/WatermarkForms/848?Email=${
+          entry.email
+        }&StaffFirstName=${name.first}&StaffLastName=${name.last}`,
         text: 'Schedule a Conversation',
       };
     }

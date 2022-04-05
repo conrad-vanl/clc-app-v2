@@ -9,7 +9,11 @@ export function present<T>(value: T | undefined | null | ''): value is T {
   return true
 }
 
-export function rewriteContentfulUrl(url: string, query: Record<string, any> = {}): string {
+export function rewriteContentfulUrl(url?: undefined | null | '', query?: Record<string, any>): undefined
+export function rewriteContentfulUrl(url: string, query?: Record<string, any>): string
+export function rewriteContentfulUrl(url?: string | null, query: Record<string, any> = {}): string | undefined {
+  if (!url) { return }
+
   url = url.replace(/^(https?\:)?\/\//, 'https://')
   const parsed = URL.parse(url, true)
   Object.assign(parsed.query, query)
