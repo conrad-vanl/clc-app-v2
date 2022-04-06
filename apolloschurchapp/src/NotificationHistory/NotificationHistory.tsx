@@ -4,13 +4,12 @@ import querystring from 'querystring';
 import moment from 'moment';
 import {gql, useMutation} from '@apollo/client';
 
-import { FlatList, View, Linking } from 'react-native'
+import { FlatList, View, Linking, TouchableOpacity as Touchable } from 'react-native'
 import {
   BackgroundView,
   H4,
   H5,
   styled,
-  Touchable,
   Cell,
   CellText,
   Divider,
@@ -185,6 +184,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
     onPress={_onPress}
     key={item?.id}
   >
+    <>
     <Wrapper style={{ flexDirection: 'row', width: '100%' }}>
       <Wrapper style={{ flexDirection: 'column', width: '90%' }}>
         <HeaderCell read={item.read}>
@@ -205,6 +205,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
       {item.url ? <LinkCaret style={{width: '10%'}} /> : null}
     </Wrapper>
     <Divider />
+    </>
   </Touchable>
 
   function _onPress() {
