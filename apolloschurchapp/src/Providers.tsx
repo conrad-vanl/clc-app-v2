@@ -6,7 +6,7 @@ import { AnalyticsProvider } from '@apollosproject/ui-analytics';
 import { LiveProvider } from '@apollosproject/ui-connected';
 import { checkOnboardingStatusAndNavigate } from '@apollosproject/ui-onboarding';
 import RNAmplitude from 'react-native-amplitude-analytics';
-import { NotificationsProvider } from './Providers/notificationsProvider';
+import {NotificationsProvider} from '@apollosproject/ui-notifications';
 import NotificationListener from './Providers/notificationListener';
 
 import ClientProvider, { client } from './client';

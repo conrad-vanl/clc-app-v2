@@ -1,0 +1,58 @@
+diff --git a/node_modules/@apollosproject/ui-notifications/src/Provider.js b/node_modules/@apollosproject/ui-notifications/src/Provider.js
+index f846665..9f0dabd 100644
+--- a/node_modules/@apollosproject/ui-notifications/src/Provider.js
++++ b/node_modules/@apollosproject/ui-notifications/src/Provider.js
+@@ -7,6 +7,7 @@ import gql from 'graphql-tag';
+ import { withApollo } from '@apollo/client/react/hoc';
+ import { get } from 'lodash';
+ import OneSignal from 'react-native-onesignal';
++import EventEmitter from 'events';
+ import { resolvers, defaults } from './store';
+ import PushProvider from './pushProvider';
+ 
+@@ -22,6 +23,8 @@ const GET_PUSH_ID = gql`
+   }
+ `;
+ 
++export const NotificationsEvents = new EventEmitter();
++
+ class NotificationsInit extends Component {
+   static propTypes = {
+     children: PropTypes.oneOfType([
+@@ -89,6 +92,7 @@ class NotificationsInit extends Component {
+ 
+   onReceived = (notification) => {
+     console.log('Notification received: ', notification);
++    NotificationsEvents.emit('received', notification)
+   };
+ 
+   onOpened = (openResult) => {
+@@ -96,6 +100,9 @@ class NotificationsInit extends Component {
+     console.log('Data: ', openResult.notification.payload.additionalData);
+     console.log('isActive: ', openResult.notification.isAppInFocus);
+     console.log('openResult: ', openResult);
++
++    NotificationsEvents.emit('opened', openResult)
++
+     // URL looks like this
+     // apolloschurchapp://AppStackNavigator/Connect
+     // apolloschurchapp://SomethingElse/Connect
+@@ -114,6 +121,8 @@ class NotificationsInit extends Component {
+   };
+ 
+   onIds = (device) => {
++    NotificationsEvents.emit('ids', device)
++
+     this.props.client.mutate({
+       mutation: UPDATE_DEVICE_PUSH_ID,
+       variables: { pushId: device.userId },
+diff --git a/node_modules/@apollosproject/ui-notifications/src/index.js b/node_modules/@apollosproject/ui-notifications/src/index.js
+index cbc3d30..e2982f8 100644
+--- a/node_modules/@apollosproject/ui-notifications/src/index.js
++++ b/node_modules/@apollosproject/ui-notifications/src/index.js
+@@ -1,4 +1,4 @@
+-export NotificationsProvider from './Provider';
++export NotificationsProvider, { NotificationsEvents } from './Provider';
+ export {
+   getPushPermissions,
+   GET_PUSH_ID,
