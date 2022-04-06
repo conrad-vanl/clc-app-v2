@@ -45,8 +45,8 @@ class ChangePassword extends PureComponent {
     <StyledKeyboardAvoidingView
       behavior={'padding'}
       keyboardVerticalOffset={
-        Header.HEIGHT +
-        (Platform.OS === 'android' ? StatusBar.currentHeight : 0)
+        (Header.HEIGHT || 0) +
+        (Platform.OS === 'android' ? StatusBar.currentHeight || 0 : 0)
       }
     >
       <FlexedView>

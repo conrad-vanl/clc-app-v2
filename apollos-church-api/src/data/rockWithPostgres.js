@@ -40,7 +40,7 @@ class personDataSource extends postgresPerson.dataSource {
   async getFromId(id, encodedId, { originType = null } = {}) {
     const person = await super.getFromId(id, encodedId, { originType });
     // fixes Error: Expected a value of type "GENDER" but received: ""
-    person.gender = person.gender || 'Unknown';
+    person.gender = person?.gender || 'Unknown';
     return person;
   }
 }
@@ -164,7 +164,15 @@ class authDataSource extends AuthOriginal.dataSource {
         .first();
 
       if (existing) {
-        await this.delete(`/UserLogins/${existing.id}`);
+        try {
+          await this.delete(`/UserLogins/${existing.id}`);
+        } catch (ex) {
+          if (/404/.test(ex.message)) {
+            // OK
+          } else {
+            throw ex;
+          }
+        }
       }
 
       return await this.post('/UserLogins', {
