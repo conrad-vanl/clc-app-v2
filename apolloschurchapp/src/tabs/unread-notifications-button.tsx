@@ -52,11 +52,9 @@ export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
     }
   }
 
-  console.log('render btn', size)
   return (
     <TouchableOpacity
       onPress={() => {
-        console.log('pressed!!!')
         navigation.navigate('NotificationHistory');
       }}
     >

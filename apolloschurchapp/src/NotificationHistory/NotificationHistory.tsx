@@ -213,7 +213,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
 
     if (track) {
       track({
-        eventName: 'Click',
+        eventName: 'Open',
         properties: {
           title: item.headings,
           itemId: item.id,
