@@ -1,6 +1,10 @@
 /* eslint-disable import/prefer-default-export, max-classes-per-file */
 import { parseGlobalId } from '@apollosproject/server-core';
 import { Person as postgresPerson } from '@apollosproject/data-connector-postgres';
+import { Auth as AuthOriginal } from '@apollosproject/data-connector-rock';
+import moment from 'moment';
+
+import { camelCaseKeys } from '../util';
 import * as OneSignalOriginal from './oneSignal';
 
 class personDataSource extends postgresPerson.dataSource {
@@ -8,11 +12,28 @@ class personDataSource extends postgresPerson.dataSource {
     const rockPersonId = await this.context.dataSources.RockPerson.create(
       attributes
     );
-    super.create({
+    // eslint-disable-next-line no-param-reassign
+    attributes = {
       ...attributes,
       originType: 'rock',
       originId: String(rockPersonId),
+    };
+
+    const cleanedAttributes = camelCaseKeys(attributes);
+    await this.model.findOrCreate({
+      where: {
+        originType: 'rock',
+        originId: String(rockPersonId),
+      },
+      defaults: {
+        apollosUser: true,
+        ...cleanedAttributes,
+        ...(cleanedAttributes.gender
+          ? { gender: cleanedAttributes.gender.toUpperCase() }
+          : {}),
+      },
     });
+
     return rockPersonId;
   }
 
@@ -131,4 +152,36 @@ class oneSignalDataSource extends OneSignalOriginal.dataSource {
 export const OneSignal = {
   ...OneSignalOriginal,
   dataSource: oneSignalDataSource,
+};
+
+class authDataSource extends AuthOriginal.dataSource {
+  createUserLogin = async (props = {}) => {
+    try {
+      const { email, password, personId } = props;
+
+      const existing = await this.request('/UserLogins')
+        .filter(`UserName eq '${email}'`)
+        .first();
+
+      if (existing) {
+        await this.delete(`/UserLogins/${existing.id}`);
+      }
+
+      return await this.post('/UserLogins', {
+        PersonId: personId,
+        EntityTypeId: 27, // A default setting we use in Rock-person-creation-flow
+        UserName: email,
+        PlainTextPassword: password,
+        LastLoginDateTime: `${moment().toISOString()}`,
+      });
+    } catch (err) {
+      console.error(err)
+      throw new Error('Unable to create user login!');
+    }
+  };
+}
+
+export const Auth = {
+  ...AuthOriginal,
+  dataSource: authDataSource,
 };

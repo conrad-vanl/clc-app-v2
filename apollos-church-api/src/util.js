@@ -1,3 +1,5 @@
+import { camelCase } from 'lodash';
+
 export function present(value) {
   if (!value) {
     return false;
@@ -15,4 +17,12 @@ export function tryParseDate(dateStr) {
   } catch (ex) {
     return null;
   }
+}
+
+export function camelCaseKeys(obj) {
+  return Object.keys(obj).reduce((accum, curr) => {
+    // eslint-disable-next-line no-param-reassign
+    accum[camelCase(curr)] = obj[curr];
+    return accum;
+  }, {});
 }
