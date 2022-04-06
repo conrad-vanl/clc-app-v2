@@ -71,6 +71,7 @@
     "@apollosproject/ui-scripture": "^2.10.0",
     "@apollosproject/ui-storybook": "^2.10.0",
     "@apollosproject/ui-test-utils": "^2.10.0",
+    "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@gorhom/bottom-sheet": "3.4.1",
     "@graphql-tools/merge": "^8.2.3",
     "@metarouter/analytics-react-native": "^1.1.5",
