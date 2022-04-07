@@ -67,8 +67,6 @@ export function ConsequenceGenerator() {
 }
 
 const ITEM_HEIGHT = 50;
-/** The number of times the wheel can spin in either direction before coming to the end of the list */
-const REPLICAS = 5;
 
 const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
   backgroundColor: theme.colors.background.accent,
@@ -100,15 +98,13 @@ interface ConsequenceWheelProps {
 
 
 function ConsequenceWheel({ items }: ConsequenceWheelProps) {
-  const data = React.useMemo(() => repeatArray(items, (REPLICAS * 2) + 1), [items])
+  // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
+  const [data, setData] = React.useState([...items, ...items, ...items])
+
   const onViewableItemsChanged = React.useCallback(debounce(_onViewableItemsChanged, 50), [items])
   const listRef = React.useRef<any>()
 
-  const numBefore = REPLICAS * items.length
-  const beginningOfLastReplica = data.length - items.length
-
-  const [hoveredIndex, setHoveredIndex] = React.useState(2)  // initially [0, 1, 2, 3, 4] displayed
-
+  const [hoveredIndex, setHoveredIndex] = React.useState(items.length + 2)  // initially [0, 1, 2, 3, 4] displayed
   const hoveredItem = data[hoveredIndex]
 
   return <BackgroundView>
@@ -117,8 +113,7 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
     onPress={React.useCallback(() => {
       if(listRef?.current) {
         // Spin to a random one in the next group
-        const randomIdx = getRandomInt(items.length) + hoveredIndex
-        console.log('hovered', hoveredIndex, randomIdx)
+        const randomIdx = hoveredIndex + getRandomInt(items.length)
         listRef.current.scrollToIndex({
           index: randomIdx
         })
@@ -131,7 +126,7 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
       style={{height: ITEM_HEIGHT * 5}}
       data={data}
       renderItem={({item, index}) => <ConsequenceItem {...item} index={index} />}
-      initialScrollIndex={numBefore}
+      initialScrollIndex={items.length}
       initialNumToRender={items.length}
       removeClippedSubviews
       onViewableItemsChanged={onViewableItemsChanged}
@@ -156,10 +151,9 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
     const middle = viewableItems[Math.round((viewableItems.length - 1) / 2)]
     if (!middle || !middle.index) { return }
 
-    console.log('middle', middle.index)
-    if (middle.index >= beginningOfLastReplica || middle.index < items.length) {
-      // We've scrolled to the last or first replica - re-scroll to the middle
-      const newIndex = numBefore + (middle.index % items.length)
+    if (middle.index < items.length) {
+      // We've scrolled to the first replica - re-scroll to the middle
+      const newIndex = items.length + middle.index
       listRef?.current?.scrollToIndex({
         index: newIndex,
         viewPosition: 0.5,
@@ -168,6 +162,14 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
       setHoveredIndex(newIndex)
     } else {
       setHoveredIndex(middle.index)
+      setData((data) => {
+        if (middle.index! + items.length > data.length) {
+          // We've scrolled pretty far forward, need to add more data
+          return [...data, ...items]
+        }
+        // no update
+        return data
+      })
     }
   }
 }
