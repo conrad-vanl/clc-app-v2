@@ -13,7 +13,7 @@ export default function NotificationListenerConnected(props: React.PropsWithChil
 
   React.useEffect(() => {
     const handler = (openResult: any) => {
-      const { notificationID, body, additionalData, launchURL } = openResult?.notification?.payload || {}
+      const { notificationID, title, additionalData, launchURL } = openResult?.notification?.payload || {}
 
       if (notificationID) {
         client.mutate({
@@ -28,7 +28,7 @@ export default function NotificationListenerConnected(props: React.PropsWithChil
           track({
             eventName: 'Open',
             properties: {
-              title: body,
+              title: title,
               itemId: notificationID,
               type: 'OneSignalNotification',
               url: additionalData?.url || launchURL
