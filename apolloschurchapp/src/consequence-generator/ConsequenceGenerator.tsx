@@ -1,9 +1,10 @@
 import React from 'react';
 import { useQuery, gql } from '@apollo/client';
-import { FlatList, View, Text } from 'react-native'
+import { FlatList, View, Text, ViewToken } from 'react-native'
 import {
   BackgroundView,
   H1,
+  H4,
   H5,
   styled,
   Touchable,
@@ -70,16 +71,20 @@ export function ConsequenceGenerator() {
   const { data, loading, error } = useQuery<ConsequenceQueryData>(CONSEQUENCE_QUERY, {
     fetchPolicy: 'no-cache'
   });
-  console.log('data', data)
+  const onViewableItemsChanged = React.useCallback(_onViewableItemsChanged, [data])
+
+  const [middleIndex, setMiddleIndex] = React.useState(2)  // initially [0, 1, 2, 3, 4] displayed
 
   if (loading) {
     return null
   }
 
   const items = data?.local?.consequenceCollection?.items
-  if (!loading && (error || !items || !items.length)) {
+  if (error || !items || !items.length) {
     return <ErrorCard error={error || new Error(`An unknown error occurred`)} />
   }
+
+  const hoveredItem = items[middleIndex]
 
   return <BackgroundView>
   <TrackEventWhenLoaded
@@ -97,12 +102,22 @@ export function ConsequenceGenerator() {
       style={{height: ITEM_HEIGHT * 5}}
       data={items}
       renderItem={({item, index}) => <ConsequenceItem {...item} selected={index == 3} />}
+      onViewableItemsChanged={onViewableItemsChanged}
     />
     <SelectedConsequenceOverlay>
       <ConsequenceButton title="Accept" />
     </SelectedConsequenceOverlay>
   </View>
+  <View>
+    <H4>{hoveredItem.title}</H4>
+  </View>
   </BackgroundView>
+
+  function _onViewableItemsChanged({changed, viewableItems}: { changed: ViewToken[], viewableItems: ViewToken[] }) {
+    const middle = viewableItems[Math.round((viewableItems.length - 1) / 2)]
+    console.log('middle', middle.index)
+    setMiddleIndex(middle.index!)
+  }
 }
 
 interface ConsequenceItemProps {
