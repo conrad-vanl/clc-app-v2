@@ -15,18 +15,17 @@ const ConsequenceGeneratorNavigator = ({ route, navigation, ...props }) => (
       headerMode="float"
       screenOptions={{
         headerTranslucent: false,
-        headerStyle: { backgroundColor: 'transparent' },
+        headerStyle: { opacity: 0 },
         headerHideShadow: true,
         headerRight: ModalCloseButton,
         headerLeft: ModalBackButton,
-        headerTitle: 'Farkle Consequence Generator',
         headerTopInsetEnabled: false,
       }}
     >
       <Screen
         name="ConsequenceGenerator"
         component={ConsequenceGenerator}
-        options={{ title: 'Staff Directory' }}
+        options={{ title: 'Farkle Wheel of Consequences' }}
         initialParams={route.params}
       />
     </Navigator>

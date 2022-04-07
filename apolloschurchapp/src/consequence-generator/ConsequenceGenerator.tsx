@@ -3,7 +3,7 @@ import { useQuery, gql } from '@apollo/client';
 import { FlatList, View, Text, ViewToken } from 'react-native'
 import {
   BackgroundView,
-  H1,
+  H2,
   H4,
   H5,
   styled,
@@ -71,16 +71,15 @@ const ITEM_HEIGHT = 50;
 const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
   backgroundColor: theme.colors.background.accent,
   color: theme.colors.background.accent,
-  margin: 4,
   borderWidth: 0,
   borderRadius: 30,
-  height: ITEM_HEIGHT,
+  height: ITEM_HEIGHT + 1,
   position: 'absolute',
   top: ITEM_HEIGHT * 2,
   bottom: ITEM_HEIGHT * 2,
   left: 0,
   right: 0,
-}))(Button);
+}))(View);
 
 const ConsequenceButton = styled(({ theme, selected }: any) => ({
   backgroundColor: theme.colors.action.tertiary,
@@ -89,13 +88,13 @@ const ConsequenceButton = styled(({ theme, selected }: any) => ({
   borderRadius: 30,
   height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
   position: 'absolute',
+  top: 5,
   right: 4
 }))(Button);
 
 interface ConsequenceWheelProps {
   items: Consequence[]
 }
-
 
 function ConsequenceWheel({ items }: ConsequenceWheelProps) {
   // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
@@ -108,19 +107,21 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
   const hoveredItem = data[hoveredIndex]
 
   return <BackgroundView>
-  <H1>Farkle Wheel of Consequences</H1>
-  <Button title="Spin the Wheel" type="tertiary"
-    onPress={React.useCallback(() => {
-      if(listRef?.current) {
-        // Spin to a random one in the next group
-        const randomIdx = hoveredIndex + getRandomInt(items.length)
-        listRef.current.scrollToIndex({
-          index: randomIdx
-        })
-      }
-    }, [listRef?.current, hoveredIndex, items.length])} />
+    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10}}>
+      <Button title="Spin the Wheel" type="tertiary"
+        style={{ width: '50%' }}
+        onPress={React.useCallback(() => {
+          if(listRef?.current) {
+            // Spin to a random one in the next group
+            const randomIdx = hoveredIndex + getRandomInt(items.length)
+            listRef.current.scrollToIndex({
+              index: randomIdx
+            })
+          }
+        }, [listRef?.current, hoveredIndex, items.length])} />
+    </View>
 
-  <View style={{height: ITEM_HEIGHT * 5}}>
+  <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20}}>
     <FlatList
       ref={listRef}
       style={{height: ITEM_HEIGHT * 5}}
@@ -129,6 +130,7 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
       initialScrollIndex={items.length}
       initialNumToRender={items.length}
       removeClippedSubviews
+      snapToInterval={ITEM_HEIGHT}
       onViewableItemsChanged={onViewableItemsChanged}
       getItemLayout={React.useCallback((data, index) => {
         return {
@@ -142,8 +144,8 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
       <ConsequenceButton title="Accept" />
     </SelectedConsequenceOverlay>
   </View>
-  <View>
-    <H4>{hoveredItem.title}</H4>
+  <View style={{marginLeft: 26, marginRight: 26}}>
+    {hoveredItem && <HoveredItem item={hoveredItem} />}
   </View>
   </BackgroundView>
 
@@ -215,6 +217,40 @@ const Spacer = styled(({ theme }: any) => ({
   width: ITEM_HEIGHT / 2 // equal to ItemWrapper borderRadius
 }))(View);
 
+
+function HoveredItem({ item, selected }: { item: Consequence, selected?: boolean }) {
+  // wait 400ms to show an item (in case we're scrolling fast!)
+  const [shown, setShown] = React.useState(false)
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShown(true)
+    }, 400)
+    return () => { setShown(false); clearTimeout(timeout) }
+  }, [item])
+
+  return <>
+    <HoveredItem.Title selected={selected} shown={shown}>{item.title}</HoveredItem.Title>
+    <HoveredItem.Body shown={shown}>
+      {item.description}
+    </HoveredItem.Body>
+    </>
+}
+
+HoveredItem.Title = styled(({ theme, selected, shown }: any) => ({
+  fontSize: 16,
+  opacity: !shown ? 0 :
+    selected ? 1 :
+    0.6,
+  marginBottom: 8
+}))(H4)
+
+HoveredItem.Body = styled(({ theme, selected, shown }: any) => ({
+  opacity: !shown ? 0 :
+  selected ? 1 :
+  0.6,
+  color: theme.colors.text.primary,
+}))(Text)
+
 function ConsequenceItem({title, index, selected}: ConsequenceItemProps) {
   return <ItemWrapper selected={selected}>
     <Spacer />
@@ -225,13 +261,6 @@ function ConsequenceItem({title, index, selected}: ConsequenceItemProps) {
   </ItemWrapper>
 }
 
-function repeatArray<T>(items: T[], replicas: number): T[] {
-  let retval: T[] = []
-  for(let i = 0; i < replicas; i++) {
-    retval.push(...items)
-  }
-  return retval
-}
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
