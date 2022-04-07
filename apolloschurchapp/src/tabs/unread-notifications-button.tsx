@@ -2,9 +2,9 @@ import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import { Placeholder, makeIcon } from '@apollosproject/ui-kit';
 import Svg, { Path, Circle } from 'react-native-svg';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { GetNotificationHistoryData, GET_NOTIFICATION_HISTORY } from '../NotificationHistory/NotificationHistory';
-import { useQuery } from '@apollo/client';
+import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 
 const NotificationsIcon = makeIcon(
   ({ size = 32, fill = undefined, ...otherProps } = {}) => (
@@ -37,7 +37,7 @@ const UnreadNotificationsIcon = makeIcon(
 
 export function UnreadNotificationsButton({ size = 32 }: {size?: number}) {
   const navigation = useNavigation();
-  const { data, loading, refetch } = useQuery<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY, {
+  const { data } = useQueryAutoRefresh<GetNotificationHistoryData>(GET_NOTIFICATION_HISTORY, {
     fetchPolicy: 'cache-and-network'
   });
 

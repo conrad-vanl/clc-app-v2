@@ -7,6 +7,7 @@ import {
 } from 'contentful-local-schema';
 import AsyncStorage from '@react-native-community/async-storage';
 import { printSchema } from 'graphql';
+import { debounce, throttle } from 'lodash';
 
 // import contentfulSchema from '../../contentful-schema.gql';
 import contentfulSchemaJson from '../../contentful-schema.json';
@@ -34,7 +35,7 @@ const localSchema = printSchema(createSchema(options));
 
 const localResolvers = createLocalResolvers(enhancedDataSource, options);
 
-export function resyncContentful(): Promise<void> {
+export const resyncContentful = debounce(() => {
   const syncPromise = enhancedDataSource.sync();
   // In the background, after the sync finishes, backup to AsyncStorage.
   // If this fails, we don't really care because at least the sync succeeded.
@@ -43,7 +44,7 @@ export function resyncContentful(): Promise<void> {
   });
 
   return syncPromise;
-}
+}, 1500,  {leading: true});
 
 // Import the current state from AsyncStorage
 const restoreComplete = enhancedDataSource.restore();

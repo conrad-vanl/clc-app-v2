@@ -15,13 +15,12 @@ const useQueryAutoRefresh: typeof useQuery = (query, options) => {
       appState.current.match(/inactive|background/) &&
       nextAppState === 'active'
     ) {
-      console.log('App has come to the foreground!');
-      resyncContentful()
-        .then(() => data.refetch())
-        .catch((ex) => {
-          console.error(ex);
-          return data.refetch();
-        });
+      const p = resyncContentful();
+      if (!p) {
+        data.refetch();
+      } else {
+        p.finally(() => data.refetch());
+      }
     }
 
     appState.current = nextAppState;
@@ -45,12 +44,17 @@ const useQueryAutoRefresh: typeof useQuery = (query, options) => {
     refetch: async function refetch(
       variables
     ): Promise<ApolloQueryResult<any>> {
-      return resyncContentful()
-        .then(() => data.refetch(variables))
-        .catch((ex) => {
+      const p = resyncContentful();
+      if (!p) {
+        return data.refetch(variables);
+      }
+      return p.then(
+        () => data.refetch(variables),
+        (_ex) => {
           console.error(ex);
-          return data.refetch(variables);
-        });
+          return data.refetch(variables)
+        }
+      );
     },
   };
 };
