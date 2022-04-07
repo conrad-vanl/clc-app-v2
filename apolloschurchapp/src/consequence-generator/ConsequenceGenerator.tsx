@@ -42,6 +42,30 @@ interface Consequence {
 
 const ITEM_HEIGHT = 50;
 
+const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
+  backgroundColor: theme.colors.background.accent,
+  color: theme.colors.background.accent,
+  margin: 4,
+  borderWidth: 0,
+  borderRadius: 30,
+  height: ITEM_HEIGHT,
+  position: 'absolute',
+  top: ITEM_HEIGHT * 2,
+  bottom: ITEM_HEIGHT * 2,
+  left: 0,
+  right: 0,
+}))(Button);
+
+const ConsequenceButton = styled(({ theme, selected }: any) => ({
+  backgroundColor: theme.colors.action.tertiary,
+  color: theme.colors.text.tertiary,
+  borderWidth: 1,
+  borderRadius: 30,
+  height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
+  position: 'absolute',
+  right: 4
+}))(Button);
+
 export function ConsequenceGenerator() {
   const { data, loading, error } = useQuery<ConsequenceQueryData>(CONSEQUENCE_QUERY, {
     fetchPolicy: 'no-cache'
@@ -70,10 +94,13 @@ export function ConsequenceGenerator() {
   <H1>Farkle Wheel of Consequences</H1>
   <View style={{height: ITEM_HEIGHT * 5}}>
     <FlatList
-      style={{height: ITEM_HEIGHT * 5, borderWidth: 1, borderColor: 'green'}}
+      style={{height: ITEM_HEIGHT * 5}}
       data={items}
       renderItem={({item, index}) => <ConsequenceItem {...item} selected={index == 3} />}
     />
+    <SelectedConsequenceOverlay>
+      <ConsequenceButton title="Accept" />
+    </SelectedConsequenceOverlay>
   </View>
   </BackgroundView>
 }
@@ -84,21 +111,23 @@ interface ConsequenceItemProps {
 }
 
 const ItemWrapper = styled(({ theme, selected }: any) => ({
-  borderWidth: 1,
+  borderWidth: 0,
   borderRadius: ITEM_HEIGHT / 2,
-  borderColor: selected ? theme.colors.background.accent : theme.colors.background.paper,
-  backgroundColor: selected ? theme.colors.background.accent : theme.colors.background.transparent,
+  borderColor: theme.colors.background.paper,
+  backgroundColor: theme.colors.background.transparent,
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'stretch',
+  justifyContent: 'center',
   alignItems: 'center',
   height: ITEM_HEIGHT,
 }))(View);
 
 
 const ConsequenceWrapper = styled(({ theme }: any) => ({
-  borderWidth: 1,
-  borderColor: 'green',
+  borderTopWidth: 1,
+  borderLeftWidth: 1,
+  borderRightWidth: 1,
+  borderColor: theme.colors.background.accent,
   flex: 1,
   display: 'flex',
   flexDirection: 'row',
@@ -112,16 +141,6 @@ const ConsequenceText = styled(({ theme }: any) => ({
   
 }))(H5);
 
-const ConsequenceButton = styled(({ theme, selected }: any) => ({
-  opacity: selected ? 1 : 0,
-  backgroundColor: theme.colors.action.tertiary,
-  color: theme.colors.text.tertiary,
-  margin: 4,
-  borderWidth: 1,
-  borderRadius: 30,
-  height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
-}))(Button);
-
 const Spacer = styled(({ theme }: any) => ({
   width: ITEM_HEIGHT / 2 // equal to ItemWrapper borderRadius
 }))(View);
@@ -132,6 +151,6 @@ function ConsequenceItem({title, selected}: ConsequenceItemProps) {
     <ConsequenceWrapper selected={selected}>
       <ConsequenceText selected={selected}>{title}</ConsequenceText>
     </ConsequenceWrapper>
-    <ConsequenceButton title="Accept" selected={selected} />
+    <Spacer style={{width: 100}} />
   </ItemWrapper>
 }
