@@ -1,4 +1,5 @@
 import React from 'react';
+import Color from 'color';
 import { useQuery, gql } from '@apollo/client';
 import { FlatList, View, Text, ViewToken } from 'react-native'
 import {
@@ -46,6 +47,7 @@ export function ConsequenceGenerator() {
   const { data, loading, error } = useQuery<ConsequenceQueryData>(CONSEQUENCE_QUERY, {
     fetchPolicy: 'no-cache'
   });
+  const [locked, setLocked] = React.useState<Consequence>()
 
   const items = data?.local?.consequenceCollection?.items
   
@@ -62,7 +64,10 @@ export function ConsequenceGenerator() {
     {!loading && (error || !items || !items.length) &&
       <ErrorCard error={error || new Error(`An unknown error occurred`)} />}
     {!loading && items?.length &&
-      <ConsequenceWheel items={items} />}
+      <ConsequenceWheel items={items}
+        locked={locked}
+        onAccept={setLocked}
+        onUnlock={() => setLocked(undefined)} />}
   </>
 }
 
@@ -81,7 +86,8 @@ const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
   right: 0,
 }))(View);
 
-const ConsequenceButton = styled(({ theme, selected }: any) => ({
+const ConsequenceButton = styled(({ theme, locked }: any) => ({
+  opacity: locked ? 0.6 : 1,
   backgroundColor: theme.colors.action.tertiary,
   color: theme.colors.text.tertiary,
   borderWidth: 1,
@@ -94,13 +100,17 @@ const ConsequenceButton = styled(({ theme, selected }: any) => ({
 
 interface ConsequenceWheelProps {
   items: Consequence[]
+
+  locked?: Consequence
+  onUnlock: () => void
+  onAccept: (consequence: Consequence) => void
 }
 
-function ConsequenceWheel({ items }: ConsequenceWheelProps) {
+function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWheelProps) {
   // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
   const [data, setData] = React.useState([...items, ...items, ...items])
 
-  const onViewableItemsChanged = React.useCallback(debounce(_onViewableItemsChanged, 50), [items])
+  const onViewableItemsChanged = React.useCallback(debounce(_onViewableItemsChanged, 100), [items])
   const listRef = React.useRef<any>()
 
   const [hoveredIndex, setHoveredIndex] = React.useState(items.length + 2)  // initially [0, 1, 2, 3, 4] displayed
@@ -110,6 +120,7 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
     <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10}}>
       <Button title="Spin the Wheel" type="tertiary"
         style={{ width: '50%' }}
+        disabled={locked}
         onPress={React.useCallback(() => {
           if(listRef?.current) {
             // Spin to a random one in the next group
@@ -121,32 +132,44 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
         }, [listRef?.current, hoveredIndex, items.length])} />
     </View>
 
-  <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20}}>
-    <FlatList
-      ref={listRef}
-      style={{height: ITEM_HEIGHT * 5}}
-      data={data}
-      renderItem={({item, index}) => <ConsequenceItem {...item} index={index} />}
-      initialScrollIndex={items.length}
-      initialNumToRender={items.length}
-      removeClippedSubviews
-      snapToInterval={ITEM_HEIGHT}
-      onViewableItemsChanged={onViewableItemsChanged}
-      getItemLayout={React.useCallback((data, index) => {
-        return {
-          length: ITEM_HEIGHT,
-          offset: index * ITEM_HEIGHT,
-          index
-        }
-      }, [])}
-    />
-    <SelectedConsequenceOverlay>
-      <ConsequenceButton title="Accept" />
-    </SelectedConsequenceOverlay>
-  </View>
-  <View style={{marginLeft: 26, marginRight: 26}}>
-    {hoveredItem && <HoveredItem item={hoveredItem} />}
-  </View>
+    <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20}}>
+      <FlatList
+        ref={listRef}
+        style={{height: ITEM_HEIGHT * 5}}
+        data={data}
+        renderItem={({item, index}) =>
+          <ConsequenceItem {...item} hovered={index == hoveredIndex} />}
+        initialScrollIndex={items.length}
+        initialNumToRender={items.length}
+        removeClippedSubviews
+        snapToInterval={ITEM_HEIGHT}
+        onViewableItemsChanged={onViewableItemsChanged}
+        getItemLayout={React.useCallback((data, index) => {
+          return {
+            length: ITEM_HEIGHT,
+            offset: index * ITEM_HEIGHT,
+            index
+          }
+        }, [])}
+      />
+      <SelectedConsequenceOverlay>
+        {locked &&
+          <ConsequenceButton title="Locked" locked={true}
+            onPress={React.useCallback(() => {
+              onUnlock()
+            }, [onUnlock])} />}
+
+        {!locked &&
+          <ConsequenceButton title="Accept"
+            onPress={React.useCallback(() => {
+              onAccept(items[hoveredIndex % items.length])
+            }, [hoveredIndex, onAccept])} />}
+      </SelectedConsequenceOverlay>
+    </View>
+    <View style={{marginLeft: 26, marginRight: 26}}>
+      {hoveredItem &&
+        <HoveredItem item={hoveredItem} locked={!!locked} />}
+    </View>
   </BackgroundView>
 
   function _onViewableItemsChanged({changed, viewableItems}: { changed: ViewToken[], viewableItems: ViewToken[] }) {
@@ -178,11 +201,10 @@ function ConsequenceWheel({ items }: ConsequenceWheelProps) {
 
 interface ConsequenceItemProps {
   title: string
-  index: number
-  selected?: boolean
+  hovered?: boolean
 }
 
-const ItemWrapper = styled(({ theme, selected }: any) => ({
+const ItemWrapper = styled(({ theme, hovered }: any) => ({
   borderWidth: 0,
   borderRadius: ITEM_HEIGHT / 2,
   borderColor: theme.colors.background.paper,
@@ -209,16 +231,24 @@ const ConsequenceWrapper = styled(({ theme }: any) => ({
   height: ITEM_HEIGHT,
 }))(View);
 
-const ConsequenceText = styled(({ theme }: any) => ({
-  
+const ConsequenceText = styled(({ theme, hovered }: any) => ({
 }))(H5);
 
 const Spacer = styled(({ theme }: any) => ({
   width: ITEM_HEIGHT / 2 // equal to ItemWrapper borderRadius
 }))(View);
 
+function ConsequenceItem({title, hovered}: ConsequenceItemProps) {
+  return <ItemWrapper hovered={hovered}>
+    <Spacer />
+    <ConsequenceWrapper>
+      <ConsequenceText hovered={hovered}>{title}</ConsequenceText>
+    </ConsequenceWrapper>
+    <Spacer style={{width: 100}} />
+  </ItemWrapper>
+}
 
-function HoveredItem({ item, selected }: { item: Consequence, selected?: boolean }) {
+function HoveredItem({ item, locked }: { item: Consequence, locked?: boolean }) {
   // wait 400ms to show an item (in case we're scrolling fast!)
   const [shown, setShown] = React.useState(false)
   React.useEffect(() => {
@@ -229,38 +259,27 @@ function HoveredItem({ item, selected }: { item: Consequence, selected?: boolean
   }, [item])
 
   return <>
-    <HoveredItem.Title selected={selected} shown={shown}>{item.title}</HoveredItem.Title>
-    <HoveredItem.Body shown={shown}>
+    <HoveredItem.Title locked={locked} shown={shown}>{item.title}</HoveredItem.Title>
+    <HoveredItem.Body locked={locked} shown={shown}>
       {item.description}
     </HoveredItem.Body>
     </>
 }
 
-HoveredItem.Title = styled(({ theme, selected, shown }: any) => ({
+HoveredItem.Title = styled(({ theme, locked, shown }: any) => ({
   fontSize: 16,
   opacity: !shown ? 0 :
-    selected ? 1 :
+    locked ? 1 :
     0.6,
   marginBottom: 8
 }))(H4)
 
-HoveredItem.Body = styled(({ theme, selected, shown }: any) => ({
+HoveredItem.Body = styled(({ theme, locked, shown }: any) => ({
   opacity: !shown ? 0 :
-  selected ? 1 :
-  0.6,
+    locked ? 1 :
+    0.6,
   color: theme.colors.text.primary,
 }))(Text)
-
-function ConsequenceItem({title, index, selected}: ConsequenceItemProps) {
-  return <ItemWrapper selected={selected}>
-    <Spacer />
-    <ConsequenceWrapper selected={selected}>
-      <ConsequenceText selected={selected}>{index} {title}</ConsequenceText>
-    </ConsequenceWrapper>
-    <Spacer style={{width: 100}} />
-  </ItemWrapper>
-}
-
 
 function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
