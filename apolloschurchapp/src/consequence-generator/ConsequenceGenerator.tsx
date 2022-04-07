@@ -1,6 +1,6 @@
 import React from 'react';
 import Color from 'color';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, gql, useMutation } from '@apollo/client';
 import { FlatList, View, Text, ViewToken } from 'react-native'
 import {
   BackgroundView,
@@ -22,7 +22,9 @@ const CONSEQUENCE_QUERY = gql`
   query getAllConsequences {
     local @client {
       consequenceCollection {
+        chosen
         items {
+          sys { id }
           title
           description
         }
@@ -31,15 +33,29 @@ const CONSEQUENCE_QUERY = gql`
   }
 `
 
+const MARK_CHOSEN = gql`
+  mutation markConsequenceChosen($id: String!) {
+    markConsequenceChosen(id: $id) @client
+  }
+`
+
+const MARK_UNLOCKED = gql`
+  mutation markConsequenceUnlocked {
+    markConsequenceUnlocked @client
+  }
+`
+
 interface ConsequenceQueryData {
   local: {
     consequenceCollection: {
+      chosen: string | null
       items: Consequence[]
     }
   }
 }
 interface Consequence {
-  title: string
+  sys: { id: string },
+  title: string,
   description: string
 }
 
@@ -47,9 +63,24 @@ export function ConsequenceGenerator() {
   const { data, loading, error } = useQuery<ConsequenceQueryData>(CONSEQUENCE_QUERY, {
     fetchPolicy: 'no-cache'
   });
-  const [locked, setLocked] = React.useState<Consequence>()
+
+  const [_markChosen] = useMutation(MARK_CHOSEN)
+  const [_markUnlocked] = useMutation(MARK_UNLOCKED)
+  const [locked, setLocked] = React.useState<string | null | undefined>(null)
+
+  const markChosen = React.useCallback((id: string) => {
+    setLocked(id)
+    _markChosen({ variables: { id } }).catch((ex) => console.error(ex))
+  }, [setLocked, _markChosen])
+  const markUnlocked = React.useCallback(() => {
+    setLocked(null)
+    _markUnlocked().catch((ex) => console.error(ex))
+  }, [setLocked, _markUnlocked])
 
   const items = data?.local?.consequenceCollection?.items
+  React.useEffect(() => {
+    setLocked(data?.local?.consequenceCollection?.chosen)
+  }, [data?.local?.consequenceCollection?.chosen])
   
   return <>
     <TrackEventWhenLoaded
@@ -66,8 +97,8 @@ export function ConsequenceGenerator() {
     {!loading && items?.length &&
       <ConsequenceWheel items={items}
         locked={locked}
-        onAccept={setLocked}
-        onUnlock={() => setLocked(undefined)} />}
+        onAccept={markChosen}
+        onUnlock={markUnlocked} />}
   </>
 }
 
@@ -99,21 +130,25 @@ const ConsequenceButton = styled(({ theme, locked }: any) => ({
 }))(Button);
 
 interface ConsequenceWheelProps {
-  items: Consequence[]
+  items: Consequence[],
 
-  locked?: Consequence
-  onUnlock: () => void
-  onAccept: (consequence: Consequence) => void
+  locked?: string | null,
+  onUnlock: () => void,
+  onAccept: (consequenceId: string) => void
 }
 
 function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWheelProps) {
   // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
   const [data, setData] = React.useState([...items, ...items, ...items])
 
+  const lockedIndex = locked ?
+    items.findIndex((item) => item.sys.id == locked) + items.length :
+    null
+
   const onViewableItemsChanged = React.useCallback(debounce(_onViewableItemsChanged, 100), [items])
   const listRef = React.useRef<any>()
 
-  const [hoveredIndex, setHoveredIndex] = React.useState(items.length + 2)  // initially [0, 1, 2, 3, 4] displayed
+  const [hoveredIndex, setHoveredIndex] = React.useState(lockedIndex || items.length + 2)  // initially [0, 1, 2, 3, 4] displayed
   const hoveredItem = data[hoveredIndex]
 
   return <BackgroundView>
@@ -139,8 +174,9 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
         data={data}
         renderItem={({item, index}) =>
           <ConsequenceItem {...item} hovered={index == hoveredIndex} />}
-        initialScrollIndex={items.length}
+        initialScrollIndex={lockedIndex ? lockedIndex - 2 : items.length}
         initialNumToRender={items.length}
+        scrollEnabled={!locked}
         removeClippedSubviews
         snapToInterval={ITEM_HEIGHT}
         onViewableItemsChanged={onViewableItemsChanged}
@@ -162,7 +198,8 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
         {!locked &&
           <ConsequenceButton title="Accept"
             onPress={React.useCallback(() => {
-              onAccept(items[hoveredIndex % items.length])
+
+              onAccept(items[hoveredIndex % items.length]?.sys?.id)
             }, [hoveredIndex, onAccept])} />}
       </SelectedConsequenceOverlay>
     </View>
