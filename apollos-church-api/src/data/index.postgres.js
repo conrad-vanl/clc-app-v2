@@ -20,7 +20,6 @@ import {
   // ContentItem,
   // ContentChannel,
   Sharable,
-  Auth,
   PersonalDevice,
   Template,
   AuthSms,
@@ -51,7 +50,7 @@ import * as ActionAlgorithm from './ActionAlgorithms';
 
 // This modules ties together certain updates so they occurs in both Rock and Postgres.
 // Will be eliminated in the future through an enhancement to the Shovel
-import { Person, OneSignal } from './rockWithPostgres';
+import { Person, Auth, OneSignal } from './rockWithPostgres';
 
 const data = {
   ...Conference,

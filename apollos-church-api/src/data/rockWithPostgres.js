@@ -1,6 +1,10 @@
 /* eslint-disable import/prefer-default-export, max-classes-per-file */
 import { parseGlobalId } from '@apollosproject/server-core';
 import { Person as postgresPerson } from '@apollosproject/data-connector-postgres';
+import { Auth as AuthOriginal } from '@apollosproject/data-connector-rock';
+import moment from 'moment';
+
+import { camelCaseKeys } from '../util';
 import * as OneSignalOriginal from './oneSignal';
 
 class personDataSource extends postgresPerson.dataSource {
@@ -8,18 +12,35 @@ class personDataSource extends postgresPerson.dataSource {
     const rockPersonId = await this.context.dataSources.RockPerson.create(
       attributes
     );
-    super.create({
+    // eslint-disable-next-line no-param-reassign
+    attributes = {
       ...attributes,
       originType: 'rock',
       originId: String(rockPersonId),
+    };
+
+    const cleanedAttributes = camelCaseKeys(attributes);
+    await this.model.findOrCreate({
+      where: {
+        originType: 'rock',
+        originId: String(rockPersonId),
+      },
+      defaults: {
+        apollosUser: true,
+        ...cleanedAttributes,
+        ...(cleanedAttributes.gender
+          ? { gender: cleanedAttributes.gender.toUpperCase() }
+          : {}),
+      },
     });
+
     return rockPersonId;
   }
 
   async getFromId(id, encodedId, { originType = null } = {}) {
     const person = await super.getFromId(id, encodedId, { originType });
     // fixes Error: Expected a value of type "GENDER" but received: ""
-    person.gender = person.gender || 'Unknown';
+    person.gender = person?.gender || 'Unknown';
     return person;
   }
 }
@@ -131,4 +152,44 @@ class oneSignalDataSource extends OneSignalOriginal.dataSource {
 export const OneSignal = {
   ...OneSignalOriginal,
   dataSource: oneSignalDataSource,
+};
+
+class authDataSource extends AuthOriginal.dataSource {
+  createUserLogin = async (props = {}) => {
+    try {
+      const { email, password, personId } = props;
+
+      const existing = await this.request('/UserLogins')
+        .filter(`UserName eq '${email}'`)
+        .first();
+
+      if (existing) {
+        try {
+          await this.delete(`/UserLogins/${existing.id}`);
+        } catch (ex) {
+          if (/404/.test(ex.message)) {
+            // OK
+          } else {
+            throw ex;
+          }
+        }
+      }
+
+      return await this.post('/UserLogins', {
+        PersonId: personId,
+        EntityTypeId: 27, // A default setting we use in Rock-person-creation-flow
+        UserName: email,
+        PlainTextPassword: password,
+        LastLoginDateTime: `${moment().toISOString()}`,
+      });
+    } catch (err) {
+      console.error(err)
+      throw new Error('Unable to create user login!');
+    }
+  };
+}
+
+export const Auth = {
+  ...AuthOriginal,
+  dataSource: authDataSource,
 };
