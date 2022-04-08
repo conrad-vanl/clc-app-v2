@@ -120,6 +120,7 @@ const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
 const ConsequenceButton = styled(({ theme, locked }: any) => ({
   opacity: locked ? 0.6 : 1,
   backgroundColor: theme.colors.action.tertiary,
+  borderColor: theme.colors.action.tertiary,
   color: theme.colors.text.tertiary,
   borderWidth: 1,
   borderRadius: 30,
@@ -152,7 +153,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
   const hoveredItem = data[hoveredIndex]
 
   return <BackgroundView>
-    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10}}>
+    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10, marginTop: 10}}>
       <Button title="Spin the Wheel" type="tertiary"
         style={{ width: '50%' }}
         disabled={locked}
