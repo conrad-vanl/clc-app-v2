@@ -40,7 +40,7 @@ const links = [authLink, errorLink, httpLink];
 
 if (process.env.NODE_ENV === 'development') {
   const logLink = new ApolloLink((operation, forward) => {
-    console.info('request', print(operation.query));
+    console.info('request', print(operation.query), operation.variables);
     return forward(operation).map((result) => {
       console.info('response', result.data);
       return result;

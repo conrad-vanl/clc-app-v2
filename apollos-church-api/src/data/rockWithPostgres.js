@@ -40,7 +40,9 @@ class personDataSource extends postgresPerson.dataSource {
   async getFromId(id, encodedId, { originType = null } = {}) {
     const person = await super.getFromId(id, encodedId, { originType });
     // fixes Error: Expected a value of type "GENDER" but received: ""
-    person.gender = person?.gender || 'Unknown';
+    if (person) {
+      person.gender = person?.gender || 'Unknown';
+    }
     return person;
   }
 }
