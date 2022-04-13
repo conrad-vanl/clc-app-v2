@@ -40,7 +40,7 @@ jobs:
           AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
 
       - name: Install Dependencies
-        run: yarn --network-timeout 100000
+        run: yarn --network-timeout 100000 && yarn pods
 
       # required to build
       - name: Generate Stories
@@ -98,7 +98,7 @@ jobs:
           AMPLITUDE_API_KEY: ${{ secrets.AMPLITUDE_API_KEY }}
 
       - name: Install Dependencies
-        run: yarn --network-timeout 100000
+        run: yarn --network-timeout 100000 && yarn pods
 
       # required to build
       - name: Generate Stores
