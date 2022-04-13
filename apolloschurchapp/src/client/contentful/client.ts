@@ -34,7 +34,7 @@ export class SimpleContentfulClient {
       baseUrl: 'https://cdn.contentful.com',
       space: process.env.CONTENTFUL_SPACE_ID!,
       accessToken: process.env.CONTENTFUL_ACCESS_TOKEN!,
-      environmentId: process.env.CONTENTFUL_ENVIRONMENT || 'master',
+      environmentId: process.env.CONTENTFUL_ENVIRONMENT || 'dev',
       ...options,
     }
     this.logger = this.options.logger || console.debug

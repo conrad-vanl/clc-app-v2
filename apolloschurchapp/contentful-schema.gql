@@ -80,6 +80,19 @@ type Local_ConferenceResourceCollection {
   items: [Local_ConferenceResource]!
 }
 
+type Local_Consequence implements Local_Entry {
+  internalTitle: String!
+  title: String!
+  description: String!
+}
+
+type Local_ConsequenceCollection {
+  skip: Int!
+  limit: Int!
+  total: Int!
+  items: [Local_Consequence]!
+}
+
 type Local_ContentfulMetadata {
   tags: [Local_ContentfulTag]!
 }
@@ -191,6 +204,8 @@ type local_Query {
   breakoutsCollection(skip: String, limit: String): Local_BreakoutsCollection
   conference(id: String): Local_Conference
   conferenceCollection(skip: String, limit: String): Local_ConferenceCollection
+  consequence(id: String): Local_Consequence
+  consequenceCollection(skip: String, limit: String): Local_ConsequenceCollection
   day(id: String): Local_Day
   dayCollection(skip: String, limit: String): Local_DayCollection
   event(id: String): Local_Event

@@ -21,10 +21,17 @@ export const schema = `
     updatePushPermissions(enabled: Boolean!): Boolean
 
     markNotificationsRead(ids: [String]!): Boolean
+
+    markConsequenceChosen(id: String!): Boolean
+    markConsequenceUnlocked: Boolean
   }
 
   extend type Notification {
     read: Boolean
+  }
+
+  extend type Local_ConsequenceCollection {
+    chosen: String!
   }
 ${mediaPlayerSchema || ''}
 `;
@@ -83,9 +90,48 @@ export const resolvers = {
 
       return true;
     },
+    markConsequenceChosen: async (root, args) => {
+      if (args.id) {
+        await _markConsequenceChosen(args.id);
+        return true;
+      }
+    },
+    markConsequenceUnlocked: async () => {
+      await _markConsequenceUnlocked();
+      return true;
+    },
   },
   Notification: {
     read: async ({ id }) =>
       (await AsyncStorage.getItem(`Notification/${id}/read`)) == 'true',
   },
+  Local_ConsequenceCollection: {
+    chosen: async () => getChosenConsequenceId(),
+  },
 };
+
+let chosenConsequenceId = null;
+
+async function _markConsequenceChosen(id) {
+  await AsyncStorage.setItem(`Local_ConsequenceCollection/chosen`, id);
+  chosenConsequenceId = id;
+
+  return true;
+}
+
+async function _markConsequenceUnlocked() {
+  await AsyncStorage.removeItem(`Local_ConsequenceCollection/chosen`);
+  chosenConsequenceId = null;
+
+  return true;
+}
+
+async function getChosenConsequenceId() {
+  if (chosenConsequenceId) {
+    return chosenConsequenceId;
+  }
+
+  const id = await AsyncStorage.getItem(`Local_ConsequenceCollection/chosen`);
+  chosenConsequenceId = id;
+  return id;
+}
