@@ -60,6 +60,7 @@ const CapacityRow = styled(({ theme }) => ({
 
 const Container = styled(({ theme }) => ({
   paddingHorizontal: theme.sizing.baseUnit,
+  paddingBottom: 20,
   flex: 1,
 }))(SafeAreaView);
 
@@ -119,22 +120,22 @@ const LocalActionContianer = ({ contentId }) => {
       backgroundComponent={(bgProps) => <ModalBackgroundView {...bgProps} />} // eslint-disable-line react/jsx-props-no-spreading
     >
       <Container edges={['bottom', 'left', 'right']}>
-        {isCapacityEvent ? (
-          <CapacityRow>
+        <CapacityRow>
+          {isCapacityEvent && (
             <ChannelLabel
               icon="groups"
               label={
                 isCapacityEvent ? `${data?.node?.capacity} person capacity` : ``
               }
             />
-            {isCapacityEvent && capacityRemaining >= 0 ? (
-              <H6>
-                {capacityRemaining} {capacityRemaining === 1 ? 'spot' : 'spots'}{' '}
-                left
-              </H6>
-            ) : null}
-          </CapacityRow>
-        ) : null}
+          )}
+          {isCapacityEvent && capacityRemaining >= 0 ? (
+            <H6>
+              {capacityRemaining} {capacityRemaining === 1 ? 'spot' : 'spots'}{' '}
+              left
+            </H6>
+          ) : null}
+        </CapacityRow>
         <RegisterButton
           isRegistered={!!data?.node?.isRegistered}
           isCapacityEvent={!!isCapacityEvent}
