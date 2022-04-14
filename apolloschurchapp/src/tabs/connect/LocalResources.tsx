@@ -16,6 +16,8 @@ import { useNavigation } from '@react-navigation/native';
 
 import { Caret } from '../../ui/ScheduleItem';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
+import { present } from 'contentful-local-schema/dist/util';
+import { navigateInApp } from '../../util/navigation';
 
 const getResources = gql`
   query getLocalResources {
@@ -72,13 +74,17 @@ const Resources = () => {
   const navigation = useNavigation();
 
   const onPressHandler = ({ resource }: { resource: ResourceItem }) => async () => {
-    if (resource.__typename === 'Local_Link') {
-      if (resource.useInAppBrowser && await InAppBrowser.isAvailable()) {
-        InAppBrowser.open(resource.url);
+    if('url' in resource && present(resource?.url)) {
+      if (/^http(s)?\:\/\//.test(resource.url)) {
+        if (resource.useInAppBrowser && await InAppBrowser.isAvailable()) {
+          InAppBrowser.open(resource.url);
+        } else {
+          Linking.openURL(resource.url);
+        }
       } else {
-        Linking.openURL(resource.url);
+        navigateInApp(resource.url, navigation)
       }
-    } else {
+    } else if (present(resource?.sys?.id)) {
       navigation.push('LocalContentSingle', {
         itemId: resource.sys.id,
       });
@@ -92,32 +98,6 @@ const Resources = () => {
         <H5 padded>Resources</H5>
       </PaddedView>
       <TableView>
-          <React.Fragment>
-            <Touchable onPress={() => navigation.push('StaffDirectory')}>
-              <Cell>
-                <CellText>
-                  <UIText>Watermark Staff</UIText>
-                </CellText>
-                <Caret />
-              </Cell>
-            </Touchable>
-
-            <Divider />
-          </React.Fragment>
-
-          <React.Fragment>
-            <Touchable onPress={() => navigation.push('ConsequenceGenerator')}>
-              <Cell>
-                <CellText>
-                  <UIText>Farkle Consequence Generator</UIText>
-                </CellText>
-                <Caret />
-              </Cell>
-            </Touchable>
-
-            <Divider />
-          </React.Fragment>
-
           {(data?.local?.conference?.resources?.items || []).map((resource) => (
             <React.Fragment key={resource.sys.id}>
               <Touchable
