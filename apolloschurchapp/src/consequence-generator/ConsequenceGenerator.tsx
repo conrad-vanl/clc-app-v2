@@ -112,7 +112,9 @@ const SelectedConsequenceOverlay = styled(({ theme, locked }: any) => ({
   right: 4,
 }))(View);
 
-const ConsequenceButton = styled(({ theme, locked }: any) => ({
+const ConsequenceButton = styled(({ theme, disabled }: any) => ({
+  backgroundColor: disabled ? '#8D7484' : theme.colors.action.secondary,
+  borderColor: disabled ? '#8D7484' : theme.colors.action.secondary,
   borderWidth: 1,
   borderRadius: 30,
   height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
