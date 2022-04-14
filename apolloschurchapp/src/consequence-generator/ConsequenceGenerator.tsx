@@ -11,6 +11,7 @@ import {
 } from '@apollosproject/ui-kit';
 import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 import { debounce } from 'lodash';
+import { hex2rgba } from '../util';
 
 const CONSEQUENCE_QUERY = gql`
   query getAllConsequences {
@@ -98,30 +99,27 @@ export function ConsequenceGenerator() {
 
 const ITEM_HEIGHT = 50;
 
-const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
-  backgroundColor: theme.colors.background.accent,
-  color: theme.colors.background.accent,
+const SelectedConsequenceOverlay = styled(({ theme, locked }: any) => ({
+  backgroundColor: locked ? theme.colors.action.primary : hex2rgba(theme.colors.action.primary, 0.6),
+  color: theme.colors.action.primary,
   borderWidth: 0,
   borderRadius: 30,
   height: ITEM_HEIGHT + 1,
   position: 'absolute',
   top: ITEM_HEIGHT * 2,
   bottom: ITEM_HEIGHT * 2,
-  left: 0,
-  right: 0,
+  left: 4,
+  right: 4,
 }))(View);
 
 const ConsequenceButton = styled(({ theme, locked }: any) => ({
-  opacity: locked ? 0.6 : 1,
-  backgroundColor: theme.colors.action.tertiary,
-  borderColor: theme.colors.action.tertiary,
-  color: theme.colors.text.tertiary,
   borderWidth: 1,
   borderRadius: 30,
   height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
   position: 'absolute',
-  top: 5,
-  right: 4
+  right: 8,
+  top: ITEM_HEIGHT * 2 + 5,
+  bottom: ITEM_HEIGHT * 2 - 5,
 }))(Button);
 
 interface ConsequenceWheelProps {
@@ -150,7 +148,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
 
   return <BackgroundView>
     <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10, marginTop: 10}}>
-      <Button title="Spin the Wheel" type="tertiary"
+      <Button title="Spin the Wheel" type="secondary"
         style={{ width: '50%' }}
         disabled={locked}
         onPress={React.useCallback(() => {
@@ -164,13 +162,15 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
         }, [listRef?.current, hoveredIndex, items.length])} />
     </View>
 
-    <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20}}>
+    <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20, display: 'flex', flexDirection: 'row'}}>
+      <SelectedConsequenceOverlay locked={locked} />
+
       <FlatList
         ref={listRef}
-        style={{height: ITEM_HEIGHT * 5}}
+        style={{height: ITEM_HEIGHT * 5, marginRight: 100}}
         data={data}
         renderItem={({item, index}) =>
-          <ConsequenceItem {...item} hovered={index == hoveredIndex} />}
+          <ConsequenceItem {...item} locked={locked == item.sys.id} />}
         initialScrollIndex={lockedIndex ? lockedIndex - 2 : sizeOfBuffer}
         initialNumToRender={items.length}
         scrollEnabled={!locked}
@@ -185,24 +185,22 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
           }
         }, [])}
       />
-      <SelectedConsequenceOverlay>
-        {locked &&
-          <ConsequenceButton title="Locked" locked={true}
-            onPress={React.useCallback(() => {
-              onUnlock()
-            }, [onUnlock])} />}
 
-        {!locked &&
-          <ConsequenceButton title="Accept"
-            onPress={React.useCallback(() => {
-
-              onAccept(items[hoveredIndex % items.length]?.sys?.id)
-            }, [hoveredIndex, onAccept])} />}
-      </SelectedConsequenceOverlay>
+      <ConsequenceButton title={locked ? "Locked" : "Accept"} type="secondary" disabled={locked}
+        onPress={React.useCallback(() => {
+          console.log('Accept!!')
+          onAccept(items[hoveredIndex % items.length]?.sys?.id)
+        }, [hoveredIndex, onAccept])} />
     </View>
-    <View style={{marginLeft: 26, marginRight: 26}}>
+    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 20}}>
       {hoveredItem &&
         <HoveredItem item={hoveredItem} locked={!!locked} />}
+    </View>
+
+    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 20}}>
+      {locked &&
+        <Button type="secondary" title="Consequence Complete!"
+          onPress={onUnlock} />}
     </View>
   </BackgroundView>
 
@@ -235,7 +233,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
 
 interface ConsequenceItemProps {
   title: string
-  hovered?: boolean
+  locked?: boolean
 }
 
 const ItemWrapper = styled(({ theme, hovered }: any) => ({
@@ -265,20 +263,26 @@ const ConsequenceWrapper = styled(({ theme }: any) => ({
   height: ITEM_HEIGHT,
 }))(View);
 
-const ConsequenceText = styled(({ theme, hovered }: any) => ({
-}))(H5);
+const ConsequenceText = styled(({ theme, locked }: any) => {
+  if (locked) {
+    return {
+      color: '#FFFFFF',
+    }
+  }
+
+  return {}
+})(H5);
 
 const Spacer = styled(({ theme }: any) => ({
   width: ITEM_HEIGHT / 2 // equal to ItemWrapper borderRadius
 }))(View);
 
-function ConsequenceItem({title, hovered}: ConsequenceItemProps) {
-  return <ItemWrapper hovered={hovered}>
+function ConsequenceItem({title, locked}: ConsequenceItemProps) {
+  return <ItemWrapper locked={locked}>
     <Spacer />
     <ConsequenceWrapper>
-      <ConsequenceText hovered={hovered}>{title}</ConsequenceText>
+      <ConsequenceText locked={locked}>{title}</ConsequenceText>
     </ConsequenceWrapper>
-    <Spacer style={{width: 100}} />
   </ItemWrapper>
 }
 
