@@ -1,21 +1,15 @@
 import React from 'react';
-import Color from 'color';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { FlatList, View, Text, ViewToken } from 'react-native'
 import {
   BackgroundView,
-  H2,
   H4,
   H5,
   styled,
-  Touchable,
-  Cell,
-  CellText,
-  GradientOverlayImage,
   Button,
   ErrorCard
 } from '@apollosproject/ui-kit';
-import { useTrack, TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
+import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 import { debounce } from 'lodash';
 
 const CONSEQUENCE_QUERY = gql`
@@ -140,16 +134,18 @@ interface ConsequenceWheelProps {
 
 function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWheelProps) {
   // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
-  const [data, setData] = React.useState([...items, ...items, ...items])
+  const [data, setData] = React.useState([...items, ...items, ...items, ...items, ...items])
+
+  const sizeOfBuffer = 2 * items.length
 
   const lockedIndex = locked ?
-    items.findIndex((item) => item.sys.id == locked) + items.length :
+    items.findIndex((item) => item.sys.id == locked) + sizeOfBuffer :
     null
 
   const onViewableItemsChanged = React.useCallback(debounce(_onViewableItemsChanged, 100), [items])
   const listRef = React.useRef<any>()
 
-  const [hoveredIndex, setHoveredIndex] = React.useState(lockedIndex || items.length + 2)  // initially [0, 1, 2, 3, 4] displayed
+  const [hoveredIndex, setHoveredIndex] = React.useState(lockedIndex || sizeOfBuffer + 2)  // initially [0, 1, 2, 3, 4] displayed
   const hoveredItem = data[hoveredIndex]
 
   return <BackgroundView>
@@ -160,7 +156,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
         onPress={React.useCallback(() => {
           if(listRef?.current) {
             // Spin to a random one in the next group
-            const randomIdx = hoveredIndex + getRandomInt(items.length)
+            const randomIdx = hoveredIndex + getRandomInt(items.length) + (Math.round(items.length / 2))
             listRef.current.scrollToIndex({
               index: randomIdx
             })
@@ -175,7 +171,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
         data={data}
         renderItem={({item, index}) =>
           <ConsequenceItem {...item} hovered={index == hoveredIndex} />}
-        initialScrollIndex={lockedIndex ? lockedIndex - 2 : items.length}
+        initialScrollIndex={lockedIndex ? lockedIndex - 2 : sizeOfBuffer}
         initialNumToRender={items.length}
         scrollEnabled={!locked}
         removeClippedSubviews
@@ -226,7 +222,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
     } else {
       setHoveredIndex(middle.index)
       setData((data) => {
-        if (middle.index! + items.length > data.length) {
+        if (middle.index! + sizeOfBuffer > data.length) {
           // We've scrolled pretty far forward, need to add more data
           return [...data, ...items]
         }
