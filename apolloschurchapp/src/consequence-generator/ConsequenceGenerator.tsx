@@ -1,22 +1,17 @@
 import React from 'react';
-import Color from 'color';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { FlatList, View, Text, ViewToken } from 'react-native'
 import {
   BackgroundView,
-  H2,
   H4,
   H5,
   styled,
-  Touchable,
-  Cell,
-  CellText,
-  GradientOverlayImage,
   Button,
   ErrorCard
 } from '@apollosproject/ui-kit';
-import { useTrack, TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
+import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
 import { debounce } from 'lodash';
+import { hex2rgba } from '../util';
 
 const CONSEQUENCE_QUERY = gql`
   query getAllConsequences {
@@ -104,30 +99,29 @@ export function ConsequenceGenerator() {
 
 const ITEM_HEIGHT = 50;
 
-const SelectedConsequenceOverlay = styled(({ theme, selected }: any) => ({
-  backgroundColor: theme.colors.background.accent,
-  color: theme.colors.background.accent,
+const SelectedConsequenceOverlay = styled(({ theme, locked }: any) => ({
+  backgroundColor: locked ? theme.colors.action.primary : hex2rgba(theme.colors.action.primary, 0.6),
+  color: theme.colors.action.primary,
   borderWidth: 0,
   borderRadius: 30,
   height: ITEM_HEIGHT + 1,
   position: 'absolute',
   top: ITEM_HEIGHT * 2,
   bottom: ITEM_HEIGHT * 2,
-  left: 0,
-  right: 0,
+  left: 4,
+  right: 4,
 }))(View);
 
-const ConsequenceButton = styled(({ theme, locked }: any) => ({
-  opacity: locked ? 0.6 : 1,
-  backgroundColor: theme.colors.action.tertiary,
-  borderColor: theme.colors.action.tertiary,
-  color: theme.colors.text.tertiary,
+const ConsequenceButton = styled(({ theme, disabled }: any) => ({
+  backgroundColor: disabled ? '#8D7484' : theme.colors.action.secondary,
+  borderColor: disabled ? '#8D7484' : theme.colors.action.secondary,
   borderWidth: 1,
   borderRadius: 30,
   height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
   position: 'absolute',
-  top: 5,
-  right: 4
+  right: 8,
+  top: ITEM_HEIGHT * 2 + 5,
+  bottom: ITEM_HEIGHT * 2 - 5,
 }))(Button);
 
 interface ConsequenceWheelProps {
@@ -140,27 +134,29 @@ interface ConsequenceWheelProps {
 
 function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWheelProps) {
   // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
-  const [data, setData] = React.useState([...items, ...items, ...items])
+  const [data, setData] = React.useState([...items, ...items, ...items, ...items, ...items])
+
+  const sizeOfBuffer = 2 * items.length
 
   const lockedIndex = locked ?
-    items.findIndex((item) => item.sys.id == locked) + items.length :
+    items.findIndex((item) => item.sys.id == locked) + sizeOfBuffer :
     null
 
   const onViewableItemsChanged = React.useCallback(debounce(_onViewableItemsChanged, 100), [items])
   const listRef = React.useRef<any>()
 
-  const [hoveredIndex, setHoveredIndex] = React.useState(lockedIndex || items.length + 2)  // initially [0, 1, 2, 3, 4] displayed
+  const [hoveredIndex, setHoveredIndex] = React.useState(lockedIndex || sizeOfBuffer + 2)  // initially [0, 1, 2, 3, 4] displayed
   const hoveredItem = data[hoveredIndex]
 
   return <BackgroundView>
     <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10, marginTop: 10}}>
-      <Button title="Spin the Wheel" type="tertiary"
+      <Button title="Spin the Wheel" type="secondary"
         style={{ width: '50%' }}
         disabled={locked}
         onPress={React.useCallback(() => {
           if(listRef?.current) {
             // Spin to a random one in the next group
-            const randomIdx = hoveredIndex + getRandomInt(items.length)
+            const randomIdx = hoveredIndex + getRandomInt(items.length) + (Math.round(items.length / 2))
             listRef.current.scrollToIndex({
               index: randomIdx
             })
@@ -168,14 +164,16 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
         }, [listRef?.current, hoveredIndex, items.length])} />
     </View>
 
-    <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20}}>
+    <View style={{height: ITEM_HEIGHT * 5, marginBottom: 20, display: 'flex', flexDirection: 'row'}}>
+      <SelectedConsequenceOverlay locked={locked} />
+
       <FlatList
         ref={listRef}
-        style={{height: ITEM_HEIGHT * 5}}
+        style={{height: ITEM_HEIGHT * 5 + 1, marginRight: 100}}
         data={data}
         renderItem={({item, index}) =>
-          <ConsequenceItem {...item} hovered={index == hoveredIndex} />}
-        initialScrollIndex={lockedIndex ? lockedIndex - 2 : items.length}
+          <ConsequenceItem {...item} locked={locked == item.sys.id} />}
+        initialScrollIndex={lockedIndex ? lockedIndex - 2 : sizeOfBuffer}
         initialNumToRender={items.length}
         scrollEnabled={!locked}
         removeClippedSubviews
@@ -189,29 +187,27 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
           }
         }, [])}
       />
-      <SelectedConsequenceOverlay>
-        {locked &&
-          <ConsequenceButton title="Locked" locked={true}
-            onPress={React.useCallback(() => {
-              onUnlock()
-            }, [onUnlock])} />}
 
-        {!locked &&
-          <ConsequenceButton title="Accept"
-            onPress={React.useCallback(() => {
-
-              onAccept(items[hoveredIndex % items.length]?.sys?.id)
-            }, [hoveredIndex, onAccept])} />}
-      </SelectedConsequenceOverlay>
+      <ConsequenceButton title={locked ? "Locked" : "Accept"} type="secondary" disabled={locked}
+        onPress={React.useCallback(() => {
+          console.log('Accept!!')
+          onAccept(items[hoveredIndex % items.length]?.sys?.id)
+        }, [hoveredIndex, onAccept])} />
     </View>
-    <View style={{marginLeft: 26, marginRight: 26}}>
+    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 20}}>
       {hoveredItem &&
         <HoveredItem item={hoveredItem} locked={!!locked} />}
+    </View>
+
+    <View style={{marginLeft: 26, marginRight: 26, marginBottom: 20}}>
+      {locked &&
+        <Button type="secondary" title="Consequence Complete!"
+          onPress={onUnlock} />}
     </View>
   </BackgroundView>
 
   function _onViewableItemsChanged({changed, viewableItems}: { changed: ViewToken[], viewableItems: ViewToken[] }) {
-    const middle = viewableItems[Math.round((viewableItems.length - 1) / 2)]
+    const middle = viewableItems[Math.floor((viewableItems.length - 1) / 2)]
     if (!middle || !middle.index) { return }
 
     if (middle.index < items.length) {
@@ -226,7 +222,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
     } else {
       setHoveredIndex(middle.index)
       setData((data) => {
-        if (middle.index! + items.length > data.length) {
+        if (middle.index! + sizeOfBuffer > data.length) {
           // We've scrolled pretty far forward, need to add more data
           return [...data, ...items]
         }
@@ -239,7 +235,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
 
 interface ConsequenceItemProps {
   title: string
-  hovered?: boolean
+  locked?: boolean
 }
 
 const ItemWrapper = styled(({ theme, hovered }: any) => ({
@@ -269,20 +265,26 @@ const ConsequenceWrapper = styled(({ theme }: any) => ({
   height: ITEM_HEIGHT,
 }))(View);
 
-const ConsequenceText = styled(({ theme, hovered }: any) => ({
-}))(H5);
+const ConsequenceText = styled(({ theme, locked }: any) => {
+  if (locked) {
+    return {
+      color: '#FFFFFF',
+    }
+  }
+
+  return {}
+})(H5);
 
 const Spacer = styled(({ theme }: any) => ({
   width: ITEM_HEIGHT / 2 // equal to ItemWrapper borderRadius
 }))(View);
 
-function ConsequenceItem({title, hovered}: ConsequenceItemProps) {
-  return <ItemWrapper hovered={hovered}>
+function ConsequenceItem({title, locked}: ConsequenceItemProps) {
+  return <ItemWrapper locked={locked}>
     <Spacer />
     <ConsequenceWrapper>
-      <ConsequenceText hovered={hovered}>{title}</ConsequenceText>
+      <ConsequenceText locked={locked}>{title}</ConsequenceText>
     </ConsequenceWrapper>
-    <Spacer style={{width: 100}} />
   </ItemWrapper>
 }
 
