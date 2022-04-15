@@ -178,6 +178,15 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
             listRef.current.scrollToIndex({
               index: randomIdx
             })
+
+            track({
+              eventName: 'Click',
+              properties: {
+                title: 'Spin the Wheel',
+                itemId: 'ConsequenceGenerator/Spin',
+                on: 'ConsequenceGenerator'
+              },
+            })
           }
         }, [listRef?.current, hoveredIndex, items.length])} />
     </View>
