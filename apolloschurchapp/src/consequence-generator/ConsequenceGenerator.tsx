@@ -207,7 +207,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
   </BackgroundView>
 
   function _onViewableItemsChanged({changed, viewableItems}: { changed: ViewToken[], viewableItems: ViewToken[] }) {
-    const middle = viewableItems[Math.round((viewableItems.length - 1) / 2)]
+    const middle = viewableItems[Math.floor((viewableItems.length - 1) / 2)]
     if (!middle || !middle.index) { return }
 
     if (middle.index < items.length) {
