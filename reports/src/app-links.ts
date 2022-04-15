@@ -54,7 +54,7 @@ export class AppLinks {
       { type: 'Tab', title: 'Tracks', link:  'clc://clc/app-link/Tracks' },
       { type: 'Tab', title: 'Connect', link:  'clc://clc/app-link/Connect' },
       { type: 'Tab', title: 'Staff Directory', link:  'clc://clc/app-link/StaffDirectory' },
-      { type: 'Tab', title: 'Settings', link:  'clc://clc/app-link/UserSettings' }
+      { type: 'Tab', title: 'Farkle Consequence Wheel', link:  'clc://clc/app-link/ConsequenceGenerator' }
     ]
     Tabs.forEach((t) => writerStream.write(t))
 

@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import URL from 'url';
-import querystring from 'querystring';
 import moment from 'moment';
 import {gql, useMutation} from '@apollo/client';
 
@@ -22,6 +20,7 @@ import { Caret } from '../ui/ScheduleItem';
 import { useQueryAutoRefresh } from '../client/hooks/useQueryAutoRefresh';
 import { present } from '../util';
 import { uniq } from 'lodash';
+import { navigateInApp } from '../util/navigation';
 
 export const GET_NOTIFICATION_HISTORY = gql`
   query getNotificationHistory {
@@ -227,7 +226,7 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
       if (/^http(s)?\:\/\//.test(item.url)) {
         Linking.openURL(item.url);
       } else {
-        navigateInApp(item.url)
+        navigateInApp(item.url, NavigationService)
       }
     }
   }
@@ -235,16 +234,4 @@ function NotificationListItem({item, loading, onPress}: NotificationListItemProp
 
 function byCompletedAtDesc(a: { completed_at: string }, b: { completed_at: string }): number {
   return Date.parse(b.completed_at) - Date.parse(a.completed_at)
-}
-
-function navigateInApp(rawUrl: string) {
-  // copied from packages/apollos-ui-notifications/src/Provider.js
-  const url = URL.parse(rawUrl);
-  const route = url.pathname!.substring(1);
-  const cleanedRoute = route.includes('/app-link/')
-    ? route
-    : route.split('app-link/')[1];
-  const args = querystring.parse(url.query || '');
-  console.log('Navigate to', cleanedRoute)
-  NavigationService.navigate(cleanedRoute, args);
 }
