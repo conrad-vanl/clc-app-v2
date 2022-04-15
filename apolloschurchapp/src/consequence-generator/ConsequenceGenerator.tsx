@@ -9,7 +9,7 @@ import {
   Button,
   ErrorCard
 } from '@apollosproject/ui-kit';
-import { TrackEventWhenLoaded } from '@apollosproject/ui-analytics';
+import { TrackEventWhenLoaded, useTrack } from '@apollosproject/ui-analytics';
 import { debounce } from 'lodash';
 import { hex2rgba } from '../util';
 
@@ -133,6 +133,8 @@ interface ConsequenceWheelProps {
 }
 
 function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWheelProps) {
+  const track = useTrack();
+
   // start with a duplicate set of the items that you can scroll up to, and another to scroll down to
   const [data, setData] = React.useState([...items, ...items, ...items, ...items, ...items])
 
@@ -148,6 +150,22 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
   const [hoveredIndex, setHoveredIndex] = React.useState(lockedIndex || sizeOfBuffer + 2)  // initially [0, 1, 2, 3, 4] displayed
   const hoveredItem = data[hoveredIndex]
 
+  const completeConsequence = React.useCallback(() => {
+    onUnlock()
+
+    if (!lockedIndex) { return }
+    const lockedItem = items[lockedIndex % items.length];
+    if (!lockedItem) { return }
+
+    track({
+      eventName: 'ConsequenceCompleted',
+      properties: {
+        title: lockedItem.title,
+        itemId: lockedItem.sys?.id,
+      }
+    })
+  }, [onUnlock, items, lockedIndex])
+
   return <BackgroundView>
     <View style={{marginLeft: 26, marginRight: 26, marginBottom: 10, marginTop: 10}}>
       <Button title="Spin the Wheel" type="secondary"
@@ -159,6 +177,15 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
             const randomIdx = hoveredIndex + getRandomInt(items.length) + (Math.round(items.length / 2))
             listRef.current.scrollToIndex({
               index: randomIdx
+            })
+
+            track({
+              eventName: 'Click',
+              properties: {
+                title: 'Spin the Wheel',
+                itemId: 'ConsequenceGenerator/Spin',
+                on: 'ConsequenceGenerator'
+              },
             })
           }
         }, [listRef?.current, hoveredIndex, items.length])} />
@@ -190,9 +217,18 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
 
       <ConsequenceButton title={locked ? "Locked" : "Accept"} type="secondary" disabled={locked}
         onPress={React.useCallback(() => {
-          console.log('Accept!!')
-          onAccept(items[hoveredIndex % items.length]?.sys?.id)
-        }, [hoveredIndex, onAccept])} />
+          const item = items[hoveredIndex % items.length]
+          if (!item) { return }
+          
+          track({
+            eventName: 'ConsequenceSelected',
+            properties: {
+              title: item.title,
+              itemId: item.sys?.id,
+            }
+          })
+          onAccept(item?.sys?.id)
+        }, [items, hoveredIndex, onAccept])} />
     </View>
     <View style={{marginLeft: 26, marginRight: 26, marginBottom: 20}}>
       {hoveredItem &&
@@ -202,7 +238,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
     <View style={{marginLeft: 26, marginRight: 26, marginBottom: 20}}>
       {locked &&
         <Button type="secondary" title="Consequence Complete!"
-          onPress={onUnlock} />}
+          onPress={completeConsequence} />}
     </View>
   </BackgroundView>
 
