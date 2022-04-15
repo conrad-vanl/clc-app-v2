@@ -169,7 +169,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
 
       <FlatList
         ref={listRef}
-        style={{height: ITEM_HEIGHT * 5, marginRight: 100}}
+        style={{height: ITEM_HEIGHT * 5 + 1, marginRight: 100}}
         data={data}
         renderItem={({item, index}) =>
           <ConsequenceItem {...item} locked={locked == item.sys.id} />}
