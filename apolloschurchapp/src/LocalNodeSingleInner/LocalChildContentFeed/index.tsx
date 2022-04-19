@@ -99,6 +99,7 @@ const HorizontalContentFeed = ({ contentId }: { contentId: string }) => {
             startTime={item.startTime}
             endTime={item.endTime}
             key={item.sys.id}
+            showTime={!typename.includes('Breakout')}
             onPress={() => handleOnPressItem(item)}
           />
         )}

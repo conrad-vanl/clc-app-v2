@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
+import formatInTimeZone from 'date-fns-tz/formatInTimeZone'
 import { View } from 'react-native';
 import {
   Cell,
@@ -58,7 +58,8 @@ export const Caret = styled(({ theme }) => ({
 
 const SecondaryText = styled({ opacity: 0.6 })(UIText);
 
-const formatTime = (time) => (time ? moment(time).format('h:mma') : null);
+const formatTime = (time) =>
+  time ? formatInTimeZone(time, 'America/Chicago', 'h:mmaaa') : null;
 
 const ScheduleItem = ({
   id,
@@ -69,12 +70,14 @@ const ScheduleItem = ({
   label = '',
   onPress,
   isLoading,
+  showTime,
   ...other
 }) => {
+  const expired = Date.parse(endTime) < Date.now();
   let cell = (
-    <ScheduleCell expired={moment(endTime) < new Date()} {...other}>
+    <ScheduleCell expired={expired} {...other}>
       <ScheduleCellRowPositioner>
-        {startTime || isLoading ? (
+        {showTime !== false && (startTime || isLoading) ? (
           <TimeContainer>
             <UIText isLoading={isLoading}>{formatTime(startTime)}</UIText>
             <SecondaryText isLoading={isLoading}>
@@ -86,7 +89,7 @@ const ScheduleItem = ({
           {label || isLoading ? (
             <LabelText
               isLoading={isLoading}
-              expired={moment(endTime) < new Date()}
+              expired={expired}
             >
               {label}
             </LabelText>
