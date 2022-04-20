@@ -10,12 +10,15 @@ Array [
         Object {
           "bottom": 0,
           "left": 0,
-          "overflow": "hidden",
           "position": "absolute",
           "right": 0,
           "top": 0,
         },
-        Object {},
+        Object {
+          "bottom": 0,
+          "overflow": "hidden",
+          "top": 0,
+        },
       ]
     }
   />,
@@ -328,12 +331,15 @@ Array [
         Object {
           "bottom": 0,
           "left": 0,
-          "overflow": "hidden",
           "position": "absolute",
           "right": 0,
           "top": 0,
         },
-        Object {},
+        Object {
+          "bottom": 0,
+          "overflow": "hidden",
+          "top": 0,
+        },
       ]
     }
   />,
@@ -446,12 +452,15 @@ Array [
         Object {
           "bottom": 0,
           "left": 0,
-          "overflow": "hidden",
           "position": "absolute",
           "right": 0,
           "top": 0,
         },
-        Object {},
+        Object {
+          "bottom": 0,
+          "overflow": "hidden",
+          "top": 0,
+        },
       ]
     }
   />,
@@ -564,12 +573,15 @@ Array [
         Object {
           "bottom": 0,
           "left": 0,
-          "overflow": "hidden",
           "position": "absolute",
           "right": 0,
           "top": 0,
         },
-        Object {},
+        Object {
+          "bottom": 0,
+          "overflow": "hidden",
+          "top": 0,
+        },
       ]
     }
   />,
@@ -682,12 +694,15 @@ Array [
         Object {
           "bottom": 0,
           "left": 0,
-          "overflow": "hidden",
           "position": "absolute",
           "right": 0,
           "top": 0,
         },
-        Object {},
+        Object {
+          "bottom": 0,
+          "overflow": "hidden",
+          "top": 0,
+        },
       ]
     }
   />,
@@ -803,12 +818,15 @@ Array [
         Object {
           "bottom": 0,
           "left": 0,
-          "overflow": "hidden",
           "position": "absolute",
           "right": 0,
           "top": 0,
         },
-        Object {},
+        Object {
+          "bottom": 0,
+          "overflow": "hidden",
+          "top": 0,
+        },
       ]
     }
   />,
