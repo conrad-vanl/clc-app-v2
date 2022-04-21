@@ -1,9 +1,8 @@
-import React, { PureComponent } from 'react';
+import React from 'react';
 import { gql, useQuery } from '@apollo/client';
 
-import { useNavigation } from '@react-navigation/native';
 import { Text, View } from 'react-native';
-import PropTypes from 'prop-types';
+import formatInTimeZone from 'date-fns-tz/formatInTimeZone';
 import moment from 'moment';
 import { get } from 'lodash';
 
@@ -52,11 +51,16 @@ const LocalTime = ({ contentId, condensed }: Props) => {
           <OpaqueIcon name="time" size={14} />
         )}
         <CellText isLoading={!get(data, 'local.entry.startTime') && loading}>
-          {moment(get(data, 'local.entry.startTime')).format(
-            condensed ? 'ddd h:mma' : 'dddd h:mma'
+          {formatInTimeZone(
+            get(data, 'local.entry.startTime'),
+              '-0500',
+              condensed ? 'eeee h:mmaaa' : 'eeee h:mmaaa'
           )}
           {' - '}
-          {moment(get(data, 'local.entry.endTime')).format('h:mma')}{' '}
+          {formatInTimeZone(
+              get(data, 'local.entry.endTime'),
+              '-0500',
+              'h:mmaaa')}{' '}
           {!condensed ? (
             <LightText>
               {moment(get(data, 'local.entry.startTime')).fromNow()}
