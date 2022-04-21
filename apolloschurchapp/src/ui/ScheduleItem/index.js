@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import formatInTimeZone from 'date-fns-tz/formatInTimeZone'
+import formatInTimeZone from 'date-fns-tz/formatInTimeZone';
 import { View } from 'react-native';
 import {
   Cell,
@@ -58,8 +58,10 @@ export const Caret = styled(({ theme }) => ({
 
 const SecondaryText = styled({ opacity: 0.6 })(UIText);
 
+// we have to use explicit offset here b/c of a bug in Hermes on Android.
+// Fixed in hermes 0.10
 const formatTime = (time) =>
-  time ? formatInTimeZone(time, 'America/Chicago', 'h:mmaaa') : null;
+  time ? formatInTimeZone(Date.parse(time), '-0500', 'h:mmaaa') : null;
 
 const ScheduleItem = ({
   id,
@@ -87,10 +89,7 @@ const ScheduleItem = ({
         ) : null}
         <EventInfo>
           {label || isLoading ? (
-            <LabelText
-              isLoading={isLoading}
-              expired={expired}
-            >
+            <LabelText isLoading={isLoading} expired={expired}>
               {label}
             </LabelText>
           ) : null}
