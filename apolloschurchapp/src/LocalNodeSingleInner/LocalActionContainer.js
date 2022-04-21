@@ -114,7 +114,7 @@ const LocalActionContianer = ({ contentId }) => {
     <BottomSheetModal
       ref={bottomSheetModalRef}
       index={0}
-      snapPoints={[90 + safeArea.bottom]}
+      snapPoints={['20%']}
       animateOnMount
       dismissOnPanDown={false}
       backgroundComponent={(bgProps) => <ModalBackgroundView {...bgProps} />} // eslint-disable-line react/jsx-props-no-spreading
