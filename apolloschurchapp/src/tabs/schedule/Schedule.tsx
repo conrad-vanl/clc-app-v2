@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import marked from 'marked';
 import { gql } from '@apollo/client';
 import { SectionList } from 'react-native';

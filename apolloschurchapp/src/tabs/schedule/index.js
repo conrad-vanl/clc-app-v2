@@ -2,20 +2,13 @@ import React from 'react';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { withTheme } from '@apollosproject/ui-kit';
 
-import tabBarIcon from '../tabBarIcon';
-
 import Schedule from './Schedule';
-
 
 const { Screen, Navigator } = createNativeStackNavigator();
 
-
 export const ScheduleNavigator = (props) => (
   <Navigator {...props}>
-    <Screen
-      component={Schedule}
-      name="Schedule"
-    />
+    <Screen component={Schedule} name="Schedule" />
   </Navigator>
 );
 
