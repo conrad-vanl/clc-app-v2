@@ -116,12 +116,17 @@ const ConsequenceButton = styled(({ theme, disabled }: any) => ({
   backgroundColor: disabled ? '#8D7484' : theme.colors.action.secondary,
   borderColor: disabled ? '#8D7484' : theme.colors.action.secondary,
   borderWidth: 1,
-  borderRadius: 30,
+  borderRadius: ITEM_HEIGHT,
+  padding: 0,
+  marginTop: 'auto',
+  marginBottom: 'auto',
+  marginRight: 8,
+  marginLeft: 8,
   height: ITEM_HEIGHT - 10, // 2 * margin + 2 * borderWidth of ItemWrapper
-  position: 'absolute',
-  right: 8,
-  top: ITEM_HEIGHT * 2 + 5,
-  bottom: ITEM_HEIGHT * 2 - 5,
+  position: 'relative'
+  // right: 8,
+  // top: ITEM_HEIGHT * 2 + 5,
+  // bottom: ITEM_HEIGHT * 2 - 5,
 }))(Button);
 
 interface ConsequenceWheelProps {
@@ -196,7 +201,7 @@ function ConsequenceWheel({ items, locked, onAccept, onUnlock }: ConsequenceWhee
 
       <FlatList
         ref={listRef}
-        style={{height: ITEM_HEIGHT * 5 + 1, marginRight: 100}}
+        style={{height: ITEM_HEIGHT * 5 + 1}}
         data={data}
         renderItem={({item, index}) =>
           <ConsequenceItem {...item} locked={locked == item.sys.id} />}
