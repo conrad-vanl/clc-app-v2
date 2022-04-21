@@ -107,14 +107,14 @@ const LocalActionContianer = ({ contentId }) => {
     () => {
       if (data?.node?.id) bottomSheetModalRef.current?.present();
     },
-    [data?.node?.id, bottomSheetModalRef]
+    [data?.node?.id, bottomSheetModalRef.current]
   );
 
   return (
     <BottomSheetModal
       ref={bottomSheetModalRef}
       index={0}
-      snapPoints={['20%']}
+      snapPoints={[120 + safeArea.bottom]}
       animateOnMount
       dismissOnPanDown={false}
       backgroundComponent={(bgProps) => <ModalBackgroundView {...bgProps} />} // eslint-disable-line react/jsx-props-no-spreading
