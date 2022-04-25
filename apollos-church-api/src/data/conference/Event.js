@@ -222,9 +222,11 @@ async function isLiked(
   { sessionId, dataSources: { UserLike, Cache } },
   { parentType }
 ) {
-  UserLike.setCacheHint({ maxAge: 0, scope: 'PRIVATE' });
   if (!sessionId) {
     return false;
+  }
+  if (UserLike && UserLike.setCacheHint) {
+    UserLike.setCacheHint({ maxAge: 0, scope: 'PRIVATE' });
   }
   const nodeId = createGlobalId(sys.id, parentType.name);
   const key = `/${sessionId}/${nodeId}/${parentType.name}`;
