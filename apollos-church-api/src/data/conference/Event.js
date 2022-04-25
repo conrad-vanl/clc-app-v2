@@ -78,7 +78,7 @@ export const schema = gql`
 
     capacity: Int 
     registered: Int 
-    isRegistered: Boolean @cacheControl(maxAge: 0)
+    isRegistered: Boolean @cacheControl(maxAge: 0, scope: PRIVATE)
   }
 `;
 
