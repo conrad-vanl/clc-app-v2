@@ -35,7 +35,9 @@ const Feed = () => {
   const track = useTrack();
 
   const client = useApolloClient();
-  const { data } = useQueryAutoRefresh(GET_FEED_FEED);
+  const { data } = useQueryAutoRefresh(GET_FEED_FEED, {
+    fetchPolicy: 'cache-and-network',
+  });
 
   return (
     <RockAuthedWebBrowser>
