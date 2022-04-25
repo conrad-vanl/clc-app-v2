@@ -35,16 +35,9 @@ const Feed = () => {
   const track = useTrack();
 
   const client = useApolloClient();
-  const { data, refetch: _refetch } = useQueryAutoRefresh(GET_FEED_FEED, {
+  const { data } = useQueryAutoRefresh(GET_FEED_FEED, {
     fetchPolicy: 'cache-and-network',
-    pollInterval: 30000,
-  });
-
-  const refetch = React.useCallback(() => debounce(_refetch, 1000), [_refetch]);
-  useFocusEffect(() => {
-    const timeout = setTimeout(() => refetch(), 100);
-
-    return () => clearTimeout(timeout);
+    pollInterval: undefined,
   });
 
   return (
