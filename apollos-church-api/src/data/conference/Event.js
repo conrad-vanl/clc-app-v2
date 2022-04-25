@@ -78,7 +78,7 @@ export const schema = gql`
 
     capacity: Int 
     registered: Int 
-    isRegistered: Boolean 
+    isRegistered: Boolean @cacheControl(maxAge: 0)
   }
 `;
 
@@ -224,9 +224,6 @@ async function isLiked(
 ) {
   if (!sessionId) {
     return false;
-  }
-  if (UserLike && UserLike.setCacheHint) {
-    UserLike.setCacheHint({ maxAge: 0, scope: 'PRIVATE' });
   }
   const nodeId = createGlobalId(sys.id, parentType.name);
   const key = `/${sessionId}/${nodeId}/${parentType.name}`;
