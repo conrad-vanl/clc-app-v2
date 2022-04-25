@@ -6,7 +6,7 @@ import { resyncContentful } from '../contentful';
 const useQueryAutoRefresh: typeof useQuery = (query, options) => {
   const data = useQuery(query, {
     fetchPolicy: 'cache-and-network',
-    pollInterval: 3000,
+    pollInterval: 10000,
     ...options,
   });
 
