@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Platform, View } from 'react-native';
-import { gql, useQuery, useMutation } from '@apollo/client';
+import { gql, useQuery, useMutation, MutationUpdaterFn, ApolloCache, FetchResult } from '@apollo/client';
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -10,8 +10,8 @@ import { useTrack } from '@apollosproject/ui-analytics';
 
 import { styled, ChannelLabel, H6, Button } from '@apollosproject/ui-kit';
 
-import { GET_FEED_FEED } from '../tabs/my-schedule/Feed';
 import RegisterButton from '../NodeSingleInner/RegisterButton';
+import { BottomSheetModalMethods } from '@gorhom/bottom-sheet/lib/typescript/types';
 
 const QUERY = gql`
   query getRegistrationStatusByContentfulId($contentfulId: ID!) {
@@ -27,68 +27,97 @@ const QUERY = gql`
 
 const REGISTER = gql`
   mutation register($nodeId: ID!) {
-    register(nodeId: $nodeId) {
+    node: register(nodeId: $nodeId) {
       id
-      isRegistered
+      title
       registered
+      capacity
+      isRegistered
     }
   }
 `;
 
 const UNREGISTER = gql`
   mutation unregister($nodeId: ID!) {
-    unregister(nodeId: $nodeId) {
+    node: unregister(nodeId: $nodeId) {
       id
-      isRegistered
+      title
       registered
+      capacity
+      isRegistered
     }
   }
 `;
 
-const ModalBackgroundView = styled(({ theme }) => ({
+interface Event {
+  id: string
+  title: string
+  registered?: number
+  capacity?: number
+  isRegistered?: boolean
+}
+
+interface QueryData {
+  node: Event
+}
+
+const ModalBackgroundView = styled(({ theme }: any) => ({
   borderTopLeftRadius: theme.sizing.baseUnit,
   borderTopRightRadius: theme.sizing.baseUnit,
   backgroundColor: theme.colors.background.paper,
   ...Platform.select({ ios: theme.shadows.default.ios }),
 }))(View);
 
-const CapacityRow = styled(({ theme }) => ({
+const CapacityRow = styled(({ theme }: any) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
   flex: 1,
 }))(View);
 
-const Container = styled(({ theme }) => ({
+const Container = styled(({ theme }: any) => ({
   paddingHorizontal: theme.sizing.baseUnit,
   paddingBottom: 20,
   flex: 1,
 }))(SafeAreaView);
 
-const LocalActionContianer = ({ contentId }) => {
+const LocalActionContianer = ({ contentId }: { contentId: string }) => {
   const safeArea = useSafeAreaInsets();
-  const bottomSheetModalRef = useRef();
+  const bottomSheetModalRef = useRef<BottomSheetModalMethods>();
   const track = useTrack();
 
   const variables = { contentfulId: contentId };
-  const { data, error, loading } = useQuery(QUERY, {
+  const { data, error, loading } = useQuery<QueryData>(QUERY, {
     fetchPolicy: 'cache-and-network',
     pollInterval: 3000,
     variables,
   });
-  const [register, { loading: loadingRegister }] = useMutation(REGISTER, {
-    refetchQueries: [{ query: QUERY, variables }, { query: GET_FEED_FEED }],
+
+  const updateLocalCache = React.useCallback((cache: ApolloCache<any>, { data }: FetchResult<QueryData>) => {
+      if (data) {
+        cache.writeQuery({
+          query: QUERY,
+          data
+        })
+      }
+    },
+    [contentId]
+  );
+  const [register, { loading: loadingRegister }] = useMutation<QueryData, { nodeId: string }>(REGISTER, {
+    update: updateLocalCache,
   });
-  const [unregister, { loading: loadingUnregister }] = useMutation(UNREGISTER, {
-    refetchQueries: [{ query: QUERY, variables }, { query: GET_FEED_FEED }],
+  const [unregister, { loading: loadingUnregister }] = useMutation<QueryData, { nodeId: string }>(UNREGISTER, {
+    update: updateLocalCache,
   });
 
   const isCapacityEvent = data?.node?.capacity && data?.node?.capacity > 0;
-  const capacityRemaining = data?.node?.capacity - data?.node?.registered;
+  const capacityRemaining = data?.node?.capacity ? data?.node?.capacity - (data?.node?.registered || 0) : undefined;
 
   const handleButtonPress = useCallback(
     () => {
       const nodeId = data?.node?.id;
+      if (!nodeId) { return }
+
       const variables = {
         nodeId,
       };
@@ -135,7 +164,7 @@ const LocalActionContianer = ({ contentId }) => {
               }
             />
           )}
-          {isCapacityEvent && capacityRemaining >= 0 ? (
+          {isCapacityEvent && capacityRemaining && capacityRemaining >= 0 ? (
             <H6>
               {capacityRemaining} {capacityRemaining === 1 ? 'spot' : 'spots'}{' '}
               left
