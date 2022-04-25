@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
-import debounce from 'lodash/debounce';
 import { gql, useApolloClient } from '@apollo/client';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { BackgroundView } from '@apollosproject/ui-kit';
 import {
