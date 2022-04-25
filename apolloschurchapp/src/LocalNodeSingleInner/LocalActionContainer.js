@@ -10,6 +10,7 @@ import { useTrack } from '@apollosproject/ui-analytics';
 
 import { styled, ChannelLabel, H6, Button } from '@apollosproject/ui-kit';
 
+import { GET_FEED_FEED } from '../tabs/my-schedule/Feed';
 import RegisterButton from '../NodeSingleInner/RegisterButton';
 
 const QUERY = gql`
@@ -69,13 +70,18 @@ const LocalActionContianer = ({ contentId }) => {
   const bottomSheetModalRef = useRef();
   const track = useTrack();
 
+  const variables = { contentfulId: contentId };
   const { data, error, loading } = useQuery(QUERY, {
     fetchPolicy: 'cache-and-network',
     pollInterval: 3000,
-    variables: { contentfulId: contentId },
+    variables,
   });
-  const [register, { loading: loadingRegister }] = useMutation(REGISTER);
-  const [unregister, { loading: loadingUnregister }] = useMutation(UNREGISTER);
+  const [register, { loading: loadingRegister }] = useMutation(REGISTER, {
+    refetchQueries: [{ query: QUERY, variables }, { query: GET_FEED_FEED }],
+  });
+  const [unregister, { loading: loadingUnregister }] = useMutation(UNREGISTER, {
+    refetchQueries: [{ query: QUERY, variables }, { query: GET_FEED_FEED }],
+  });
 
   const isCapacityEvent = data?.node?.capacity && data?.node?.capacity > 0;
   const capacityRemaining = data?.node?.capacity - data?.node?.registered;
@@ -140,7 +146,9 @@ const LocalActionContianer = ({ contentId }) => {
           isRegistered={!!data?.node?.isRegistered}
           isCapacityEvent={!!isCapacityEvent}
           capacityRemaining={capacityRemaining}
-          loading={loadingRegister || loadingUnregister}
+          loading={
+            (!data?.node?.id && !error) || loadingRegister || loadingUnregister
+          }
           onPress={handleButtonPress}
         />
       </Container>

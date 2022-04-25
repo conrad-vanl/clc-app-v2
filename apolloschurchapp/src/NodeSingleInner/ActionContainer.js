@@ -67,7 +67,7 @@ const ActionContianer = ({ contentId }) => {
   const safeArea = useSafeAreaInsets();
   const bottomSheetModalRef = useRef();
 
-  const { data } = useQuery(QUERY, {
+  const { data, error } = useQuery(QUERY, {
     fetchPolicy: 'cache-and-network',
     pollInterval: 3000,
     variables: { nodeId: contentId },
@@ -128,7 +128,9 @@ const ActionContianer = ({ contentId }) => {
           isRegistered={!!data?.node?.isRegistered}
           isCapacityEvent={!!isCapacityEvent}
           capacityRemaining={capacityRemaining}
-          loading={loadingRegister || loadingUnregister}
+          loading={
+            (!data?.node?.id && !error) || loadingRegister || loadingUnregister
+          }
           onPress={handleButtonPress}
         />
       </Container>

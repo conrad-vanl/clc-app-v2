@@ -1,6 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { gql, useApolloClient } from '@apollo/client';
 import { useNavigation } from '@react-navigation/native';
 
@@ -35,7 +34,10 @@ const Feed = () => {
   const track = useTrack();
 
   const client = useApolloClient();
-  const { data } = useQueryAutoRefresh(GET_FEED_FEED);
+  const { data } = useQueryAutoRefresh(GET_FEED_FEED, {
+    fetchPolicy: 'cache-and-network',
+    pollInterval: undefined,
+  });
 
   return (
     <RockAuthedWebBrowser>

@@ -44,7 +44,7 @@ const query = gql`
 
 const LocalMapView = ({ nodeId }) => {
   const { loading, data } = useQuery(query, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'no-cache',
     variables: { itemId: nodeId },
   });
   const location = data?.local?.location;
