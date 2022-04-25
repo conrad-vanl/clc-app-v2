@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
+import debounce from 'lodash/debounce';
 import { gql, useApolloClient } from '@apollo/client';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import { BackgroundView } from '@apollosproject/ui-kit';
 import {
@@ -35,8 +35,14 @@ const Feed = () => {
   const track = useTrack();
 
   const client = useApolloClient();
-  const { data } = useQueryAutoRefresh(GET_FEED_FEED, {
+  const { data, refetch: _refetch } = useQueryAutoRefresh(GET_FEED_FEED, {
     fetchPolicy: 'cache-and-network',
+    pollInterval: 30000,
+  });
+
+  const refetch = React.useCallback(() => debounce(_refetch, 1000), [_refetch]);
+  useFocusEffect(() => {
+    setTimeout(() => refetch(), 100);
   });
 
   return (

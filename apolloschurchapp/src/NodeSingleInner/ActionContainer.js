@@ -128,7 +128,7 @@ const ActionContianer = ({ contentId }) => {
           isRegistered={!!data?.node?.isRegistered}
           isCapacityEvent={!!isCapacityEvent}
           capacityRemaining={capacityRemaining}
-          loading={loadingRegister || loadingUnregister}
+          loading={(!data?.node?.id && !error) || loadingRegister || loadingUnregister}
           onPress={handleButtonPress}
         />
       </Container>
