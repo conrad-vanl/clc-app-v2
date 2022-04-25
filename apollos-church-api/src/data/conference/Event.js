@@ -222,6 +222,7 @@ async function isLiked(
   { sessionId, dataSources: { UserLike, Cache } },
   { parentType }
 ) {
+  UserLike.setCacheHint({ maxAge: 0, scope: 'PRIVATE' });
   if (!sessionId) {
     return false;
   }
