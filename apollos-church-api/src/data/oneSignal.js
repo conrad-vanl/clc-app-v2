@@ -31,7 +31,7 @@ export const resolver = {
   Query: {
     ...OneSignalOriginal.resolver.Query,
     oneSignalHistory: async (_query, args, { dataSources }) => {
-      const cacheKey = `oneSignalHistory/1`;
+      const cacheKey = `oneSignalHistory/2`;
       const cached = await dataSources.Cache.get({ key: cacheKey });
       if (cached !== undefined && cached !== null) {
         return cached;
@@ -64,6 +64,11 @@ export class dataSource extends OneSignalOriginal.dataSource {
     const data = await this.get(`notifications`, {
       app_id: ONE_SIGNAL.APP_ID,
     });
+
+    // hide notifications that havent been sent yet
+    data.notifications = data.notifications.filter((n) =>
+      present(n.completed_at)
+    );
 
     if (HIDE_NOTIFICATIONS_BEFORE) {
       data.notifications = data.notifications.filter(
