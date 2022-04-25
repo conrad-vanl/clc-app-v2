@@ -42,7 +42,9 @@ const Feed = () => {
 
   const refetch = React.useCallback(() => debounce(_refetch, 1000), [_refetch]);
   useFocusEffect(() => {
-    setTimeout(() => refetch(), 100);
+    const timeout = setTimeout(() => refetch(), 100);
+
+    return () => clearTimeout(timeout);
   });
 
   return (
