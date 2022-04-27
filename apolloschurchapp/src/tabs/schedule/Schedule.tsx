@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import marked from 'marked';
 import { gql } from '@apollo/client';
 import { SectionList } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import {
   BackgroundView,
   H4,
@@ -81,14 +81,51 @@ function byStartTime(a: { startTime: string }, b: { startTime: string }) {
 const HEADER_HEIGHT = 30
 const ITEM_HEIGHT = 80
 
-const Schedule = ({ navigation }: { navigation: any }) => {
+function renderSectionHeader({ section }: { section: { title: string } }) {
+  return <SectionHeader height={HEADER_HEIGHT}>
+      {section.title}
+    </SectionHeader>
+}
+
+function renderItem({ item }: { item: ScheduleItemData }) {
+  const track = useTrack();
+  const navigation = useNavigation()
+
+  return <ScheduleItem
+    key={item.sys.id}
+    height={ITEM_HEIGHT}
+    id={null}
+    isLoading={false}
+    onPress={() => {
+
+      if (track) {
+        track({
+          eventName: 'Click',
+          properties: {
+            title: item.title,
+            itemId: item.sys.id,
+            on: 'schedule'
+          }
+        })
+      }
+
+      navigation.navigate('LocalContentSingle', {
+        itemId: item.sys.id,
+      });
+    }}
+    {...item}
+    summary={item.description && marked(item.description, {renderer: renderPlain()} )}
+  />
+}
+
+const Schedule = () => {
   const isFocused = useIsFocused();
   const { loading, error, refetch, data } = useQueryAutoRefresh(getDays, {
     fetchPolicy: 'no-cache',
   });
   const days: Day[] | undefined = data?.local?.conference?.days?.items
 
-  const sections = useMemo(
+  const sections = React.useMemo(
     () =>
       (days || [])
         .slice()
@@ -100,135 +137,114 @@ const Schedule = ({ navigation }: { navigation: any }) => {
         })),
     [days]
   );
+  const itemIndexesWithOffsets = React.useMemo(() => buildItemOffsets(sections), [sections])
 
-  const renderItem = useMemo(
-    () => ({ item }: { item: ScheduleItemData }) => {
-      const track = useTrack();
-
-      return <ScheduleItem
-        height={ITEM_HEIGHT}
-        id={null}
-        isLoading={false}
-        onPress={() => {
-
-          if (track) {
-            track({
-              eventName: 'Click',
-              properties: {
-                title: item.title,
-                itemId: item.sys.id,
-                on: 'schedule'
-              }
-            })
-          }
-
-          navigation.navigate('LocalContentSingle', {
-            itemId: item.sys.id,
-          });
-        }}
-        {...item}
-        summary={item.description && marked(item.description, {renderer: renderPlain()} )}
-      />
-    },
-    []
-  );
-
-  const renderSectionHeader = useMemo(
-    () => ({ section }: { section: Day }) => (
-      <SectionHeader height={HEADER_HEIGHT}>
-        {section.title}
-      </SectionHeader>
-    ),
-    []
-  );
-
-  const sectionListRef = React.useRef<any>()
-  useEffect(() => {
-    if (!sectionListRef.current) { return }
-    if (loading) { return }
-    if (!isFocused) { return }
-    
+  const currentIndex = React.useMemo(() => {
+    if (!days || days.length == 0) {
+      return {
+        index: 0,
+      }
+    }
+    // "index" is zero-indexed, "sectionIndex" is one-indexed in flatList apparently.
+    // Don't ask me why.
+    let index = -1
     const now = new Date()
-    const tomorrowIndex = sections.findIndex((s) => new Date(s.date) > now)
-    // today is the day before tomorrow - unless we're on the last day
-    let todayIndex = tomorrowIndex < 0 ? sections.length - 1 : tomorrowIndex - 1;
-    if (todayIndex < 0) { return }
 
-    const nextItemIdx = sections[todayIndex].data.findIndex((item) => new Date(item.endTime) > now)
-    if (nextItemIdx < 0) {
-      // all events for today are done, go to tomorrow at index 0
-      return sectionListRef.current.scrollToLocation({
-        sectionIndex: tomorrowIndex,
-        itemIndex: 0
-      })
+    for(const day of days) {
+      for(const item of day.scheduleItem.items) {
+        index++
+
+        if (new Date(item.endTime) > now) {
+          return {
+            // stop on the item before this one
+            index: Math.max(index - 1, 0),
+          }
+        }
+      }
     }
 
-    const prevItemIdx = nextItemIdx - 1;
-    sectionListRef.current.scrollToLocation({
-      sectionIndex: todayIndex,
-      itemIndex: Math.max(prevItemIdx, 0)
-    })
-  }, [sectionListRef.current, loading, isFocused])
+    // end of the entire conference - start at the top
+    return {
+      index: 0,
+    }
+  }, [days])
+
+  const getItemLayout = React.useCallback((data, index) => {
+    let offset: { length: number; offset: number; index: number } | undefined =
+      itemIndexesWithOffsets[index]
+    if (!offset) {
+      // sometimes getItemLayout will be called with indexes that don't exist in our data...
+      if (index < 0) {
+        // don't add in any headers - just ITEM_HEIGHT
+        offset = {
+          length: ITEM_HEIGHT,
+          index,
+          offset: index * ITEM_HEIGHT
+        }
+      } else {
+        // the index is beyond the end of our list - add in all our headers
+        const headerOffset = (days?.length || 0) * HEADER_HEIGHT
+
+        offset = {
+          length: ITEM_HEIGHT,
+          index,
+          offset: headerOffset + (index * ITEM_HEIGHT)
+        }
+      }
+    }
+    return offset
+  }, [itemIndexesWithOffsets])
 
   return (
     <BackgroundView>
-      <SectionList
-        ref={sectionListRef}
-        refreshing={loading}
-        onRefresh={refetch}
-        style={{ flex: 1 }}
-        sections={sections}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        getItemLayout={useCallback((data, index) => {
-          const offset = calculateOffset(index)
-
-          return {
-            length: ITEM_HEIGHT,
-            offset,
-            index,
-          }
-        }, [])}
-      />
+      {itemIndexesWithOffsets.length > 0 &&
+        <SectionList
+          refreshing={loading}
+          initialScrollIndex={currentIndex.index}
+          onRefresh={refetch}
+          style={{ flex: 1 }}
+          sections={sections}
+          renderItem={renderItem}
+          renderSectionHeader={renderSectionHeader}
+          getItemLayout={getItemLayout}
+        />}
     </BackgroundView>
   );
-
-  /**
-   * SectionList flattens headers + items into a single list and gives you the
-   * index into that list - from that you have to add together ITEM_HEIGHT +
-   * HEADER_HEIGHT for each header you pass by or each item you pass by until
-   * you reach the offset.
-   */
-  function calculateOffset(index: number): number {
-    if (!sections || sections.length == 0) { return 0 }
-    const data = [...sections]
-  
-    let offset = 0
-    let day: { data: ScheduleItemData[] } | undefined
-    while(index > 0) {
-      if (!day) {
-        day = data.shift()
-        // out of data
-        if (!day) { return offset }
-  
-        // new day - add in header height
-        offset += HEADER_HEIGHT
-        index -= 1
-      }
-      const dayCount = day.data.length
-      if (index > dayCount) {
-        // skip the rest of this day
-        offset += (ITEM_HEIGHT * dayCount)
-        index -= dayCount
-        day = undefined
-      } else {
-        // skip to the right spot of today
-        offset += (ITEM_HEIGHT * index)
-        index = 0
-      }
-    }
-  
-    return offset
-  }
 };
 export default Schedule;
+
+/**
+ * SectionList flattens headers + items into a single list and gives you the
+ * index into that list - from that you have to add together ITEM_HEIGHT +
+ * HEADER_HEIGHT for each header you pass by or each item you pass by until
+ * you reach the offset.
+ */
+function buildItemOffsets(sections: { title: string; date: string; data: ScheduleItemData[]; }[]) {
+  const offsets: ScheduleItemWithOffset[] = []
+
+  let currentOffset = 0
+  for(const section of sections) {
+    currentOffset += HEADER_HEIGHT
+
+    for(const item of section.data) {
+      const toAdd = {
+        item,
+        index: offsets.length,
+        offset: currentOffset,
+        length: ITEM_HEIGHT
+      }
+      offsets.push(toAdd)
+      console.log('addItem', toAdd.index, toAdd.offset)
+      currentOffset += ITEM_HEIGHT
+    }
+  }
+
+  return offsets
+}
+
+interface ScheduleItemWithOffset {
+  item: ScheduleItemData
+  index: number
+  offset: number
+  length: number
+}
