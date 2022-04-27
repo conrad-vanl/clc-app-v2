@@ -828,7 +828,7 @@
 				);
 				INFOPLIST_FILE = CLC/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.04;
+				MARKETING_VERSION = 3.0.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
