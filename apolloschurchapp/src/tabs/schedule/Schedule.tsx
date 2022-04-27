@@ -249,7 +249,6 @@ function buildItemOffsets(sections: { title: string; date: string; data: Schedul
         length: ITEM_HEIGHT
       }
       offsets.push(toAdd)
-      console.log('addItem', toAdd.index, toAdd.offset)
       currentOffset += ITEM_HEIGHT
     }
   }
