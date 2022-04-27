@@ -143,6 +143,7 @@ const Schedule = () => {
     if (!days || days.length == 0) {
       return {
         index: 0,
+        offset: 0
       }
     }
     // "index" is zero-indexed, "sectionIndex" is one-indexed in flatList apparently.
@@ -155,9 +156,10 @@ const Schedule = () => {
         index++
 
         if (new Date(item.endTime) > now) {
+          // stop on the item before this one
+          index = Math.max(index - 1, 0)
           return {
-            // stop on the item before this one
-            index: Math.max(index - 1, 0),
+            ...itemIndexesWithOffsets[index],
           }
         }
       }
@@ -166,6 +168,7 @@ const Schedule = () => {
     // end of the entire conference - start at the top
     return {
       index: 0,
+      offset: 0
     }
   }, [days])
 
@@ -195,10 +198,22 @@ const Schedule = () => {
     return offset
   }, [itemIndexesWithOffsets])
 
+  // scrollTo on focus
+  const sectionListRef = React.useRef<SectionList<any, any>>()
+  React.useEffect(() => {
+    if (loading) { return }
+    if (!isFocused) { return }
+    const scrollView = sectionListRef.current?.getScrollResponder()
+    if (!scrollView) { return }
+
+    scrollView.scrollTo({ x: 0, y: currentIndex.offset, animated: true })
+  }, [loading, isFocused, currentIndex.offset, sectionListRef.current])
+
   return (
     <BackgroundView>
       {itemIndexesWithOffsets.length > 0 &&
         <SectionList
+          ref={sectionListRef}
           refreshing={loading}
           initialScrollIndex={currentIndex.index}
           onRefresh={refetch}
