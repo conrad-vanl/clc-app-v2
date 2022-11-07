@@ -9,5 +9,6 @@ module.exports = {
     'no-use-before-define': 'off',
     'consistent-return': 'off',
     eqeqeq: 'off',
+    'prettier/prettier': 'off',
   },
 };
