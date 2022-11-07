@@ -34,7 +34,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
 
-      - name: Publish Schema
-        run: npx apollo schema:publish --endpoint=${{ secrets.APP_DATA_URL }}
-        env:
-          ENGINE_API_KEY: ${{ secrets.ENGINE_API_KEY }}
+      # - name: Publish Schema
+      #   run: npx apollo schema:publish --endpoint=${{ secrets.APP_DATA_URL }}
+      #   env:
+      #     ENGINE_API_KEY: ${{ secrets.ENGINE_API_KEY }}
