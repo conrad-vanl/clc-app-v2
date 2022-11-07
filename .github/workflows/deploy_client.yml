@@ -5,7 +5,10 @@ on:
     branches: [master]
 
 jobs:
+  test:
+    uses: ./.github/workflows/ci.yml  # use the callable tests job to run tests
   ios:
+    needs: [test]  # require tests to pass before deploy runs
     defaults:
       run:
         working-directory: apolloschurchapp
@@ -18,9 +21,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
 
       - name: Install Yarn
         run: npm install -g yarn
@@ -76,9 +79,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 16
 
       - name: Install Yarn
         run: npm install -g yarn

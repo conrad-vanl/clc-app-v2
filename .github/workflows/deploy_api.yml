@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    uses: ./.github/workflows/ci.yml  # use the callable tests job to run tests
+  health:
+    uses: ./.github/workflows/ci.yml  # use the callable tests job to run tests
   api:
     runs-on: ubuntu-latest
+    needs: [test, health]  # require tests to pass before deploy runs
     steps:
       - uses: actions/checkout@v2
 
