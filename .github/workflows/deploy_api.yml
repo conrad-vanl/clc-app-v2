@@ -21,7 +21,7 @@ jobs:
           git commit -am "added yarn.lock"
 
       - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.5.6
+        uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
@@ -29,7 +29,7 @@ jobs:
           appdir: apollos-church-api
 
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
 
       - name: Publish Schema
         run: npx apollo schema:publish --endpoint=${{ secrets.APP_DATA_URL }}

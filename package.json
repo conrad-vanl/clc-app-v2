@@ -18,7 +18,9 @@
     "secrets": "./scripts/secrets.sh"
   },
   "private": true,
-  "node": ">=12.x.x",
+  "engines": {
+    "node": "16"
+  },
   "devDependencies": {
     "lerna": "^3.20.2",
     "chalk": "^4.0.0"

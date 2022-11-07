@@ -8,10 +8,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node 14.x.x
-      uses: actions/setup-node@v1
+    - name: Use Node 16
+      uses: actions/setup-node@v3
       with:
-        node-version: 14.x.x
+        node-version: 16
 
     - name: Install Yarn
       run: npm install -g yarn
@@ -27,10 +27,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node 14.x.x
-      uses: actions/setup-node@v1
+    - name: Use Node 16
+      uses: actions/setup-node@v3
       with:
-        node-version: 14.x.x
+        node-version: 16
 
     - name: Install Yarn
       run: npm install -g yarn
@@ -42,17 +42,17 @@ jobs:
       run: yarn test -- -- -- --forceExit
 
     - name: Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
 
   health:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node 14.x.x
-      uses: actions/setup-node@v1
+    - name: Use Node 16
+      uses: actions/setup-node@v3
       with:
-        node-version: 14.x.x
+        node-version: 16
 
     - name: Install Yarn
       run: npm install -g yarn
