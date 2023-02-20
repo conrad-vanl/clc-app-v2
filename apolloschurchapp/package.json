@@ -146,7 +146,7 @@
     "yup": "0.26.6"
   },
   "devDependencies": {
-    "@apollosproject/eslint-config": "^2.10.0",
+    "@apollosproject/eslint-config": "^3.6.0",
     "@babel/core": "^7.8.4",
     "@babel/preset-typescript": "^7.16.7",
     "@babel/runtime": "^7.8.4",
