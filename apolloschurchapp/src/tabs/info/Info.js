@@ -17,7 +17,7 @@ import { Caret } from '../../ui/ScheduleItem';
 import Maps from './LocalMaps';
 import Resources from './LocalResources';
 
-function Connect() {
+function Info() {
   const navigation = useNavigation()
 
   return (
@@ -30,4 +30,4 @@ function Connect() {
   );
 }
 
-export default Connect;
+export default Info;

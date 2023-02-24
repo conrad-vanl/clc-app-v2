@@ -9,7 +9,7 @@ import PersonalDetails from '../../user-settings/PersonalDetails';
 import ChangePassword from '../../user-settings/ChangePassword';
 import TestingControlPanel from '../../testing-control-panel';
 
-import Connect from './Connect';
+import Info from './Info';
 
 const { Screen, Navigator } = createNativeStackNavigator();
 
@@ -27,8 +27,8 @@ const SettingsButton = () => {
 const ConnectNavigator = (props) => (
   <Navigator {...props}>
     <Screen
-      component={Connect}
-      name="Connect"
+      component={Info}
+      name="Info"
       options={{ headerRight: SettingsButton }}
     />
     <Screen

@@ -52,7 +52,7 @@ export class AppLinks {
       { type: 'Tab', title: 'Schedule', link:  'clc://clc/app-link/Schedule' },
       { type: 'Tab', title: 'My CLC', link:  'clc://clc/app-link/My-CLC' },
       { type: 'Tab', title: 'Tracks', link:  'clc://clc/app-link/Tracks' },
-      { type: 'Tab', title: 'Connect', link:  'clc://clc/app-link/Connect' },
+      { type: 'Tab', title: 'Info', link:  'clc://clc/app-link/Info' },
       { type: 'Tab', title: 'Staff Directory', link:  'clc://clc/app-link/StaffDirectory' },
       { type: 'Tab', title: 'Farkle Consequence Wheel', link:  'clc://clc/app-link/ConsequenceGenerator' }
     ]
