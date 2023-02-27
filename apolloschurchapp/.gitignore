@@ -162,3 +162,5 @@ key.json
 # GraphQL info
 schema.graphql
 fragmentTypes.json
+
+vendor/bundle
