@@ -67,6 +67,8 @@ jobs:
 
       - name: Fastlane Deploy
         run: bundle exec fastlane ios deploy
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 
   android:
     needs: [test]  # require tests to pass before deploy runs
