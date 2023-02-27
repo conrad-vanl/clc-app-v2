@@ -270,6 +270,11 @@
   dependencies:
     graphql-tag "^2.10.0"
 
+"@apollosproject/eslint-config@^2.8.0":
+  version "2.47.9"
+  resolved "https://registry.yarnpkg.com/@apollosproject/eslint-config/-/eslint-config-2.47.9.tgz#6ae383f2e3f470400e1f64b1356f1e894f338650"
+  integrity sha512-Xpj+2TFKI4yL259lLYaBvPKx1y93hXwXfHPi4b7vK0TjOGX2pEANHDADstCdnxJWg8L+gpfygM38D4qSf1ti7w==
+
 "@apollosproject/eslint-config@^3.6.0":
   version "3.6.0"
   resolved "https://registry.yarnpkg.com/@apollosproject/eslint-config/-/eslint-config-3.6.0.tgz#a3962ae5c9f28b1771abd9690bf4d8a4ae73899c"
