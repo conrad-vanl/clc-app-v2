@@ -4,7 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { withTheme } from '@apollosproject/ui-kit';
 import { useTrack } from '@apollosproject/ui-analytics';
 
-import Connect from './connect';
+import Info from './info';
 import Home from './home';
 import Discover from './discover';
 import Schedule from './schedule';
@@ -92,16 +92,16 @@ const TabNavigator = (props) => {
         }}
       />
       <Screen
-        name="Connect"
-        component={Connect}
+        name="Info"
+        component={Info}
         options={{ tabBarIcon: tabBarIcon('profile') }}
         listeners={{
           focus: () => {
             track({
               eventName: 'View Content',
               properties: {
-                title: 'Connect',
-                id: 'connect',
+                title: 'Info',
+                id: 'info',
                 type: 'tab',
               },
             });
