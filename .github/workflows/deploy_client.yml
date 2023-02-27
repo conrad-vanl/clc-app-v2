@@ -61,7 +61,10 @@ jobs:
         run: git diff && [ -z "$(git status --porcelain)" ]
 
       - name: Fastlane Deploy
-        run: bundle exec fastlane ios deploy
+        run: |
+          mkdir -p ~/.ssh
+          echo "$MATCH_GIT_PRIVATE_KEY" > "~/.ssh/id_rsa"
+          MATCH_GIT_PRIVATE_KEY="~/.ssh/id_rsa" bundle exec fastlane ios deploy
         env:
           MATCH_GIT_PRIVATE_KEY: ${{ secrets.CLC_APP_V2_CERTIFICATES_DEPLOY_KEY }}
 
