@@ -60,13 +60,13 @@ jobs:
       - name: Ensure no changes to repo
         run: git diff && [ -z "$(git status --porcelain)" ]
 
+      - name: Add deploy key to SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.CLC_APP_V2_CERTIFICATES_DEPLOY_KEY }}
+
       - name: Fastlane Deploy
-        run: |
-          mkdir -p ~/.ssh
-          echo "$MATCH_GIT_PRIVATE_KEY" > "~/.ssh/id_rsa"
-          MATCH_GIT_PRIVATE_KEY="~/.ssh/id_rsa" bundle exec fastlane ios deploy
-        env:
-          MATCH_GIT_PRIVATE_KEY: ${{ secrets.CLC_APP_V2_CERTIFICATES_DEPLOY_KEY }}
+        run: bundle exec fastlane ios deploy
 
   android:
     needs: [test]  # require tests to pass before deploy runs
