@@ -63,8 +63,7 @@ jobs:
       - name: Fastlane Deploy
         run: bundle exec fastlane ios deploy
         env:
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_PRIVATE_KEY: ${{ secrets.CLC_APP_V2_CERTIFICATES_DEPLOY_KEY }}
 
   android:
     needs: [test]  # require tests to pass before deploy runs
