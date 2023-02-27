@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import AsyncStorage from '@react-native-community/async-storage';
-import { schema as mediaPlayerSchema } from '@apollosproject/ui-media-player';
+
 import { updatePushId } from '@apollosproject/ui-notifications';
 import CACHE_LOADED from '../client/getCacheLoaded'; // eslint-disable-line
 import { present } from '../util';
@@ -33,7 +33,6 @@ export const schema = `
   extend type Local_ConsequenceCollection {
     chosen: String!
   }
-${mediaPlayerSchema || ''}
 `;
 
 export const defaults = {
