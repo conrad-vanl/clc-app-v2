@@ -1,0 +1,28 @@
+{
+  "name": "@apollosproject/ui-media-player",
+  "description": "An opinionated media player for react-native apps from The Apollos Project",
+  "main": "lib/commonjs/index",
+  "module": "lib/module/index",
+  "types": "lib/typescript/src/index.d.ts",
+  "react-native": "src/index",
+  "source": "src/index",
+  "repository": "git://github.com/apollosproject/apollos-apps.git",
+  "engines": {
+    "node": ">=14"
+  },
+  "version": "4.2.0",
+  "files": [
+    "src"
+  ],
+  "author": "The Apollos Project <contact@apollos.app> (https://apollos.app)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/apollosproject/apollos-apps/issues"
+  },
+  "homepage": "https://github.com/apollosproject/apollos-apps#readme",
+
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  }
+}
