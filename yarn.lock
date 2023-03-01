@@ -2820,11 +2820,6 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@metarouter/analytics-react-native@^1.1.5":
-  version "1.1.5"
-  resolved "https://registry.npmjs.org/@metarouter/analytics-react-native/-/analytics-react-native-1.1.5.tgz"
-  integrity sha512-xEyazUyK/Dm7jthSRms/CGWJ5RGmYfyBLT93Uv4snb78xVgsBLF7I6pp4fa5j6Eo/LBWFMtp59k1CObCwt9ySQ==
-
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.npmjs.org/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz"
