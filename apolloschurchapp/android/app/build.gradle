@@ -5,6 +5,9 @@ buildscript {
     dependencies {
         classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.10.0, 0.99.99]'
     }
+    ext {
+        kotlinVersion = "1.6.0"
+    }
 }
 
 apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
