@@ -4,7 +4,7 @@ import moment from 'moment';
 
 import ContentfulDataSource from './ContentfulDataSource';
 
-const CONFERENCE_CODE = 'CLC2022'; // todo: move into .env
+const CONFERENCE_CODE = 'CLC2023'; // todo: move into .env
 const enforceProtocol = (uri) => (uri.startsWith('//') ? `https:${uri}` : uri);
 
 export class dataSource extends ContentfulDataSource {
